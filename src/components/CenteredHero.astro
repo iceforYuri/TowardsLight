@@ -14,7 +14,7 @@ const hero = site.homeHero;
 <section class="hero">
   {
     hero.background && (
-      <div class="hero-backdrop" aria-hidden="true">
+      <div class="hero-backdrop" aria-hidden="true" transition:name="stage-media">
         <img
           src={hero.background}
           alt=""
@@ -33,15 +33,17 @@ const hero = site.homeHero;
     <div class="hero-status">
       <CurrentStatus />
     </div>
-    <h1 class="hero-title font-display">{hero.greeting}</h1>
-    <p class="hero-tagline">{hero.tagline}</p>
-    <p class="hero-intro">{hero.intro}</p>
-    <div class="hero-meta font-mono">
-      <span>{postCount} 篇文章</span>
-      {latestDate && <span class="meta-sep" aria-hidden="true">/</span>}
-      {latestDate && <span>最近更新 {latestDate}</span>}
-      <span class="meta-sep" aria-hidden="true">/</span>
-      <span>{site.stack.slice(0, 3).join(' · ')}</span>
+    <h1 class="hero-title font-display" transition:name="page-title">{hero.greeting}</h1>
+    <div class="hero-body" transition:name="hero-body">
+      <p class="hero-tagline">{hero.tagline}</p>
+      <p class="hero-intro">{hero.intro}</p>
+      <div class="hero-meta font-mono">
+        <span>{postCount} 篇文章</span>
+        {latestDate && <span class="meta-sep" aria-hidden="true">/</span>}
+        {latestDate && <span>最近更新 {latestDate}</span>}
+        <span class="meta-sep" aria-hidden="true">/</span>
+        <span>{site.stack.slice(0, 3).join(' · ')}</span>
+      </div>
     </div>
   </div>
 </section>
@@ -98,6 +100,12 @@ const hero = site.homeHero;
     flex-direction: column;
     align-items: center;
     text-align: center;
+  }
+
+  .hero-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .hero-status {

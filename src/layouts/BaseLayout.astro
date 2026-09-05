@@ -56,7 +56,7 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
 
     <!-- View Transitions 软导航时,把当前主题带到新文档,防止换回亮色 -->
     <script>
-      // 记录导航方向与是否涉及首页,供转场动画选择策略
+      // 记录导航方向与是否涉及首页(首页的标题用淡入淡出,不做滚换)
       document.addEventListener('astro:before-preparation', (e) => {
         const ev = e as unknown as { direction?: string; from?: URL; to?: URL };
         const html = document.documentElement;

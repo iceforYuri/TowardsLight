@@ -5,15 +5,9 @@ interface Props {
 }
 
 const { overlap = 'hero', class: className = '' } = Astro.props;
-
-// 首页的转场是整页淡入淡出,不参与卡片位移动画
-const isHome = Astro.url.pathname === '/';
 ---
 
-<div
-  class:list={['main-card', `overlap-${overlap}`, className]}
-  style={isHome ? undefined : 'view-transition-name: main-card;'}
->
+<div class:list={['main-card', `overlap-${overlap}`, className]} transition:name="main-card">
   <slot />
 </div>
 

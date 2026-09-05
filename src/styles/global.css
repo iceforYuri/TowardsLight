@@ -218,22 +218,40 @@ button {
   animation: none;
 }
 
-/* 首页进出:整页柔和淡入淡出,不做分层位移 */
-html[data-soft-fade='true'] ::view-transition-old(root) {
-  animation: root-fade-out 0.22s ease both;
+/* 图层堆叠:标题最上,卡片压住背景,背景最底
+   (不设置时,进入文章页封面可能盖住滑入的卡片) */
+::view-transition-group(stage-media) {
+  z-index: 1;
 }
 
-html[data-soft-fade='true'] ::view-transition-new(root) {
-  animation: root-fade-in 0.28s ease both;
+::view-transition-group(hero-body) {
+  z-index: 2;
 }
 
-@keyframes root-fade-out {
+::view-transition-group(main-card) {
+  z-index: 3;
+}
+
+::view-transition-group(page-title) {
+  z-index: 4;
+}
+
+/* 首页相关切换:标题只做淡入淡出,不做滚换 */
+html[data-soft-fade='true'] ::view-transition-old(page-title) {
+  animation: title-fade-out 0.2s ease both;
+}
+
+html[data-soft-fade='true'] ::view-transition-new(page-title) {
+  animation: title-fade-in 0.28s ease 0.05s both;
+}
+
+@keyframes title-fade-out {
   to {
     opacity: 0;
   }
 }
 
-@keyframes root-fade-in {
+@keyframes title-fade-in {
   from {
     opacity: 0;
   }
