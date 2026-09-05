@@ -14,6 +14,7 @@
   margin-top: 1.4em;
 }
 
+.prose h1,
 .prose h2,
 .prose h3,
 .prose h4 {
@@ -24,6 +25,8 @@
   scroll-margin-top: calc(var(--nav-height) + 48px);
 }
 
+/* 正文中的 h1 与 h2 同级对待 */
+.prose h1,
 .prose h2 {
   font-size: 1.55em;
   margin-top: 2.4em;
@@ -119,7 +122,8 @@
 }
 
 .prose pre.astro-code {
-  background-color: var(--shiki-light-bg);
+  /* 亮主题:用表面色与卡片形成微差,不与卡片同色 */
+  background-color: var(--color-surface-raised);
 }
 
 html[data-theme='dark'] .prose pre.astro-code {

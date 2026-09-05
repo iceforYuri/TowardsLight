@@ -8,7 +8,8 @@ interface Props {
 }
 
 const { headings, variant } = Astro.props;
-const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+// 正文里 h1–h3 都进目录,h1 与 h2 同级展示
+const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 3);
 ---
 
 {
@@ -45,12 +46,16 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
       <ul>
         {toc.map((h) => (
           <li class:list={[{ 'depth-3': h.depth === 3 }]}>
-            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug} title={h.text}>
               {h.text}
             </a>
           </li>
         ))}
       </ul>
+      <p class="toc-percent font-mono" data-toc-percent aria-hidden="true" />
+      <span class="toc-rail" aria-hidden="true">
+        <span class="toc-rail-fill" data-toc-rail />
+      </span>
     </nav>
   )
 }
@@ -58,8 +63,8 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
 <style>
   .toc-desktop {
     position: sticky;
-    top: 120px;
-    max-height: calc(100vh - 160px);
+    top: 96px;
+    max-height: calc(100svh - 140px);
     overflow-y: auto;
     padding-left: 18px;
     border-left: 1px solid var(--color-border);
@@ -113,6 +118,38 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
     width: 2px;
     border-radius: 2px;
     background: var(--color-accent);
+  }
+
+  /* 阅读进度轨道:沿目录左缘生长 */
+  .toc-rail {
+    position: absolute;
+    left: -1px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    pointer-events: none;
+  }
+
+  .toc-rail-fill {
+    display: block;
+    width: 100%;
+    height: 0%;
+    border-radius: 2px;
+    background: var(--color-accent);
+    opacity: 0.45;
+    transition: height 0.1s linear;
+  }
+
+  .toc-percent {
+    margin-top: 14px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+    opacity: 0.8;
+  }
+
+  .toc-percent:empty {
+    display: none;
   }
 
   .toc-desktop .depth-3 {
@@ -197,7 +234,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
       );
     }
 
-    // 桌面目录:滚动高亮当前小节
+    // 桌面目录:滚动高亮当前小节(h1–h3)
     const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
     if (links.length === 0) return;
     const map = new Map<string, HTMLAnchorElement>();
@@ -211,9 +248,62 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
           }
         }
       },
-      { rootMargin: '-80px 0px -70% 0px' },
+      { rootMargin: '-96px 0px -65% 0px' },
     );
-    document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach((h) => observer.observe(h));
+    document
+      .querySelectorAll('.prose h1[id], .prose h2[id], .prose h3[id]')
+      .forEach((h) => observer.observe(h));
+
+    // 目录初始位置与正文第一个小节的顶部对齐
+    const aside = document.querySelector<HTMLElement>('.article-aside');
+    const firstHeading = document.querySelector('.prose h1[id], .prose h2[id]');
+    if (aside && firstHeading) {
+      const align = () => {
+        if (!window.matchMedia('(min-width: 1280px)').matches) {
+          aside.style.paddingTop = '';
+          return;
+        }
+        aside.style.paddingTop = '0px';
+        const delta = firstHeading.getBoundingClientRect().top - aside.getBoundingClientRect().top;
+        aside.style.paddingTop = `${Math.max(0, Math.round(delta))}px`;
+      };
+      align();
+      document.fonts?.ready.then(align);
+      window.addEventListener('resize', align);
+      document.addEventListener(
+        'astro:before-swap',
+        () => window.removeEventListener('resize', align),
+        { once: true },
+      );
+    }
+
+    // 进度轨道 + 百分比
+    const rail = document.querySelector<HTMLElement>('[data-toc-rail]');
+    const percent = document.querySelector<HTMLElement>('[data-toc-percent]');
+    if (rail || percent) {
+      let ticking = false;
+      const update = () => {
+        const doc = document.documentElement;
+        const total = doc.scrollHeight - doc.clientHeight;
+        const p = total > 0 ? Math.min(1, doc.scrollTop / total) : 0;
+        if (rail) rail.style.height = `${(p * 100).toFixed(1)}%`;
+        if (percent) percent.textContent = `${Math.round(p * 100)}%`;
+        ticking = false;
+      };
+      const onScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(update);
+          ticking = true;
+        }
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+      update();
+      document.addEventListener(
+        'astro:before-swap',
+        () => window.removeEventListener('scroll', onScroll),
+        { once: true },
+      );
+    }
   }
   document.addEventListener('astro:page-load', initToc);
 </script>
