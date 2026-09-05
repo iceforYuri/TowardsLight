@@ -89,7 +89,8 @@ const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
   .intro-avatar {
     width: 64px;
     height: 64px;
-    border-radius: 50%;
+    /* 圆角方形,与卡片同一圆角语言 */
+    border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     flex-shrink: 0;
     /* 任意比例的原图都居中裁切成正方形,不变形 */
