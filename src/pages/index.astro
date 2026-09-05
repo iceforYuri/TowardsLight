@@ -4,7 +4,7 @@ import CenteredHero from '../components/CenteredHero.astro';
 import FloatingMainCard from '../components/FloatingMainCard.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import PostList from '../components/PostList.astro';
-import StackStatus from '../components/StackStatus.astro';
+import FlipRow from '../components/FlipRow.astro';
 import TechLinkCard from '../components/TechLinkCard.astro';
 import Icon from '../components/Icon.astro';
 import { getAllPosts, formatDate } from '../utils/posts';
@@ -35,7 +35,7 @@ const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
         <div class="intro-body">
           <p class="intro-name font-display">{site.author}</p>
           <p class="intro-bio">{site.bio}</p>
-          <StackStatus />
+          <FlipRow />
         </div>
       </section>
 
@@ -110,7 +110,6 @@ const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
     font-size: 15px;
     line-height: 1.8;
     color: var(--color-muted);
-    max-width: 640px;
   }
 
   .home-divider {

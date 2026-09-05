@@ -1,0 +1,264 @@
+---
+/**
+ * 首页介绍区翻牌栏:两套内容在同一行定时垂直滚换。
+ * - 悬停 / 键盘聚焦时暂停
+ * - 指示点可手动切换
+ * - prefers-reduced-motion 时固定显示第一栏
+ */
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+
+const { panels, interval } = site.flipRow;
+---
+
+<div class="flip-row" data-flip-row data-interval={interval}>
+  <div class="flip-viewport">
+    {
+      panels.map((panel, i) => (
+        <div class="flip-panel" data-flip-panel data-active={i === 0 ? 'true' : 'false'}>
+          <span class="panel-label font-mono">{panel.label}</span>
+          <ul>
+            {panel.items.map((item) => (
+              <li>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    class="panel-chip"
+                    {...(item.href.startsWith('http')
+                      ? { target: '_blank', rel: 'noopener noreferrer' }
+                      : {})}
+                  >
+                    {item.icon && <Icon name={item.icon} size={13} />}
+                    <span>{item.text}</span>
+                    {item.href.startsWith('http') && (
+                      <Icon name="arrow-up-right" size={11} class="chip-external" />
+                    )}
+                  </a>
+                ) : item.icon ? (
+                  <span class="panel-chip is-plain">
+                    <Icon name={item.icon} size={13} />
+                    <span>{item.text}</span>
+                  </span>
+                ) : (
+                  <span class="panel-chip is-plain">{item.text}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="flip-dots" role="group" aria-label="切换内容栏">
+    {
+      panels.map((panel, i) => (
+        <button
+          type="button"
+          class="flip-dot"
+          data-flip-dot={i}
+          aria-pressed={i === 0 ? 'true' : 'false'}
+          aria-label={`显示${panel.label}`}
+          title={panel.label}
+        />
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .flip-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .flip-viewport {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    /* 栏高固定,两套内容在同一位置滚换 */
+    height: 36px;
+    overflow: hidden;
+  }
+
+  .flip-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition:
+      transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+      opacity 0.3s ease;
+  }
+
+  .flip-panel[data-active='false'] {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .flip-panel[data-active='true'] {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .flip-panel.leaving {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  .panel-label {
+    flex-shrink: 0;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+
+  .flip-panel ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    overflow: hidden;
+    max-height: 36px;
+  }
+
+  .panel-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    font-family: var(--font-ui);
+    font-size: 12.5px;
+    color: var(--color-text);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    white-space: nowrap;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  a.panel-chip:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent-text);
+  }
+
+  .panel-chip.is-plain {
+    cursor: default;
+  }
+
+  :global(.chip-external) {
+    opacity: 0.5;
+  }
+
+  .flip-dots {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .flip-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-border);
+    padding: 0;
+    transition:
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .flip-dot:hover {
+    background: var(--color-muted);
+  }
+
+  .flip-dot[aria-pressed='true'] {
+    background: var(--color-accent);
+    transform: scale(1.25);
+  }
+
+  /* 尊重减少动态偏好:固定第一栏 */
+  @media (prefers-reduced-motion: reduce) {
+    .flip-panel {
+      transition: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .flip-viewport {
+      height: auto;
+      min-height: 36px;
+    }
+
+    .flip-panel {
+      position: static;
+      display: none;
+    }
+
+    .flip-panel[data-active='true'] {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
+</style>
+
+<script>
+  function initFlipRow() {
+    document.querySelectorAll<HTMLElement>('[data-flip-row]').forEach((root) => {
+      const panels = [...root.querySelectorAll<HTMLElement>('[data-flip-panel]')];
+      const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-flip-dot]')];
+      if (panels.length < 2) return;
+
+      const interval = Number(root.dataset.interval) || 5000;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let current = 0;
+      let timer: number | undefined;
+
+      const show = (next: number) => {
+        if (next === current) return;
+        const oldPanel = panels[current];
+        const newPanel = panels[next];
+        oldPanel.classList.add('leaving');
+        oldPanel.dataset.active = 'false';
+        setTimeout(() => oldPanel.classList.remove('leaving'), 450);
+        newPanel.dataset.active = 'true';
+        dots.forEach((d, i) => d.setAttribute('aria-pressed', String(i === next)));
+        current = next;
+      };
+
+      const start = () => {
+        if (reduced) return;
+        stop();
+        timer = window.setInterval(() => show((current + 1) % panels.length), interval);
+      };
+
+      const stop = () => {
+        if (timer) window.clearInterval(timer);
+        timer = undefined;
+      };
+
+      // 悬停或聚焦时暂停,不翻走正在看的内容
+      root.addEventListener('mouseenter', stop);
+      root.addEventListener('mouseleave', start);
+      root.addEventListener('focusin', stop);
+      root.addEventListener('focusout', start);
+
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+          show(i);
+          stop();
+          start();
+        });
+      });
+
+      start();
+
+      document.addEventListener('astro:before-swap', stop, { once: true });
+    });
+  }
+  document.addEventListener('astro:page-load', initFlipRow);
+</script>

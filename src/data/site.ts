@@ -1,3 +1,14 @@
+export interface FlipItem {
+  icon: string;
+  text: string;
+  href?: string;
+}
+
+export interface FlipPanel {
+  label: string;
+  items: FlipItem[];
+}
+
 export const site = {
   siteName: '拾光集',
   siteNameEn: 'SHIGUANG',
@@ -36,6 +47,31 @@ export const site = {
     text: '正在把这个博客迁到 Astro',
   },
   stack: ['Astro', 'TypeScript', 'Node.js', 'SQLite', 'Tailwind-free CSS'],
+  /** 首页介绍区底部的翻牌栏:两套内容定时滚换 */
+  flipRow: {
+    interval: 5000,
+    panels: [
+      {
+        label: '技术栈',
+        items: [
+          { icon: '', text: 'Astro' },
+          { icon: '', text: 'TypeScript' },
+          { icon: '', text: 'Node.js' },
+          { icon: '', text: 'SQLite' },
+          { icon: '', text: 'Tailwind-free CSS' },
+        ],
+      },
+      {
+        label: '联系方式',
+        items: [
+          { icon: 'github', text: 'github.com/chenshiguang', href: 'https://github.com' },
+          { icon: 'mail', text: 'hi@example.com', href: 'mailto:hi@example.com' },
+          { icon: 'map-pin', text: '杭州' },
+          { icon: 'rss', text: 'RSS 订阅', href: '/rss.xml' },
+        ],
+      },
+    ] as FlipPanel[],
+  },
 } as const;
 
 export type SiteConfig = typeof site;
