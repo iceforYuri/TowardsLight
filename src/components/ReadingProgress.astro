@@ -1,0 +1,52 @@
+<div class="reading-progress" aria-hidden="true">
+  <div class="progress-bar" data-progress-bar></div>
+</div>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2.5px;
+    z-index: 150;
+    background: transparent;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--color-accent);
+    border-radius: 0 2px 2px 0;
+    transition: width 0.1s linear;
+  }
+</style>
+
+<script>
+  function initProgress() {
+    const bar = document.querySelector<HTMLElement>('[data-progress-bar]');
+    if (!bar) return;
+    let ticking = false;
+    const update = () => {
+      const doc = document.documentElement;
+      const total = doc.scrollHeight - doc.clientHeight;
+      const pct = total > 0 ? Math.min(100, (doc.scrollTop / total) * 100) : 0;
+      bar.style.width = `${pct}%`;
+      ticking = false;
+    };
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    update();
+    document.addEventListener(
+      'astro:before-swap',
+      () => window.removeEventListener('scroll', onScroll),
+      { once: true },
+    );
+  }
+  document.addEventListener('astro:page-load', initProgress);
+</script>

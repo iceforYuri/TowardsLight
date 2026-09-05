@@ -1,0 +1,45 @@
+---
+import PostList from './PostList.astro';
+import type { Post } from '../utils/posts';
+
+interface Props {
+  year: number;
+  posts: Post[];
+}
+
+const { year, posts } = Astro.props;
+---
+
+<section class="archive-group">
+  <h2 class="archive-year font-display">
+    {year}
+    <span class="year-count font-mono">{posts.length}</span>
+  </h2>
+  <PostList posts={posts} showUpdated showDescription={false} />
+</section>
+
+<style>
+  .archive-group {
+    padding-block: 8px;
+  }
+
+  .archive-group + .archive-group {
+    margin-top: 24px;
+  }
+
+  .archive-year {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 26px;
+    color: var(--color-text);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .year-count {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+</style>

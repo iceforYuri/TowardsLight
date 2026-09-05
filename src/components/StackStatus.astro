@@ -1,0 +1,49 @@
+---
+import { site } from '../data/site';
+---
+
+<div class="stack-status" aria-label="当前技术栈">
+  <span class="stack-label font-mono">STACK</span>
+  <ul class="stack-list">
+    {site.stack.map((item) => <li class="stack-item font-mono">{item}</li>)}
+  </ul>
+</div>
+
+<style>
+  .stack-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+  }
+
+  .stack-label {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--color-muted);
+  }
+
+  .stack-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+  }
+
+  .stack-item {
+    font-size: 12px;
+    padding: 4px 11px;
+    color: var(--color-text);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    transition:
+      border-color 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .stack-item:hover {
+    border-color: var(--color-contrast);
+    color: var(--color-contrast);
+  }
+</style>

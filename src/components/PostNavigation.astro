@@ -1,0 +1,111 @@
+---
+import Icon from './Icon.astro';
+import { formatDate, type Post } from '../utils/posts';
+
+interface Props {
+  prev?: Post;
+  next?: Post;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav class="post-nav" aria-label="上一篇 / 下一篇">
+      {prev ? (
+        <a href={`/posts/${prev.id}`} class="nav-card prev">
+          <span class="nav-label font-mono">
+            <Icon name="arrow-left" size={13} /> 上一篇
+          </span>
+          <span class="nav-title font-display">{prev.data.title}</span>
+          <span class="nav-date font-mono">{formatDate(prev.data.pubDate)}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next ? (
+        <a href={`/posts/${next.id}`} class="nav-card next">
+          <span class="nav-label font-mono">
+            下一篇 <Icon name="arrow-right" size={13} />
+          </span>
+          <span class="nav-title font-display">{next.data.title}</span>
+          <span class="nav-date font-mono">{formatDate(next.data.pubDate)}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 56px;
+  }
+
+  .nav-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    transition:
+      border-color 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .nav-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    color: var(--color-text);
+  }
+
+  .nav-card.next {
+    text-align: right;
+    align-items: flex-end;
+  }
+
+  .nav-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--color-muted);
+  }
+
+  .nav-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+  }
+
+  .nav-date {
+    font-size: 11.5px;
+    color: var(--color-muted);
+    opacity: 0.8;
+  }
+
+  @media (max-width: 640px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-card.next {
+      text-align: left;
+      align-items: flex-start;
+    }
+  }
+</style>

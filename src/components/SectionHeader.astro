@@ -1,0 +1,59 @@
+---
+interface Props {
+  title: string;
+  count?: number;
+  href?: string;
+  linkText?: string;
+}
+
+const { title, count, href, linkText = '查看全部' } = Astro.props;
+---
+
+<div class="section-header">
+  <h2 class="section-title font-display">
+    {title}
+    {count !== undefined && <span class="section-count font-mono">{count}</span>}
+  </h2>
+  {href && <a href={href} class="section-link font-ui">{linkText} →</a>}
+</div>
+
+<style>
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 8px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 22px;
+    color: var(--color-text);
+  }
+
+  .section-count {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--color-muted);
+    padding: 2px 8px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+
+  .section-link {
+    font-family: var(--font-ui);
+    font-size: 13.5px;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .section-link:hover {
+    color: var(--color-accent-text);
+  }
+</style>

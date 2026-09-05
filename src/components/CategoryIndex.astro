@@ -1,0 +1,112 @@
+---
+import Icon from './Icon.astro';
+import type { Post } from '../utils/posts';
+import { formatDate } from '../utils/posts';
+
+interface Props {
+  categories: [string, Post[]][];
+}
+
+const { categories } = Astro.props;
+
+const descriptions: Record<string, string> = {
+  前端: '浏览器里发生的事:渲染、性能、框架与交互细节',
+  后端: '服务端、数据库与接口设计的取舍',
+  工具: '提升日常效率的软件与工作流',
+  随笔: '技术之外,或技术与生活交界处的想法',
+  折腾记录: '从零到一把某个东西跑起来的过程',
+  博客搭建: '关于这个博客本身:内容模型、配置与主题系统',
+};
+---
+
+<div class="category-index">
+  {
+    categories.map(([name, posts]) => (
+      <a href={`/categories/${encodeURIComponent(name)}`} class="category-card">
+        <div class="card-head">
+          <span class="card-icon" aria-hidden="true">
+            <Icon name="folder" size={17} />
+          </span>
+          <span class="card-count font-mono">{posts.length} 篇</span>
+        </div>
+        <h2 class="card-name font-display">{name}</h2>
+        <p class="card-desc">{descriptions[name] ?? '这个分类下的文章'}</p>
+        <p class="card-latest font-mono">
+          最近更新 {formatDate(posts[0].data.pubDate)}
+        </p>
+      </a>
+    ))
+  }
+</div>
+
+<style>
+  .category-index {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 16px;
+  }
+
+  .category-card {
+    display: flex;
+    flex-direction: column;
+    padding: 22px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .category-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-raised);
+    transform: translateY(-2px);
+    color: var(--color-text);
+  }
+
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--color-contrast-soft);
+    color: var(--color-contrast);
+  }
+
+  .card-count {
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+
+  .card-name {
+    font-size: 21px;
+    font-weight: 700;
+  }
+
+  .card-desc {
+    margin-top: 6px;
+    font-size: 13.5px;
+    line-height: 1.65;
+    color: var(--color-muted);
+    flex: 1;
+  }
+
+  .card-latest {
+    margin-top: 14px;
+    font-size: 11.5px;
+    color: var(--color-muted);
+    opacity: 0.8;
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+interface Props {
+  overlap?: 'hero' | 'stage' | 'none';
+  class?: string;
+}
+
+const { overlap = 'hero', class: className = '' } = Astro.props;
+---
+
+<div class:list={['main-card', `overlap-${overlap}`, className]}>
+  <slot />
+</div>
+
+<style>
+  .main-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: var(--shell-max);
+    margin-inline: auto;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    padding: clamp(24px, 5vw, 56px);
+    transition:
+      box-shadow 0.3s ease,
+      border-color 0.3s ease,
+      transform 0.3s ease,
+      background-color 0.35s ease;
+  }
+
+  .main-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  /* 与上方视觉区的重叠关系 */
+  .overlap-hero {
+    margin-top: clamp(-96px, -6vw, -48px);
+  }
+
+  .overlap-stage {
+    margin-top: clamp(-72px, -5vw, -40px);
+  }
+
+  .overlap-none {
+    margin-top: 40px;
+  }
+
+  @media (max-width: 640px) {
+    .main-card {
+      border-radius: 20px;
+      padding: clamp(20px, 5vw, 28px);
+    }
+
+    .overlap-hero,
+    .overlap-stage {
+      margin-top: -28px;
+    }
+
+    .main-card:hover {
+      transform: none;
+    }
+  }
+</style>

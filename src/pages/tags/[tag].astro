@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageVisualStage from '../../components/PageVisualStage.astro';
+import FloatingMainCard from '../../components/FloatingMainCard.astro';
+import PostList from '../../components/PostList.astro';
+import { getAllPosts, collectTags } from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts();
+  const tags = collectTags(posts);
+  return [...tags.entries()].map(([tag, list]) => ({
+    params: { tag },
+    props: { tag, posts: list },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<BaseLayout title={`标签 · ${tag}`} description={`标签「${tag}」下的所有文章`}>
+  <PageVisualStage title={`# ${tag}`} meta={`${posts.length} 篇文章`} />
+  <div class="shell-container">
+    <FloatingMainCard overlap="stage">
+      <PostList posts={posts} showUpdated />
+      <p class="back-line">
+        <a href="/tags">← 返回所有标签</a>
+      </p>
+    </FloatingMainCard>
+  </div>
+</BaseLayout>
+
+<style>
+  .back-line {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-border);
+    font-size: 14px;
+  }
+</style>

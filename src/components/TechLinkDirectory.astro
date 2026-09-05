@@ -1,0 +1,101 @@
+---
+import TechLinkRow from './TechLinkRow.astro';
+import TechLinkCard from './TechLinkCard.astro';
+import { linksByGroup, type TechLink } from '../data/links';
+
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
+const groups = linksByGroup();
+---
+
+<div class="tech-directory">
+  {
+    [...groups.entries()].map(([group, links]) => {
+      if (links.length === 0) return null;
+      if (compact) {
+        links = links.filter((l) => l.featured);
+        if (links.length === 0) return null;
+      }
+      const featured = compact ? [] : links.filter((l) => l.featured);
+      const normal = compact ? links : links.filter((l) => !l.featured);
+      return (
+        <section class="link-group">
+          <h2 class="group-title font-ui">
+            <span class="group-marker" aria-hidden="true" />
+            {group}
+            <span class="group-count font-mono">{links.length}</span>
+          </h2>
+          {featured.length > 0 && (
+            <div class="featured-grid">
+              {featured.map((link: TechLink) => (
+                <TechLinkCard link={link} />
+              ))}
+            </div>
+          )}
+          {normal.length > 0 && (
+            <div class="row-list">
+              {normal.map((link: TechLink) => (
+                <TechLinkRow link={link} />
+              ))}
+            </div>
+          )}
+        </section>
+      );
+    })
+  }
+</div>
+
+<style>
+  .tech-directory {
+    display: flex;
+    flex-direction: column;
+    gap: 44px;
+  }
+
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 14px;
+  }
+
+  .group-marker {
+    width: 16px;
+    height: 2px;
+    background: var(--color-accent);
+    border-radius: 2px;
+  }
+
+  .group-count {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--color-muted);
+    opacity: 0.7;
+  }
+
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+
+  .row-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .row-list :global(.tech-link-row + .tech-link-row) {
+    border-top: 1px solid var(--color-border);
+    border-radius: 0;
+  }
+</style>

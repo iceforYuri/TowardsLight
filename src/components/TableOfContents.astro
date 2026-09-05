@@ -1,0 +1,206 @@
+---
+import Icon from './Icon.astro';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+  variant: 'mobile' | 'desktop';
+}
+
+const { headings, variant } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  toc.length > 0 && variant === 'mobile' && (
+    <div class="toc-mobile">
+      <button
+        type="button"
+        class="toc-toggle"
+        data-toc-toggle
+        aria-expanded="false"
+        aria-controls="toc-panel"
+      >
+        <Icon name="list" size={15} />
+        <span>本文目录</span>
+        <Icon name="chevron-down" size={14} class="toc-chevron" />
+      </button>
+      <nav class="toc-panel" id="toc-panel" data-toc-panel hidden aria-label="文章目录">
+        <ul>
+          {toc.map((h) => (
+            <li class:list={[{ 'depth-3': h.depth === 3 }]}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
+  )
+}
+
+{
+  toc.length > 0 && variant === 'desktop' && (
+    <nav class="toc-desktop" aria-label="文章目录">
+      <p class="toc-heading font-mono">CONTENTS</p>
+      <ul>
+        {toc.map((h) => (
+          <li class:list={[{ 'depth-3': h.depth === 3 }]}>
+            <a href={`#${h.slug}`} data-toc-link={h.slug}>
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<style>
+  .toc-desktop {
+    position: sticky;
+    top: 120px;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    padding-left: 18px;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .toc-heading {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+    margin-bottom: 12px;
+  }
+
+  .toc-desktop ul,
+  .toc-panel ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .toc-desktop a {
+    display: block;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--color-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    transition: color 0.2s ease;
+  }
+
+  .toc-desktop a:hover {
+    color: var(--color-text);
+  }
+
+  .toc-desktop a.is-current {
+    color: var(--color-accent-text);
+    font-weight: 500;
+  }
+
+  .toc-desktop .depth-3 {
+    padding-left: 14px;
+  }
+
+  .toc-desktop .depth-3 a {
+    font-size: 12.5px;
+  }
+
+  .toc-mobile {
+    margin-bottom: 24px;
+  }
+
+  .toc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .toc-chevron {
+    margin-left: auto;
+    transition: transform 0.25s ease;
+  }
+
+  .toc-toggle[aria-expanded='true'] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  .toc-panel {
+    margin-top: 6px;
+    padding: 14px 18px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .toc-panel a {
+    display: block;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--color-muted);
+  }
+
+  .toc-panel a:hover {
+    color: var(--color-accent-text);
+  }
+
+  .toc-panel .depth-3 {
+    padding-left: 16px;
+  }
+</style>
+
+<script>
+  function initToc() {
+    const toggle = document.querySelector<HTMLButtonElement>('[data-toc-toggle]');
+    const panel = document.querySelector<HTMLElement>('[data-toc-panel]');
+    if (toggle && panel) {
+      toggle.addEventListener('click', () => {
+        const open = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!open));
+        if (open) {
+          panel.hidden = true;
+        } else {
+          panel.hidden = false;
+        }
+      });
+      panel.querySelectorAll('a').forEach((a) =>
+        a.addEventListener('click', () => {
+          panel.hidden = true;
+          toggle.setAttribute('aria-expanded', 'false');
+        }),
+      );
+    }
+
+    // 桌面目录:滚动高亮当前小节
+    const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
+    if (links.length === 0) return;
+    const map = new Map<string, HTMLAnchorElement>();
+    links.forEach((l) => map.set(l.dataset.tocLink!, l));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            links.forEach((l) => l.classList.remove('is-current'));
+            map.get(entry.target.id)?.classList.add('is-current');
+          }
+        }
+      },
+      { rootMargin: '-80px 0px -70% 0px' },
+    );
+    document.querySelectorAll('.prose h2[id], .prose h3[id]').forEach((h) => observer.observe(h));
+  }
+  document.addEventListener('astro:page-load', initToc);
+</script>

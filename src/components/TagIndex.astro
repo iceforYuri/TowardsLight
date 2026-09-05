@@ -1,0 +1,183 @@
+---
+/**
+ * 标签索引:支持 索引(网格) / 列表 两种视图切换
+ */
+import Icon from './Icon.astro';
+
+interface Props {
+  tags: [string, number][];
+}
+
+const { tags } = Astro.props;
+---
+
+<div class="tag-index" data-tag-index>
+  <div class="index-toolbar">
+    <span class="toolbar-hint font-mono">{tags.length} 个标签</span>
+    <div class="view-toggle" role="group" aria-label="切换浏览方式">
+      <button
+        type="button"
+        class="view-btn is-active"
+        data-view="grid"
+        aria-pressed="true"
+        aria-label="索引视图"
+        title="索引视图"
+      >
+        <Icon name="grid" size={15} />
+      </button>
+      <button
+        type="button"
+        class="view-btn"
+        data-view="list"
+        aria-pressed="false"
+        aria-label="列表视图"
+        title="列表视图"
+      >
+        <Icon name="list" size={15} />
+      </button>
+    </div>
+  </div>
+
+  <ul class="tag-cloud view-grid" data-tag-cloud>
+    {
+      tags.map(([tag, count]) => (
+        <li>
+          <a href={`/tags/${encodeURIComponent(tag)}`} class="tag-chip">
+            <span class="tag-name">#{tag}</span>
+            <span class="tag-count font-mono">{count}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .index-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+
+  .toolbar-hint {
+    font-size: 12.5px;
+    color: var(--color-muted);
+  }
+
+  .view-toggle {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+
+  .view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 28px;
+    border-radius: 999px;
+    color: var(--color-muted);
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .view-btn:hover {
+    color: var(--color-text);
+  }
+
+  .view-btn.is-active {
+    color: var(--color-accent-text);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-raised);
+  }
+
+  .tag-cloud {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 8px 15px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    color: var(--color-text);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    max-width: 100%;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .tag-chip:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+    transform: translateY(-1px);
+  }
+
+  .tag-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 260px;
+  }
+
+  .tag-count {
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+
+  /* 列表视图 */
+  .tag-cloud.view-list {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .tag-cloud.view-list .tag-chip {
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    background: none;
+    padding: 13px 6px;
+  }
+
+  .tag-cloud.view-list .tag-chip:hover {
+    background: var(--color-surface-raised);
+    transform: none;
+  }
+</style>
+
+<script>
+  function initTagIndex() {
+    document.querySelectorAll<HTMLElement>('[data-tag-index]').forEach((root) => {
+      const cloud = root.querySelector('[data-tag-cloud]');
+      root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const view = btn.dataset.view!;
+          root.querySelectorAll('[data-view]').forEach((b) => {
+            b.classList.toggle('is-active', b === btn);
+            b.setAttribute('aria-pressed', String(b === btn));
+          });
+          cloud?.classList.toggle('view-grid', view === 'grid');
+          cloud?.classList.toggle('view-list', view === 'list');
+        });
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initTagIndex);
+</script>

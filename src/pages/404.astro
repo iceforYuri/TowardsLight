@@ -1,0 +1,119 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FloatingMainCard from '../components/FloatingMainCard.astro';
+import Icon from '../components/Icon.astro';
+---
+
+<BaseLayout title="404">
+  <section class="not-found-stage">
+    <div class="shell-container stage-center">
+      <p class="nf-code font-mono">404</p>
+      <h1 class="nf-title font-display">这一页不存在</h1>
+      <p class="nf-desc">链接可能已经过期,或者地址打错了。文章都还在,从下面回去就能找到。</p>
+    </div>
+  </section>
+
+  <div class="shell-container">
+    <FloatingMainCard overlap="stage" class="nf-card">
+      <nav class="nf-links" aria-label="可用入口">
+        <a href="/" class="nf-link">
+          <Icon name="home" size={16} />
+          <span>
+            <strong>回到首页</strong>
+            <small>近期文章和近况</small>
+          </span>
+        </a>
+        <a href="/archive" class="nf-link">
+          <Icon name="archive" size={16} />
+          <span>
+            <strong>文章归档</strong>
+            <small>按年份翻一翻</small>
+          </span>
+        </a>
+        <a href="/tags" class="nf-link">
+          <Icon name="tag" size={16} />
+          <span>
+            <strong>标签索引</strong>
+            <small>按主题找文章</small>
+          </span>
+        </a>
+      </nav>
+    </FloatingMainCard>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52svh;
+    padding-top: calc(var(--nav-height) + 60px);
+    padding-bottom: 120px;
+    text-align: center;
+  }
+
+  .nf-code {
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--color-accent-text);
+    margin-bottom: 16px;
+  }
+
+  .nf-title {
+    font-size: clamp(30px, 5vw, 42px);
+    font-weight: 700;
+  }
+
+  .nf-desc {
+    margin: 14px auto 0;
+    max-width: 420px;
+    font-size: 15px;
+    color: var(--color-muted);
+  }
+
+  .nf-card {
+    max-width: 720px;
+  }
+
+  .nf-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .nf-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .nf-link:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    color: var(--color-text);
+  }
+
+  .nf-link span {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .nf-link strong {
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .nf-link small {
+    font-size: 12.5px;
+    color: var(--color-muted);
+  }
+</style>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1200" viewBox="0 0 2400 1200">
+  <defs>
+    <filter id="blur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="140"/>
+    </filter>
+  </defs>
+  <rect width="2400" height="1200" fill="#e9eae2"/>
+  <g filter="url(#blur)">
+    <ellipse cx="420" cy="320" rx="560" ry="380" fill="#b7c4b2" opacity="0.55"/>
+    <ellipse cx="1900" cy="240" rx="640" ry="420" fill="#d9a08f" opacity="0.42"/>
+    <ellipse cx="1250" cy="880" rx="720" ry="420" fill="#a9bcc4" opacity="0.4"/>
+    <ellipse cx="750" cy="1050" rx="480" ry="300" fill="#d6c9a8" opacity="0.35"/>
+  </g>
+  <g fill="none" stroke="#1b1d1a" stroke-opacity="0.05" stroke-width="1.5">
+    <path d="M0 700 Q 600 620 1200 700 T 2400 700"/>
+    <path d="M0 760 Q 600 690 1200 760 T 2400 760"/>
+    <path d="M0 820 Q 600 760 1200 820 T 2400 820"/>
+  </g>
+</svg>

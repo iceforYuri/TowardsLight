@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageVisualStage from '../../components/PageVisualStage.astro';
+import FloatingMainCard from '../../components/FloatingMainCard.astro';
+import CategoryIndex from '../../components/CategoryIndex.astro';
+import { getAllPosts, collectCategories } from '../../utils/posts';
+import { site } from '../../data/site';
+
+const posts = await getAllPosts();
+const categories = [...collectCategories(posts).entries()];
+---
+
+<BaseLayout title="Categories" description={`${site.siteName} 的文章分类`}>
+  <PageVisualStage
+    title="分类"
+    description="文章的大致归属,每个分类是一种长期关心的事。"
+    image={site.pageBackdrops.categories || undefined}
+    meta={`共 ${categories.length} 个分类`}
+  />
+  <div class="shell-container">
+    <FloatingMainCard overlap="stage">
+      {categories.length > 0 ? <CategoryIndex categories={categories} /> : <p class="empty">还没有分类。</p>}
+    </FloatingMainCard>
+  </div>
+</BaseLayout>
+
+<style>
+  .empty {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--color-muted);
+  }
+</style>

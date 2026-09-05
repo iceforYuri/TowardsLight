@@ -1,0 +1,153 @@
+---
+import { site } from '../data/site';
+import CurrentStatus from './CurrentStatus.astro';
+
+interface Props {
+  postCount: number;
+  latestDate?: string;
+}
+
+const { postCount, latestDate } = Astro.props;
+const hero = site.homeHero;
+---
+
+<section class="hero">
+  {
+    hero.background && (
+      <div class="hero-backdrop" aria-hidden="true">
+        <img
+          src={hero.background}
+          alt=""
+          class="hero-img img-reveal"
+          loading="eager"
+          fetchpriority="high"
+          onload="this.classList.add('is-loaded')"
+          onerror="this.closest('.hero-backdrop').remove()"
+        />
+        <div class="hero-scrim" />
+      </div>
+    )
+  }
+
+  <div class="hero-content shell-container">
+    <div class="hero-status">
+      <CurrentStatus />
+    </div>
+    <h1 class="hero-title font-display">{hero.greeting}</h1>
+    <p class="hero-tagline">{hero.tagline}</p>
+    <p class="hero-intro">{hero.intro}</p>
+    <div class="hero-meta font-mono">
+      <span>{postCount} 篇文章</span>
+      {latestDate && <span class="meta-sep" aria-hidden="true">/</span>}
+      {latestDate && <span>最近更新 {latestDate}</span>}
+      <span class="meta-sep" aria-hidden="true">/</span>
+      <span>{site.stack.slice(0, 3).join(' · ')}</span>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 72svh;
+    padding-top: calc(var(--nav-height) + 72px);
+    padding-bottom: 112px;
+    overflow: hidden;
+  }
+
+  .hero-backdrop {
+    position: absolute;
+    inset: 0;
+  }
+
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      var(--color-overlay) 0%,
+      transparent 28%,
+      transparent 68%,
+      var(--color-canvas) 96%
+    );
+  }
+
+  /* 深色主题:整幅再压一层,保证标题区对比度 */
+  :global(html[data-theme='dark']) .hero-scrim {
+    background: linear-gradient(
+      to bottom,
+      var(--color-overlay) 0%,
+      rgba(23, 25, 22, 0.42) 40%,
+      rgba(23, 25, 22, 0.55) 70%,
+      var(--color-canvas) 97%
+    );
+  }
+
+  .hero-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-status {
+    margin-bottom: 28px;
+  }
+
+  .hero-title {
+    font-size: clamp(44px, 8vw, 76px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    color: var(--color-text);
+  }
+
+  .hero-tagline {
+    margin-top: 18px;
+    font-family: var(--font-display);
+    font-size: clamp(17px, 2.4vw, 21px);
+    font-weight: 600;
+    color: var(--color-accent-text);
+    letter-spacing: 0.06em;
+  }
+
+  .hero-intro {
+    margin-top: 22px;
+    max-width: 520px;
+    font-size: 15.5px;
+    line-height: 1.9;
+    color: var(--color-muted);
+  }
+
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 12px;
+    margin-top: 30px;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    color: var(--color-muted);
+  }
+
+  .meta-sep {
+    opacity: 0.5;
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      min-height: auto;
+      padding-bottom: 100px;
+    }
+  }
+</style>

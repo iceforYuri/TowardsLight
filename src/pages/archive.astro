@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageVisualStage from '../components/PageVisualStage.astro';
+import FloatingMainCard from '../components/FloatingMainCard.astro';
+import ArchiveGroup from '../components/ArchiveGroup.astro';
+import { getAllPosts, groupPostsByYear } from '../utils/posts';
+import { site } from '../data/site';
+
+const posts = await getAllPosts();
+const byYear = [...groupPostsByYear(posts).entries()];
+---
+
+<BaseLayout title="Archive" description={`${site.siteName} 的文章归档`}>
+  <PageVisualStage
+    title="归档"
+    description="写过的所有文章,按年份排列。"
+    image={site.pageBackdrops.archive || undefined}
+    meta={`共 ${posts.length} 篇 · ${byYear.length} 个年份`}
+  />
+  <div class="shell-container">
+    <FloatingMainCard overlap="stage">
+      {
+        byYear.length > 0 ? (
+          byYear.map(([year, yearPosts]) => <ArchiveGroup year={year} posts={yearPosts} />)
+        ) : (
+          <p class="empty">还没有文章。</p>
+        )
+      }
+    </FloatingMainCard>
+  </div>
+</BaseLayout>
+
+<style>
+  .empty {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--color-muted);
+  }
+</style>

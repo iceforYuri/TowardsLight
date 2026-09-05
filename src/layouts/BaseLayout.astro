@@ -1,0 +1,76 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import FloatingCenteredHeader from '../components/FloatingCenteredHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description = site.bio } = Astro.props;
+const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · ${site.shortBio}`;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={site.siteName} href="/rss.xml" />
+
+    <!-- 字体加载:display=swap,失败时回退到系统字体栈 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@600;700&display=swap"
+    />
+
+    <title>{pageTitle}</title>
+
+    <!-- 主题初始化:在首帧绘制前确定主题,避免闪烁 -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
+
+    <ClientRouter />
+
+    <!-- View Transitions 软导航时,把当前主题带到新文档,防止换回亮色 -->
+    <script>
+      document.addEventListener('astro:before-swap', (e) => {
+        const theme = document.documentElement.dataset.theme;
+        if (theme) {
+          (e as unknown as { newDocument: Document }).newDocument.documentElement.dataset.theme =
+            theme;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到正文</a>
+    <FloatingCenteredHeader />
+    <main id="main-content">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

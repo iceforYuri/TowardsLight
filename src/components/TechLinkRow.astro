@@ -1,0 +1,116 @@
+---
+import Icon from './Icon.astro';
+import type { TechLink } from '../data/links';
+
+interface Props {
+  link: TechLink;
+}
+
+const { link } = Astro.props;
+---
+
+<a
+  href={link.href}
+  class="tech-link-row"
+  {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+>
+  <span class="link-icon" aria-hidden="true">
+    <Icon name={link.icon ?? 'link'} size={17} />
+  </span>
+  <span class="link-body">
+    <span class="link-title">
+      {link.title}
+      {link.status && <span class="link-status font-mono">{link.status}</span>}
+    </span>
+    <span class="link-desc">{link.description}</span>
+  </span>
+  {link.external && (
+    <span class="link-external" aria-hidden="true">
+      <Icon name="arrow-up-right" size={15} />
+    </span>
+  )}
+</a>
+
+<style>
+  .tech-link-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    transition: background-color 0.2s ease;
+  }
+
+  .tech-link-row:hover {
+    background: var(--color-surface-raised);
+    color: var(--color-text);
+  }
+
+  .link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent-text);
+    transition: transform 0.2s ease;
+  }
+
+  .tech-link-row:hover .link-icon {
+    transform: translateX(2px);
+  }
+
+  .link-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .link-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-ui);
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .link-status {
+    font-size: 10.5px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--color-contrast);
+    background: var(--color-contrast-soft);
+    padding: 1px 7px;
+    border-radius: 999px;
+  }
+
+  .link-desc {
+    font-size: 13px;
+    color: var(--color-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .link-external {
+    flex-shrink: 0;
+    color: var(--color-muted);
+    opacity: 0;
+    transform: translate(-3px, 3px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .tech-link-row:hover .link-external {
+    opacity: 0.8;
+    transform: translate(0, 0);
+  }
+</style>

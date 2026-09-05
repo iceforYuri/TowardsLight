@@ -1,0 +1,38 @@
+---
+import PostListItem from './PostListItem.astro';
+import type { Post } from '../utils/posts';
+
+interface Props {
+  posts: Post[];
+  showUpdated?: boolean;
+  showDescription?: boolean;
+  emptyText?: string;
+}
+
+const { posts, showUpdated = false, showDescription = true, emptyText = '这里还没有文章。' } = Astro.props;
+---
+
+{
+  posts.length > 0 ? (
+    <div class="post-list">
+      {posts.map((post) => (
+        <PostListItem post={post} showUpdated={showUpdated} showDescription={showDescription} />
+      ))}
+    </div>
+  ) : (
+    <p class="post-list-empty">{emptyText}</p>
+  )
+}
+
+<style>
+  .post-list :global(.post-item + .post-item) {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-list-empty {
+    padding: 40px 8px;
+    text-align: center;
+    color: var(--color-muted);
+    font-size: 15px;
+  }
+</style>

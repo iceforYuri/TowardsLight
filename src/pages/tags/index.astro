@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageVisualStage from '../../components/PageVisualStage.astro';
+import FloatingMainCard from '../../components/FloatingMainCard.astro';
+import TagIndex from '../../components/TagIndex.astro';
+import { getAllPosts, collectTags } from '../../utils/posts';
+import { site } from '../../data/site';
+
+const posts = await getAllPosts();
+const tags = [...collectTags(posts).entries()].map(([tag, list]) => [tag, list.length] as [string, number]);
+---
+
+<BaseLayout title="Tags" description={`${site.siteName} 的文章标签`}>
+  <PageVisualStage
+    title="标签"
+    description="文章按主题打的标签,比分类更细一些。"
+    image={site.pageBackdrops.tags || undefined}
+    meta={`共 ${tags.length} 个标签`}
+  />
+  <div class="shell-container">
+    <FloatingMainCard overlap="stage">
+      {tags.length > 0 ? <TagIndex tags={tags} /> : <p class="empty">还没有标签。</p>}
+    </FloatingMainCard>
+  </div>
+</BaseLayout>
+
+<style>
+  .empty {
+    padding: 40px 0;
+    text-align: center;
+    color: var(--color-muted);
+  }
+</style>
