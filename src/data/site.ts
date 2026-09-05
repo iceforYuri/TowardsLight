@@ -16,6 +16,8 @@ export const site = {
   bio: '一名写代码的普通人,喜欢把事情弄清楚,再把弄清楚的过程写下来。目前在杭州,做全栈开发,关心 Web 性能、开发工具和个人知识管理。',
   shortBio: '写代码,写文字,记录把问题想清楚的过程。',
   avatar: '/images/avatar.svg',
+  /** 头像裁切焦点(object-position),竖向人像建议 'center 30%' */
+  avatarPosition: 'center',
   email: 'hi@example.com',
   navigation: [
     { label: 'Home', href: '/' },

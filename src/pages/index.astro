@@ -30,6 +30,7 @@ const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
           class="intro-avatar"
           width="64"
           height="64"
+          style={`object-position: ${site.avatarPosition};`}
           onerror="this.style.display='none'"
         />
         <div class="intro-body">
@@ -91,6 +92,8 @@ const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
     border-radius: 50%;
     border: 1px solid var(--color-border);
     flex-shrink: 0;
+    /* 任意比例的原图都居中裁切成正方形,不变形 */
+    object-fit: cover;
   }
 
   .intro-body {
