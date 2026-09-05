@@ -58,7 +58,7 @@ const { panels, interval } = site.flipRow;
           class="flip-dot"
           data-flip-dot={i}
           aria-pressed={i === 0 ? 'true' : 'false'}
-          aria-label={`显示${panel.label}`}
+          aria-label={`切换到第 ${i + 1} 栏:${panel.label}`}
           title={panel.label}
         />
       ))

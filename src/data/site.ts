@@ -49,10 +49,10 @@ export const site = {
   stack: ['Astro', 'TypeScript', 'Node.js', 'SQLite', 'Tailwind-free CSS'],
   /** 首页介绍区底部的翻牌栏:两套内容定时滚换 */
   flipRow: {
-    interval: 5000,
+    interval: 3000,
     panels: [
       {
-        label: '技术栈',
+        label: 'STACK',
         items: [
           { icon: '', text: 'Astro' },
           { icon: '', text: 'TypeScript' },
@@ -62,7 +62,7 @@ export const site = {
         ],
       },
       {
-        label: '联系方式',
+        label: 'CONNECT',
         items: [
           { icon: 'github', text: 'github.com/chenshiguang', href: 'https://github.com' },
           { icon: 'mail', text: 'hi@example.com', href: 'mailto:hi@example.com' },
