@@ -98,7 +98,7 @@ npm run build      # 产物在 dist/
 ## 图标与字体
 
 - 图标:内联 Lucide SVG(`src/components/Icon.astro`,只打包用到的图标,零运行时依赖)
-- 字体:Google Fonts(Instrument Serif / Noto Serif SC / Noto Sans SC / Inter / JetBrains Mono),`display=swap` + 系统字体回退
+- 字体:Google Fonts(Playfair Display / Noto Serif SC / Noto Sans SC / Inter / JetBrains Mono),`display=swap` + 系统字体回退
 
 ## License
 
