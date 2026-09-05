@@ -18,7 +18,7 @@ const { tag, posts } = Astro.props;
 ---
 
 <BaseLayout title={`标签 · ${tag}`} description={`标签「${tag}」下的所有文章`}>
-  <PageVisualStage title={`# ${tag}`} meta={`${posts.length} 篇文章`} />
+  <PageVisualStage title={tag} meta={`${posts.length} 篇文章`} />
   <div class="shell-container">
     <FloatingMainCard overlap="stage">
       <PostList posts={posts} showUpdated />

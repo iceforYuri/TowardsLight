@@ -13,17 +13,26 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
 ---
 
 <article class="post-item">
-  <a href={`/posts/${post.id}`} class="post-item-link">
+  <div class="post-item-link">
     <time class="post-date font-mono" datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
     <div class="post-main">
-      <h3 class="post-title">{title}</h3>
+      <h3 class="post-title">
+        <a href={`/posts/${post.id}`} class="title-link">{title}</a>
+      </h3>
       {showDescription && <p class="post-desc">{description}</p>}
       <div class="post-meta font-mono">
-        <span class="meta-category">
+        <a href={`/categories/${encodeURIComponent(category)}`} class="meta-category">
           <Icon name="folder" size={13} />
           {category}
-        </span>
-        {tags.slice(0, 4).map((tag) => <span class="meta-tag">#{tag}</span>)}
+        </a>
+        {
+          tags.slice(0, 4).map((tag) => (
+            <a href={`/tags/${encodeURIComponent(tag)}`} class="meta-tag">
+              <Icon name="tag" size={12} />
+              {tag}
+            </a>
+          ))
+        }
         {
           showUpdated && updatedDate && (
             <span class="meta-updated" title="最近更新">
@@ -37,10 +46,14 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     <span class="post-arrow" aria-hidden="true">
       <Icon name="arrow-right" size={16} />
     </span>
-  </a>
+  </div>
 </article>
 
 <style>
+  .post-item {
+    position: relative;
+  }
+
   .post-item-link {
     display: flex;
     align-items: baseline;
@@ -53,7 +66,6 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
 
   .post-item-link:hover {
     background: var(--color-surface-raised);
-    color: var(--color-text);
   }
 
   .post-date {
@@ -84,6 +96,18 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     transition: color 0.2s ease;
   }
 
+  /* 标题链接:文字本身可点,点击范围通过 ::after 拉伸到整行 */
+  .title-link {
+    color: inherit;
+  }
+
+  .title-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+  }
+
   .post-item-link:hover .post-title {
     color: var(--color-accent-text);
   }
@@ -103,30 +127,54 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 6px 12px;
+    gap: 6px 14px;
     margin-top: 8px;
     font-size: 12px;
-    color: var(--color-muted);
   }
 
-  .meta-category {
+  /* 分类与标签入口:浮在拉伸链接之上 */
+  .meta-category,
+  .meta-tag {
+    position: relative;
+    z-index: 1;
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: var(--color-contrast);
-  }
-
-  .meta-tag {
-    max-width: 180px;
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    border-radius: 4px;
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  /* 分类:苔绿 + 文件夹 */
+  .meta-category {
+    color: var(--color-contrast);
+  }
+
+  .meta-category:hover {
+    color: var(--color-text);
+    background: var(--color-contrast-soft);
+  }
+
+  /* 标签:褐红 + 小标签图标,不用 # 前缀 */
+  .meta-tag {
+    color: var(--color-accent-text);
+  }
+
+  .meta-tag:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
   }
 
   .meta-updated {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    color: var(--color-muted);
     opacity: 0.85;
   }
 

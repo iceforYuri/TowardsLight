@@ -43,7 +43,8 @@ const { tags } = Astro.props;
       tags.map(([tag, count]) => (
         <li>
           <a href={`/tags/${encodeURIComponent(tag)}`} class="tag-chip">
-            <span class="tag-name">#{tag}</span>
+            <Icon name="tag" size={13} class="chip-tag-icon" />
+            <span class="tag-name">{tag}</span>
             <span class="tag-count font-mono">{count}</span>
           </a>
         </li>
@@ -126,6 +127,13 @@ const { tags } = Astro.props;
     border-color: var(--color-accent);
     background: var(--color-accent-soft);
     transform: translateY(-1px);
+  }
+
+  /* 小标签图标:与列表元信息同一色系(褐红 accent) */
+  .tag-chip :global(.chip-tag-icon) {
+    color: var(--color-accent-text);
+    flex-shrink: 0;
+    align-self: center;
   }
 
   .tag-name {
