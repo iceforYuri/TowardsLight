@@ -201,7 +201,13 @@ button {
   opacity: 1;
 }
 
-/* ============ View Transitions ============ */
+/* ============ View Transitions:分层转场 ============ */
+/*
+ * 关闭整页淡化,改为:
+ * - page-title:文字滚换(旧上出/新下入)
+ * - main-card:卡片位移(深入时新卡从下方滑入,返回时反向)
+ * - stage-media:背景/封面交叉淡化(默认行为)
+ */
 
 @view-transition {
   navigation: auto;
@@ -209,7 +215,119 @@ button {
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
-  animation-duration: 0.25s;
+  animation: none;
+}
+
+/* 首页进出:整页柔和淡入淡出,不做分层位移 */
+html[data-soft-fade='true'] ::view-transition-old(root) {
+  animation: root-fade-out 0.22s ease both;
+}
+
+html[data-soft-fade='true'] ::view-transition-new(root) {
+  animation: root-fade-in 0.28s ease both;
+}
+
+@keyframes root-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes root-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* 标题层 */
+::view-transition-old(page-title) {
+  animation: title-out 0.22s ease both;
+}
+
+::view-transition-new(page-title) {
+  animation: title-in 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) 0.06s both;
+}
+
+@keyframes title-out {
+  to {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+}
+
+@keyframes title-in {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+}
+
+/* 卡片层 */
+::view-transition-old(main-card) {
+  animation: card-out 0.2s ease both;
+}
+
+::view-transition-new(main-card) {
+  animation: card-in 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) 0.05s both;
+}
+
+@keyframes card-out {
+  to {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+}
+
+@keyframes card-in {
+  from {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+}
+
+/* 返回方向:动画对称反向 */
+html[data-nav-dir='back'] ::view-transition-old(page-title) {
+  animation-name: title-out-rev;
+}
+
+html[data-nav-dir='back'] ::view-transition-new(page-title) {
+  animation-name: title-in-rev;
+}
+
+html[data-nav-dir='back'] ::view-transition-old(main-card) {
+  animation-name: card-out-rev;
+}
+
+html[data-nav-dir='back'] ::view-transition-new(main-card) {
+  animation-name: card-in-rev;
+}
+
+@keyframes title-out-rev {
+  to {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+@keyframes title-in-rev {
+  from {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+}
+
+@keyframes card-out-rev {
+  to {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+}
+
+@keyframes card-in-rev {
+  from {
+    transform: translateY(-28px);
+    opacity: 0;
+  }
 }
 
 /* ============ 通用工具 ============ */

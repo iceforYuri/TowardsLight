@@ -1,0 +1,253 @@
+---
+/**
+ * 中宽屏(768–1279px)文章目录:
+ * 页面右侧的小按钮,点击后从右侧滑出玻璃拟态目录抽屉。
+ */
+import Icon from './Icon.astro';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+  toc.length > 0 && (
+    <div class="toc-drawer-root" data-toc-drawer>
+      <button
+        type="button"
+        class="drawer-button"
+        data-drawer-open
+        aria-expanded="false"
+        aria-controls="toc-drawer-panel"
+        aria-label="打开文章目录"
+        title="本文目录"
+      >
+        <Icon name="list" size={17} />
+      </button>
+
+      <div class="drawer-overlay" data-drawer-overlay hidden />
+
+      <aside
+        class="drawer-panel"
+        id="toc-drawer-panel"
+        data-drawer-panel
+        role="dialog"
+        aria-modal="true"
+        aria-label="文章目录"
+        hidden
+      >
+        <div class="drawer-head">
+          <span class="drawer-title font-mono">CONTENTS</span>
+          <button
+            type="button"
+            class="drawer-close"
+            data-drawer-close
+            aria-label="关闭文章目录"
+          >
+            <Icon name="x" size={16} />
+          </button>
+        </div>
+        <nav>
+          <ul>
+            {toc.map((h) => (
+              <li class:list={[{ 'depth-3': h.depth === 3 }]}>
+                <a href={`#${h.slug}`} data-toc-link={h.slug}>
+                  {h.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </aside>
+    </div>
+  )
+}
+
+<style>
+  .toc-drawer-root {
+    display: none;
+  }
+
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .toc-drawer-root {
+      display: block;
+    }
+  }
+
+  .drawer-button {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 90;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: var(--color-muted);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-nav);
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .drawer-button:hover {
+    color: var(--color-accent-text);
+    border-color: var(--color-accent);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    background: rgba(20, 25, 20, 0.18);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  :global(html[data-theme='dark']) .drawer-overlay {
+    background: rgba(0, 0, 0, 0.35);
+  }
+
+  .drawer-overlay.is-open {
+    opacity: 1;
+  }
+
+  /* 玻璃拟态抽屉:半透明 + 高斯模糊 */
+  .drawer-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 96;
+    width: min(320px, 84vw);
+    padding: 22px 26px;
+    overflow-y: auto;
+    background: color-mix(in srgb, var(--color-surface) 72%, transparent);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+    border-left: 1px solid var(--color-border);
+    box-shadow: -16px 0 48px rgba(20, 25, 20, 0.14);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  .drawer-panel.is-open {
+    transform: translateX(0);
+  }
+
+  .drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .drawer-title {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--color-muted);
+  }
+
+  .drawer-close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: var(--color-muted);
+  }
+
+  .drawer-close:hover {
+    color: var(--color-text);
+    background: var(--color-accent-soft);
+  }
+
+  .drawer-panel ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .drawer-panel a {
+    display: block;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--color-muted);
+    transition: color 0.2s ease;
+  }
+
+  .drawer-panel a:hover {
+    color: var(--color-text);
+  }
+
+  .drawer-panel a.is-current {
+    color: var(--color-accent-text);
+    font-weight: 500;
+  }
+
+  .drawer-panel .depth-3 {
+    padding-left: 16px;
+  }
+
+  .drawer-panel .depth-3 a {
+    font-size: 13px;
+  }
+</style>
+
+<script>
+  function initTocDrawer() {
+    const root = document.querySelector<HTMLElement>('[data-toc-drawer]');
+    if (!root) return;
+    const openBtn = root.querySelector<HTMLButtonElement>('[data-drawer-open]');
+    const closeBtn = root.querySelector<HTMLButtonElement>('[data-drawer-close]');
+    const overlay = root.querySelector<HTMLElement>('[data-drawer-overlay]');
+    const panel = root.querySelector<HTMLElement>('[data-drawer-panel]');
+    if (!openBtn || !overlay || !panel) return;
+
+    const open = () => {
+      overlay.hidden = false;
+      panel.hidden = false;
+      requestAnimationFrame(() => {
+        overlay.classList.add('is-open');
+        panel.classList.add('is-open');
+      });
+      openBtn.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    };
+
+    const close = () => {
+      overlay.classList.remove('is-open');
+      panel.classList.remove('is-open');
+      openBtn.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        overlay.hidden = true;
+        panel.hidden = true;
+      }, 300);
+    };
+
+    openBtn.addEventListener('click', open);
+    closeBtn?.addEventListener('click', close);
+    overlay.addEventListener('click', close);
+    panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', close));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && openBtn.getAttribute('aria-expanded') === 'true') close();
+    });
+  }
+  document.addEventListener('astro:page-load', initTocDrawer);
+</script>

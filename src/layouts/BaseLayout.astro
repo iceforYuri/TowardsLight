@@ -56,11 +56,22 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
 
     <!-- View Transitions 软导航时,把当前主题带到新文档,防止换回亮色 -->
     <script>
+      // 记录导航方向与是否涉及首页,供转场动画选择策略
+      document.addEventListener('astro:before-preparation', (e) => {
+        const ev = e as unknown as { direction?: string; from?: URL; to?: URL };
+        const html = document.documentElement;
+        html.dataset.navDir = ev.direction === 'back' ? 'back' : 'forward';
+        const isHome = (u?: URL) => !!u && (u.pathname === '/' || u.pathname === '');
+        html.dataset.softFade = isHome(ev.from) || isHome(ev.to) ? 'true' : 'false';
+      });
+
       document.addEventListener('astro:before-swap', (e) => {
-        const theme = document.documentElement.dataset.theme;
-        if (theme) {
-          (e as unknown as { newDocument: Document }).newDocument.documentElement.dataset.theme =
-            theme;
+        const from = document.documentElement;
+        const to = (e as unknown as { newDocument: Document }).newDocument.documentElement;
+        // html 属性会被新文档整体替换,需要带过去的状态都在这里复制
+        for (const key of ['theme', 'navDir', 'softFade'] as const) {
+          const value = from.dataset[key];
+          if (value) to.dataset[key] = value;
         }
       });
     </script>

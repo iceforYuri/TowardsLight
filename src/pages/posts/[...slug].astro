@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FloatingMainCard from '../../components/FloatingMainCard.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import TocDrawer from '../../components/TocDrawer.astro';
 import ReadingProgress from '../../components/ReadingProgress.astro';
 import PostNavigation from '../../components/PostNavigation.astro';
 import Icon from '../../components/Icon.astro';
@@ -35,7 +36,7 @@ const minutes = readingTime(post.body ?? '');
   <section class:list={['article-stage', { 'has-cover': cover }]}>
     {
       cover && (
-        <div class="stage-backdrop" aria-hidden="true">
+        <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
           <img
             src={cover}
             alt={coverAlt ?? ''}
@@ -52,68 +53,71 @@ const minutes = readingTime(post.body ?? '');
   </section>
 
   <div class="shell-container article-wrap">
-    <FloatingMainCard overlap="stage" class="article-card">
-      {/* 文章头部 */}
-      <header class="article-header">
-        <div class="article-breadcrumb font-mono">
-          <a href={`/categories/${encodeURIComponent(category)}`} class="crumb-category">
-            <Icon name="folder" size={13} />
-            {category}
-          </a>
-        </div>
-        <h1 class="article-title font-display">{title}</h1>
-        <p class="article-desc">{description}</p>
-        <div class="article-meta font-mono">
-          <span class="meta-item">
-            <Icon name="calendar" size={13} />
-            <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
-          </span>
+    <div class="article-layout">
+      <FloatingMainCard overlap="stage" class="article-card">
+        {/* 文章头部 */}
+        <header class="article-header">
+          <div class="article-breadcrumb font-mono">
+            <a href={`/categories/${encodeURIComponent(category)}`} class="crumb-category">
+              <Icon name="folder" size={13} />
+              {category}
+            </a>
+          </div>
+          <h1 class="article-title font-display" transition:name="page-title">{title}</h1>
+          <p class="article-desc">{description}</p>
+          <div class="article-meta font-mono">
+            <span class="meta-item">
+              <Icon name="calendar" size={13} />
+              <time datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+            </span>
+            {
+              updatedDate && (
+                <span class="meta-item">
+                  <Icon name="refresh-cw" size={13} />
+                  更新于 {formatDate(updatedDate)}
+                </span>
+              )
+            }
+            <span class="meta-item">
+              <Icon name="clock" size={13} />
+              约 {minutes} 分钟
+            </span>
+          </div>
           {
-            updatedDate && (
-              <span class="meta-item">
-                <Icon name="refresh-cw" size={13} />
-                更新于 {formatDate(updatedDate)}
-              </span>
+            tags.length > 0 && (
+              <ul class="article-tags" aria-label="文章标签">
+                {tags.map((tag) => (
+                  <li>
+                    <a href={`/tags/${encodeURIComponent(tag)}`} class="tag-pill font-mono">
+                      #{tag}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             )
           }
-          <span class="meta-item">
-            <Icon name="clock" size={13} />
-            约 {minutes} 分钟
-          </span>
-        </div>
-        {
-          tags.length > 0 && (
-            <ul class="article-tags" aria-label="文章标签">
-              {tags.map((tag) => (
-                <li>
-                  <a href={`/tags/${encodeURIComponent(tag)}`} class="tag-pill font-mono">
-                    #{tag}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )
-        }
-      </header>
+        </header>
 
-      <hr class="article-divider" />
+        <hr class="article-divider" />
 
-      {/* 正文 + 目录 */}
-      <div class="article-grid">
-        <div class="article-main">
-          <TableOfContents headings={headings} variant="mobile" />
-          <article class="prose">
-            <Content />
-          </article>
-        </div>
-        <aside class="article-aside">
-          <TableOfContents headings={headings} variant="desktop" />
-        </aside>
-      </div>
+        {/* 正文(目录已拆出卡片) */}
+        <TableOfContents headings={headings} variant="mobile" />
+        <article class="prose">
+          <Content />
+        </article>
 
-      <PostNavigation prev={prev} next={next} />
-    </FloatingMainCard>
+        <PostNavigation prev={prev} next={next} />
+      </FloatingMainCard>
+
+      {/* 宽屏:目录外挂到卡片右侧的画布区 */}
+      <aside class="article-aside">
+        <TableOfContents headings={headings} variant="desktop" />
+      </aside>
+    </div>
   </div>
+
+  {/* 中宽屏:侧边按钮 + 玻璃抽屉目录 */}
+  <TocDrawer headings={headings} />
 </BaseLayout>
 
 <style>
@@ -154,8 +158,54 @@ const minutes = readingTime(post.body ?? '');
     z-index: 10;
   }
 
-  .article-card {
-    max-width: 1080px;
+  /* 卡片与其他页面同宽(跟随壳层),由子组件渲染需要 :global */
+  :global(.article-card) {
+    width: 100%;
+  }
+
+  /* 宽屏:整屏宽的卡片 + 外挂到更右侧的目录,组合居中 */
+  .article-layout {
+    display: block;
+  }
+
+  .article-aside {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    /* 放宽壳层:整屏宽卡片 + 64 间距 + 220 目录 + 内边距 */
+    .shell-container.article-wrap {
+      max-width: 1404px;
+    }
+
+    .article-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px;
+      gap: 64px;
+    }
+
+    :global(.article-card) {
+      max-width: none;
+    }
+
+    .article-aside {
+      display: block;
+      /* 与卡片的负 margin 重叠对齐,再上推一个卡片内边距 */
+      margin-top: clamp(-72px, -5vw, -40px);
+      padding-top: clamp(24px, 5vw, 56px);
+    }
+
+    /* 宽屏时隐藏文章内的移动目录 */
+    :global(.article-card .toc-mobile) {
+      display: none;
+    }
+  }
+
+  /* 中宽屏(抽屉接管):隐藏卡内目录 */
+  @media (min-width: 768px) and (max-width: 1279px) {
+    :global(.article-card .toc-mobile) {
+      display: none;
+    }
   }
 
   .article-header {
@@ -252,32 +302,5 @@ const minutes = readingTime(post.body ?? '');
     border: none;
     border-top: 1px solid var(--color-border);
     margin-block: clamp(28px, 4vw, 40px);
-  }
-
-  /* 正文 + 目录的网格:宽屏时目录在右侧 */
-  .article-grid {
-    display: block;
-  }
-
-  .article-aside {
-    display: none;
-  }
-
-  @media (min-width: 1101px) {
-    .article-grid {
-      display: grid;
-      grid-template-columns: minmax(0, var(--prose-max)) 200px;
-      justify-content: center;
-      gap: 64px;
-    }
-
-    .article-aside {
-      display: block;
-    }
-
-    /* 宽屏时隐藏文章内的移动目录 */
-    .article-main :global(.toc-mobile) {
-      display: none;
-    }
   }
 </style>

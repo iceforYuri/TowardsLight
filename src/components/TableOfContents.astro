@@ -81,6 +81,7 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
   }
 
   .toc-desktop a {
+    position: relative;
     display: block;
     font-size: 13px;
     line-height: 1.5;
@@ -97,9 +98,21 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
     color: var(--color-text);
   }
 
+  /* 当前小节:左侧 2px 强调指示条 */
   .toc-desktop a.is-current {
     color: var(--color-accent-text);
     font-weight: 500;
+  }
+
+  .toc-desktop a.is-current::before {
+    content: '';
+    position: absolute;
+    left: -19px;
+    top: 2px;
+    bottom: 2px;
+    width: 2px;
+    border-radius: 2px;
+    background: var(--color-accent);
   }
 
   .toc-desktop .depth-3 {
@@ -129,12 +142,12 @@ const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
     border-radius: var(--radius-sm);
   }
 
-  .toc-chevron {
+  :global(.toc-chevron) {
     margin-left: auto;
     transition: transform 0.25s ease;
   }
 
-  .toc-toggle[aria-expanded='true'] .toc-chevron {
+  .toc-toggle[aria-expanded='true'] :global(.toc-chevron) {
     transform: rotate(180deg);
   }
 

@@ -18,7 +18,7 @@ const { title, description, image, meta } = Astro.props;
 <section class="page-stage" data-stage>
   {
     image && (
-      <div class="stage-backdrop" aria-hidden="true">
+      <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
         <img
           src={image}
           alt=""
@@ -33,7 +33,7 @@ const { title, description, image, meta } = Astro.props;
   }
   <div class="stage-content shell-container">
     <div class="stage-intro" data-stage-intro>
-      <h1 class="stage-title font-display">{title}</h1>
+      <h1 class="stage-title font-display" transition:name="page-title">{title}</h1>
       <div class="stage-extra">
         <div class="stage-extra-inner">
           {description && <p class="stage-desc">{description}</p>}
@@ -176,7 +176,7 @@ const { title, description, image, meta } = Astro.props;
     border-color: var(--color-accent);
   }
 
-  .toggle-icon {
+  :global(.toggle-icon) {
     transition: transform 0.3s ease;
   }
 
@@ -202,7 +202,7 @@ const { title, description, image, meta } = Astro.props;
     font-size: 24px;
   }
 
-  .page-stage.is-collapsed .toggle-icon {
+  .page-stage.is-collapsed :global(.toggle-icon) {
     transform: rotate(180deg);
   }
 </style>
