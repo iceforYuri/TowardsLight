@@ -27,9 +27,9 @@ export const site = {
     { label: 'Links', href: '/links' },
   ],
   socialLinks: [
-    { label: 'GitHub', href: 'https://github.com' },
-    { label: 'RSS', href: '/rss.xml' },
-    { label: 'Email', href: 'mailto:hi@example.com' },
+    { label: 'GitHub', href: 'https://github.com', icon: 'github' },
+    { label: 'RSS', href: '/rss.xml', icon: 'rss' },
+    { label: 'Email', href: 'mailto:hi@example.com', icon: 'mail' },
   ],
   homeHero: {
     greeting: '拾光集',

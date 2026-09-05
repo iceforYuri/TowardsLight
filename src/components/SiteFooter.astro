@@ -1,4 +1,5 @@
 ---
+import Icon from './Icon.astro';
 import { site } from '../data/site';
 
 const year = new Date().getFullYear();
@@ -20,7 +21,8 @@ const year = new Date().getFullYear();
               ? { target: '_blank', rel: 'noopener noreferrer' }
               : {})}
           >
-            {link.label}
+            <Icon name={link.icon} size={14} />
+            <span>{link.label}</span>
           </a>
         ))
       }
@@ -66,17 +68,35 @@ const year = new Date().getFullYear();
 
   .footer-links {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
   }
 
+  /* 胶囊式图标 + 文字 */
   .footer-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 16px;
     font-family: var(--font-ui);
-    font-size: 14px;
+    font-size: 13.5px;
     color: var(--color-muted);
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s ease;
   }
 
   .footer-link:hover {
     color: var(--color-accent-text);
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+    transform: translateY(-1px);
   }
 
   .footer-meta {
