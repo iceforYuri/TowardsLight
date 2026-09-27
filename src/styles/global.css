@@ -242,6 +242,10 @@ button {
   z-index: 4;
 }
 
+::view-transition-group(hero-status) {
+  z-index: 4;
+}
+
 ::view-transition-group(site-header) {
   z-index: 10;
 }
@@ -309,6 +313,53 @@ html[data-soft-fade='true'] ::view-transition-new(page-title) {
 @keyframes card-in {
   from {
     transform: translateY(28px);
+    opacity: 0;
+  }
+}
+
+/* 首页级联:状态胶囊与 hero-body 只在首页存在,无配对元素,各自定义进出场。
+   入场自上而下:胶囊(0.08s)→ 标题(0.05s,soft-fade)→ 正文组(0.16s);
+   离场配饰先走,快速上浮消失,主体标题/卡片随后 */
+::view-transition-old(hero-status) {
+  animation: hero-status-out 0.16s ease both;
+}
+
+::view-transition-new(hero-status) {
+  animation: hero-status-in 0.26s cubic-bezier(0.22, 0.61, 0.36, 1) 0.08s both;
+}
+
+@keyframes hero-status-out {
+  to {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-status-in {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}
+
+::view-transition-old(hero-body) {
+  animation: hero-body-out 0.2s ease both;
+}
+
+::view-transition-new(hero-body) {
+  animation: hero-body-in 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) 0.16s both;
+}
+
+@keyframes hero-body-out {
+  to {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-body-in {
+  from {
+    transform: translateY(10px);
     opacity: 0;
   }
 }
