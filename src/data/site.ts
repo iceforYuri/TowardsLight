@@ -20,11 +20,11 @@ export const site = {
   avatarPosition: 'center',
   email: 'hi@example.com',
   navigation: [
-    { label: 'Home', href: '/' },
-    { label: 'Archive', href: '/archive' },
-    { label: 'Tags', href: '/tags' },
-    { label: 'Categories', href: '/categories' },
-    { label: 'Links', href: '/links' },
+    { label: 'Home', href: '/', icon: 'home' },
+    { label: 'Archive', href: '/archive', icon: 'archive' },
+    { label: 'Tags', href: '/tags', icon: 'tag' },
+    { label: 'Categories', href: '/categories', icon: 'folder' },
+    { label: 'Links', href: '/links', icon: 'link' },
   ],
   socialLinks: [
     { label: 'GitHub', href: 'https://github.com', icon: 'github' },

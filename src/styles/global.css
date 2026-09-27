@@ -42,6 +42,9 @@ html[data-theme='light'] {
   --color-contrast-soft: rgba(93, 130, 122, 0.12);
   --color-danger: #b44436;
   --color-overlay: rgba(244, 245, 241, 0.72);
+
+  /* Dock 鼓包描边环(rgb 三元组,配合 --grow 调节透明度) */
+  --dock-ring: 27 29 26;
 }
 
 html[data-theme='dark'] {
@@ -58,6 +61,8 @@ html[data-theme='dark'] {
   --color-contrast-soft: rgba(145, 184, 170, 0.13);
   --color-danger: #e07a6a;
   --color-overlay: rgba(23, 25, 22, 0.68);
+
+  --dock-ring: 236 237 229;
 
   --shadow-nav: 0 10px 30px rgba(0, 0, 0, 0.3);
   --shadow-card: 0 24px 80px rgba(0, 0, 0, 0.32);
@@ -219,7 +224,8 @@ button {
 }
 
 /* 图层堆叠:标题最上,卡片压住背景,背景最底
-   (不设置时,进入文章页封面可能盖住滑入的卡片) */
+   (不设置时,进入文章页封面可能盖住滑入的卡片);
+   导航栏永远最高:背景/封面快照交叉淡化时不会盖住导航 */
 ::view-transition-group(stage-media) {
   z-index: 1;
 }
@@ -234,6 +240,10 @@ button {
 
 ::view-transition-group(page-title) {
   z-index: 4;
+}
+
+::view-transition-group(site-header) {
+  z-index: 10;
 }
 
 /* 首页相关切换:标题只做淡入淡出,不做滚换 */

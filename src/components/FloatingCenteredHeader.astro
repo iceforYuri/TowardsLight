@@ -11,30 +11,56 @@ function isActive(href: string) {
 }
 ---
 
-<header class="site-header">
-  <nav class="nav-pill" aria-label="主导航">
+<header class="site-header" transition:name="site-header" transition:animate="none">
+  <nav class="nav-pill" aria-label="主导航" data-dock-zone>
+    {/* 液体皮肤:整条下轮廓(含圆头)是一条以鼠标为中心的光滑包络,
+        单路径单描边,鼓包自然流入圆头,无接缝无截断面 */}
+    <svg class="pill-skin" aria-hidden="true">
+      <path data-pill-path d="" />
+    </svg>
     <a href="/" class="site-mark" aria-label={`${site.siteName} 首页`}>
       <span class="mark-dot" aria-hidden="true"></span>
       <span class="mark-text">{site.siteName}</span>
     </a>
 
-    <ul class="nav-links">
+    {/* 方案 A:图标 Dock 导航,悬停 tooltip + 距离感应放大 */}
+    <div class="dock-nav">
       {
         site.navigation.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class:list={['nav-link', { active: isActive(item.href) }]}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-            >
-              {item.label}
-            </a>
-          </li>
+          <a
+            href={item.href}
+            class:list={['dock-item', 'dock-nav-item', { active: isActive(item.href) }]}
+            data-dock-item
+            data-tip={item.label}
+            aria-label={item.label}
+            aria-current={isActive(item.href) ? 'page' : undefined}
+          >
+            <span class="dock-bubble" aria-hidden="true" />
+            <Icon name={item.icon} size={17} />
+          </a>
         ))
       }
-    </ul>
+    </div>
 
     <div class="nav-actions">
+      {/* 功能区小 Dock:图标圆钮,鼠标靠近按距离放大 */}
+      {
+        site.socialLinks.map((link) => (
+          <a
+            href={link.href}
+            class="dock-item"
+            data-dock-item
+            data-tip={link.label}
+            aria-label={link.label}
+            {...(link.href.startsWith('http')
+              ? { target: '_blank', rel: 'noopener noreferrer' }
+              : {})}
+          >
+            <span class="dock-bubble" aria-hidden="true" />
+            <Icon name={link.icon} size={16} />
+          </a>
+        ))
+      }
       <ThemeToggle />
       <button
         type="button"
@@ -86,8 +112,10 @@ function isActive(href: string) {
 
   .nav-pill {
     pointer-events: auto;
+    position: relative;
     display: flex;
-    align-items: center;
+    /* 顶部锚定 + 固定高度:轨道纵向不动,宽度随内容横向伸缩 */
+    align-items: flex-start;
     gap: 6px;
     height: var(--nav-height);
     padding: 0 10px;
@@ -100,12 +128,50 @@ function isActive(href: string) {
       border-color 0.35s ease;
   }
 
+  /* JS 液体皮肤就位后,矩形的背景/边框/阴影交给 SVG 路径 */
+  .nav-pill.has-skin {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .pill-skin {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+    filter: drop-shadow(0 10px 24px rgba(20, 25, 20, 0.1));
+  }
+
+  :global(html[data-theme='dark']) .pill-skin {
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.4));
+  }
+
+  .pill-skin path {
+    fill: var(--color-surface);
+    stroke: var(--color-border);
+    stroke-width: 1;
+    transition:
+      fill 0.35s ease,
+      stroke 0.35s ease;
+  }
+
+  /* 内容浮在皮肤之上 */
+  .nav-pill > *:not(.pill-skin) {
+    position: relative;
+    z-index: 1;
+  }
+
   .site-mark {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 0 12px;
     height: 40px;
+    margin-top: 8px;
     border-radius: 999px;
     color: var(--color-text);
     font-family: var(--font-display);
@@ -122,64 +188,142 @@ function isActive(href: string) {
     flex-shrink: 0;
   }
 
-  .nav-links {
+  /* 图标 Dock 导航 */
+  .dock-nav {
     display: flex;
     align-items: center;
     gap: 2px;
-    list-style: none;
-  }
-
-  .nav-link {
-    position: relative;
-    display: block;
-    padding: 8px 13px;
-    border-radius: 999px;
-    font-family: var(--font-ui);
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-muted);
-    transition:
-      color 0.2s ease,
-      background-color 0.2s ease;
-  }
-
-  .nav-link::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    bottom: 3px;
-    width: 0;
-    height: 2px;
-    border-radius: 2px;
-    background: var(--color-accent);
-    transform: translateX(-50%);
-    transition: width 0.25s ease;
-  }
-
-  .nav-link:hover {
-    color: var(--color-text);
-  }
-
-  .nav-link:hover::after {
-    width: 14px;
-  }
-
-  .nav-link.active {
-    color: var(--color-accent-text);
-    background: var(--color-accent-soft);
-  }
-
-  .nav-link.active::after {
-    width: 0;
   }
 
   .nav-actions {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 2px;
-    padding-left: 4px;
+    padding-left: 6px;
+    margin-top: 9px;
     border-left: 1px solid var(--color-border);
     margin-left: 2px;
+  }
+
+  .nav-actions :global(.theme-toggle) {
+    margin-top: 0;
+  }
+
+  /* Dock 圆钮:真尺寸驱动,放大时向下鼓出并推开邻居 */
+  .dock-item {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    margin-top: 9px;
+    border-radius: 50%;
+    color: var(--color-muted);
+    /* --grow(0..1) 由 JS 按鼠标距离写入;放大时获得描边环与浮起投影 */
+    box-shadow:
+      0 calc(var(--grow, 0) * 10px) calc(var(--grow, 0) * 24px)
+        rgba(20, 25, 20, calc(var(--grow, 0) * 0.2)),
+      inset 0 0 0 1px rgb(var(--dock-ring) / calc(var(--grow, 0) * 0.9));
+    transition:
+      width 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+      height 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.18s ease,
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .nav-actions .dock-item {
+    margin-top: 0;
+  }
+
+  .dock-item:hover {
+    color: var(--color-accent-text);
+  }
+
+  /* 泡泡光影:环境光 + 追踪高光 + 表面色,随放大浮现 */
+  /* (:global 是因为主题切换按钮在子组件里) */
+  :global(.dock-bubble) {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: var(--grow, 0);
+    transition: opacity 0.15s ease;
+    background:
+      radial-gradient(circle at var(--mx, 32%) var(--my, 26%), rgba(255, 255, 255, 0.55), transparent 50%),
+      radial-gradient(circle at 72% 82%, rgba(20, 25, 20, 0.14), transparent 55%),
+      linear-gradient(150deg, rgba(255, 255, 255, 0.5), transparent 45%),
+      var(--color-surface-raised);
+  }
+
+  :global(html[data-theme='dark'] .dock-bubble) {
+    background:
+      radial-gradient(circle at var(--mx, 32%) var(--my, 26%), rgba(255, 255, 255, 0.22), transparent 50%),
+      radial-gradient(circle at 72% 82%, rgba(0, 0, 0, 0.4), transparent 55%),
+      linear-gradient(150deg, rgba(255, 255, 255, 0.12), transparent 45%),
+      var(--color-surface-raised);
+  }
+
+  .dock-item :global(svg) {
+    position: relative;
+    z-index: 1;
+    transform: scale(calc(1 + var(--grow, 0) * 0.45));
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 当前页:accent 浅底 + Dock 式底部指示点 */
+  .dock-item.active {
+    color: var(--color-accent-text);
+    background: var(--color-accent-soft);
+  }
+
+  .dock-item.active::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-accent);
+  }
+
+  /* Dock tooltip:导航在顶部,提示向下弹出 */
+  .nav-pill :global([data-dock-item])::after {
+    content: attr(data-tip);
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    z-index: 2;
+    transform: translateX(-50%) translateY(-3px);
+    padding: 4px 10px;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    white-space: nowrap;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    box-shadow: var(--shadow-raised);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  .nav-pill :global([data-dock-item]):hover::after {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 转场期间恢复悬停态时禁用过渡,让快照直接捕获最终状态 */
+  .nav-pill.no-anim .dock-item,
+  .nav-pill.no-anim :global(.theme-toggle),
+  .nav-pill.no-anim :global(.dock-bubble) {
+    transition: none !important;
   }
 
   .menu-button {
@@ -188,6 +332,7 @@ function isActive(href: string) {
     justify-content: center;
     width: 36px;
     height: 36px;
+    margin-top: 1px;
     border-radius: 50%;
     color: var(--color-muted);
   }
@@ -225,7 +370,11 @@ function isActive(href: string) {
       justify-content: space-between;
     }
 
-    .nav-links {
+    .dock-nav {
+      display: none;
+    }
+
+    .dock-item {
       display: none;
     }
 
@@ -291,7 +440,8 @@ function isActive(href: string) {
   function initHeader() {
     const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
     const panel = document.querySelector<HTMLElement>('[data-mobile-panel]');
-    if (!button || !panel) return;
+    if (!button || !panel || button.dataset.bound) return;
+    button.dataset.bound = '1';
 
     button.addEventListener('click', () => {
       const open = button.getAttribute('aria-expanded') === 'true';
@@ -305,25 +455,207 @@ function isActive(href: string) {
         requestAnimationFrame(() => panel.classList.add('is-open'));
       }
     });
+  }
+
+  let headerGlobalBound = false;
+
+  function bindHeaderGlobal() {
+    if (headerGlobalBound) return;
+    headerGlobalBound = true;
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+      const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+      if (e.key === 'Escape' && button?.getAttribute('aria-expanded') === 'true') {
         button.click();
       }
     });
+
+    // 主题切换:事件委托,兼容 View Transitions
+    document.addEventListener('click', (e) => {
+      const toggle = (e.target as HTMLElement).closest('[data-theme-toggle]');
+      if (!toggle) return;
+      const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch {}
+    });
   }
 
-  // 主题切换:事件委托,兼容 View Transitions
-  document.addEventListener('click', (e) => {
-    const toggle = (e.target as HTMLElement).closest('[data-theme-toggle]');
-    if (!toggle) return;
-    const current = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.dataset.theme = next;
-    try {
-      localStorage.setItem('theme', next);
-    } catch {}
-  });
+  bindHeaderGlobal();
 
-  document.addEventListener('astro:page-load', initHeader);
+  // Dock 真尺寸放大 + 液体皮肤:
+  // 按钮由 JS 驱动宽高等比放大,邻居被真实推开;
+  // 胶囊皮肤是 SVG 路径,下边缘在鼠标位置局部下垂,把鼓出的按钮裹住。
+  // --grow 同时驱动泡泡光影与投影,--mx/--my 让高光跟随鼠标。
+
+  // 常驻记录鼠标位置:换页后新导航初始化时,若鼠标仍悬停在胶囊上,
+  // 用最后已知位置合成一次激活,避免"闪现缩回"
+  let lastMouse: { x: number; y: number } | null = null;
+  document.addEventListener(
+    'mousemove',
+    (e) => {
+      lastMouse = { x: e.clientX, y: e.clientY };
+    },
+    { passive: true },
+  );
+
+  function initDock() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll<HTMLElement>('[data-dock-zone]').forEach((zone) => {
+      // 导航持久化后只初始化一次
+      if (zone.dataset.bound) return;
+      zone.dataset.bound = '1';
+      const items = [...zone.querySelectorAll<HTMLElement>('[data-dock-item]')];
+      if (items.length === 0) return;
+
+      const RADIUS = 100; // 影响半径:目标 + 两侧邻居,余弦钟形衰减
+      const MAX_GROW = 19; // 最大增量 38→57(1.5x),鼓包恰好裹住珠子
+      const bases = new Map(items.map((el) => [el, el.offsetWidth]));
+
+      // ---- 液体皮肤:连续曲线 ----
+      // 整条下轮廓(含两个圆头)由一条以鼠标为中心的光滑包络一次生成:
+      // y(x) = 56 + depth · 余弦衰减(x - cx),圆头按所在位置的包络值
+      // 整体下沉。单路径、单填充、单描边,无钳制、无接缝、无截断面。
+      const path = zone.querySelector<SVGPathElement>('[data-pill-path]');
+      const PILL_H = 56;
+      const CORNER = 28;
+      let targetCx = 0;
+      let targetDepth = 0;
+      let curCx = 0;
+      let curDepth = 0;
+      let rafId = 0;
+
+      function buildSkin(W: number, cx: number, depth: number) {
+        const w = 78 + depth * 1.4; // 波形半径:随深度略增,包住两侧邻居
+        const yb = PILL_H;
+        const falloff = (x: number) => {
+          const d = Math.abs(x - cx);
+          return d < w ? (Math.cos((d / w) * Math.PI) + 1) / 2 : 0;
+        };
+        const yAt = (x: number) => yb + depth * falloff(x);
+
+        const parts: string[] = [
+          `M ${CORNER} 0`,
+          `L ${W - CORNER} 0`,
+          `Q ${W} 0 ${W} ${CORNER}`,
+        ];
+        // 右圆头:按包络值整体下沉
+        const yr = yAt(W - CORNER);
+        parts.push(`L ${W} ${yr - CORNER}`);
+        parts.push(`Q ${W} ${yr} ${W - CORNER} ${yr}`);
+        // 下边缘:从右向左采样包络曲线
+        const step = 6;
+        for (let x = W - CORNER - step; x > CORNER; x -= step) {
+          parts.push(`L ${x.toFixed(1)} ${yAt(x).toFixed(1)}`);
+        }
+        // 左圆头:同样下沉
+        const yl = yAt(CORNER);
+        parts.push(`L ${CORNER} ${yl.toFixed(1)}`);
+        parts.push(`Q 0 ${yl.toFixed(1)} 0 ${yl - CORNER}`);
+        parts.push(`L 0 ${CORNER}`, `Q 0 0 ${CORNER} 0`, 'Z');
+        return parts.join(' ');
+      }
+
+      function frame() {
+        curCx += (targetCx - curCx) * 0.22;
+        curDepth += (targetDepth - curDepth) * 0.22;
+        const W = zone.offsetWidth;
+        path?.setAttribute('d', buildSkin(W, curCx, curDepth));
+        if (Math.abs(targetCx - curCx) > 0.1 || Math.abs(targetDepth - curDepth) > 0.1) {
+          rafId = requestAnimationFrame(frame);
+        } else {
+          rafId = 0;
+        }
+      }
+
+      function kick() {
+        if (!rafId) rafId = requestAnimationFrame(frame);
+      }
+
+      if (path) {
+        // 初始画一次平面皮肤,再接管胶囊的表面
+        path.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
+        zone.classList.add('has-skin');
+        const onResize = () => {
+          if (targetDepth === 0) {
+            path.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
+          }
+        };
+        window.addEventListener('resize', onResize);
+        // 导航 DOM 每次换页都会重建,清理旧实例上的 window 监听
+        document.addEventListener(
+          'astro:before-swap',
+          () => window.removeEventListener('resize', onResize),
+          { once: true },
+        );
+      }
+
+      zone.addEventListener('mousemove', (e) => updateAt(e.clientX, e.clientY));
+
+      function updateAt(clientX: number, clientY: number) {
+        let maxGrow = 0;
+        for (const el of items) {
+          const rect = el.getBoundingClientRect();
+          const distance = Math.abs(clientX - (rect.left + rect.width / 2));
+          // 余弦钟形:中心 1,半径处平滑归 0,鼓包横截面接近波纹
+          const grow =
+            distance < RADIUS ? (Math.cos((distance / RADIUS) * Math.PI) + 1) / 2 : 0;
+          if (grow > maxGrow) maxGrow = grow;
+          const size = (bases.get(el) ?? 38) + grow * MAX_GROW;
+          el.style.width = `${size}px`;
+          el.style.height = `${size}px`;
+          el.style.setProperty('--grow', grow.toFixed(3));
+          el.style.setProperty('--mx', `${clientX - rect.left}px`);
+          el.style.setProperty('--my', `${clientY - rect.top}px`);
+        }
+        // 皮肤鼓包:裹住鼓出的按钮(9px 顶距 + 按钮超出部分 + 8px 内边距)
+        const zoneRect = zone.getBoundingClientRect();
+        targetCx = clientX - zoneRect.left;
+        targetDepth = Math.max(0, maxGrow * MAX_GROW - 1);
+        kick();
+      }
+
+      // 换页初始化时鼠标仍在胶囊上:无动画直接恢复到悬停状态。
+      // 在 astro:after-swap(新页快照捕获前)运行,新旧快照里的导航完全一致。
+      if (lastMouse) {
+        const zr = zone.getBoundingClientRect();
+        const inside =
+          lastMouse.x >= zr.left &&
+          lastMouse.x <= zr.right &&
+          lastMouse.y >= zr.top &&
+          lastMouse.y <= zr.bottom;
+        if (inside) {
+          zone.classList.add('no-anim');
+          updateAt(lastMouse.x, lastMouse.y);
+          curCx = targetCx;
+          curDepth = targetDepth;
+          path?.setAttribute('d', buildSkin(zone.offsetWidth, curCx, curDepth));
+          void zone.offsetWidth; // 强制同步布局,让快照捕获到最终状态
+          zone.classList.remove('no-anim');
+        }
+      }
+
+      zone.addEventListener('mouseleave', () => {
+        for (const el of items) {
+          el.style.width = '';
+          el.style.height = '';
+          el.style.setProperty('--grow', '0');
+        }
+        targetDepth = 0;
+        kick();
+      });
+    });
+  }
+  // after-swap:换页时在新页快照捕获前完成初始化与悬停态恢复
+  // page-load:首次加载与兜底
+  document.addEventListener('astro:after-swap', () => {
+    initHeader();
+    initDock();
+  });
+  document.addEventListener('astro:page-load', () => {
+    initHeader();
+    initDock();
+  });
 </script>
