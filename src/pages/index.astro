@@ -7,18 +7,30 @@ import PostList from '../components/PostList.astro';
 import FlipRow from '../components/FlipRow.astro';
 import TechLinkCard from '../components/TechLinkCard.astro';
 import Icon from '../components/Icon.astro';
-import { getAllPosts, formatDate } from '../utils/posts';
+import { getAllPosts, formatDate, countWords, collectTags } from '../utils/posts';
 import { site } from '../data/site';
 import { techLinks } from '../data/links';
 
 const posts = await getAllPosts();
 const recentPosts = posts.slice(0, 5);
-const latestDate = posts.length > 0 ? formatDate(posts[0].data.pubDate) : undefined;
 const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
+
+// Hero 统计行:全部由内容集合在构建时算出
+const firstPost = posts[posts.length - 1];
+const firstDate = firstPost ? formatDate(firstPost.data.pubDate) : '';
+const dayCount = firstPost
+  ? Math.max(1, Math.floor((Date.now() - firstPost.data.pubDate.getTime()) / 86400000) + 1)
+  : 0;
+const totalChars = posts.reduce((sum, p) => sum + countWords(p.body ?? ''), 0);
+const charText = totalChars >= 10000 ? `约 ${(totalChars / 10000).toFixed(1)} 万字` : `共 ${totalChars} 字`;
+const tagCount = collectTags(posts).size;
+const heroStats = firstPost
+  ? `自 ${firstDate} 的第一篇起 · 已写 ${dayCount} 天 · ${posts.length} 篇文章 · ${charText} · ${tagCount} 个标签`
+  : '';
 ---
 
 <BaseLayout>
-  <CenteredHero postCount={posts.length} latestDate={latestDate} />
+  <CenteredHero statsText={heroStats} />
 
   <div class="shell-container home-card-wrap">
     <FloatingMainCard overlap="hero">

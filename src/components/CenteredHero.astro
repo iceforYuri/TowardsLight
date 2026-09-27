@@ -3,11 +3,11 @@ import { site } from '../data/site';
 import CurrentStatus from './CurrentStatus.astro';
 
 interface Props {
-  postCount: number;
-  latestDate?: string;
+  /** 一行式统计文案,构建时从内容集合算出;支持打字机效果,无 JS 时直接显示全文 */
+  statsText: string;
 }
 
-const { postCount, latestDate } = Astro.props;
+const { statsText } = Astro.props;
 const hero = site.homeHero;
 ---
 
@@ -37,13 +37,10 @@ const hero = site.homeHero;
     <div class="hero-body" transition:name="hero-body">
       <p class="hero-tagline">{hero.tagline}</p>
       <p class="hero-intro">{hero.intro}</p>
-      <div class="hero-meta font-mono">
-        <span>{postCount} 篇文章</span>
-        {latestDate && <span class="meta-sep" aria-hidden="true">/</span>}
-        {latestDate && <span>最近更新 {latestDate}</span>}
-        <span class="meta-sep" aria-hidden="true">/</span>
-        <span>{site.stack.slice(0, 3).join(' · ')}</span>
-      </div>
+      <p class="hero-meta font-mono" data-typewriter>
+        <span data-typewriter-text>{statsText}</span><span class="type-caret" aria-hidden="true"
+        ></span>
+      </p>
     </div>
   </div>
 </section>
@@ -138,18 +135,48 @@ const hero = site.homeHero;
   }
 
   .hero-meta {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 4px 12px;
     margin-top: 30px;
     font-size: 12.5px;
     letter-spacing: 0.03em;
+    line-height: 1.8;
+    text-align: center;
     color: var(--color-muted);
   }
 
-  .meta-sep {
-    opacity: 0.5;
+  .type-caret {
+    display: none;
+  }
+
+  /* 打字中 / 刚打完:显示光标;打完后淡出 */
+  .hero-meta[data-typing='true'] .type-caret,
+  .hero-meta[data-done='true'] .type-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1.05em;
+    margin-left: 3px;
+    vertical-align: -0.15em;
+    background: var(--color-accent);
+  }
+
+  .hero-meta[data-typing='true'] .type-caret {
+    animation: caret-blink 0.85s steps(1) infinite;
+  }
+
+  .hero-meta[data-done='true'] .type-caret {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+
+  @keyframes caret-blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
   }
 
   @media (max-width: 640px) {
@@ -159,3 +186,47 @@ const hero = site.homeHero;
     }
   }
 </style>
+
+<script>
+  /**
+   * Hero 统计行打字机:只打一遍,打完光标淡出。
+   * SSR 已输出全文,减少动态偏好或无 JS 时直接保持全文显示。
+   */
+  function initTypewriter() {
+    document.querySelectorAll<HTMLElement>('[data-typewriter]').forEach((el) => {
+      const span = el.querySelector<HTMLElement>('[data-typewriter-text]');
+      if (!span) return;
+      const text = span.textContent ?? '';
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced || !text) return;
+
+      // 先量出全文宽度并固定,打字时文字从稳定的左缘生长,整行不晃动
+      const fullWidth = span.offsetWidth;
+      span.style.display = 'inline-block';
+      span.style.minWidth = `${fullWidth}px`;
+      span.style.maxWidth = '100%';
+      span.style.textAlign = 'left';
+      span.textContent = '';
+      el.dataset.typing = 'true';
+
+      let i = 0;
+      let timer: number | undefined;
+      const tick = () => {
+        i += 1;
+        span.textContent = text.slice(0, i);
+        if (i < text.length) {
+          timer = window.setTimeout(tick, 34);
+        } else {
+          // 保留 typing 让光标继续显示,由 done 状态把它淡出
+          el.dataset.done = 'true';
+        }
+      };
+      timer = window.setTimeout(tick, 420);
+
+      document.addEventListener('astro:before-swap', () => window.clearTimeout(timer), {
+        once: true,
+      });
+    });
+  }
+  document.addEventListener('astro:page-load', initTypewriter);
+</script>

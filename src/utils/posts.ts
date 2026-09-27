@@ -22,6 +22,13 @@ export function readingTime(body: string): number {
   return Math.max(1, minutes);
 }
 
+/** 全站总字数:中文按字、英文按词,用于首页统计 */
+export function countWords(body: string): number {
+  const cjk = (body.match(/[一-鿿]/g) || []).length;
+  const words = (body.replace(/[一-鿿]/g, ' ').match(/\S+/g) || []).length;
+  return cjk + words;
+}
+
 export function groupPostsByYear(posts: Post[]): Map<number, Post[]> {
   const map = new Map<number, Post[]>();
   for (const post of posts) {
