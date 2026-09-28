@@ -247,8 +247,10 @@ const intro = stripEnd(hero.intro);
     const statsEl = document.querySelector<HTMLElement>('.hero-meta[data-typewriter]');
     if (!taglineEl && !introEl && !statsEl) return;
 
-    // 多行同时打印，各自按自己的速度走完
-    await sleep(300, signal);
+    // 多行同时打印，各自按自己的速度走完。
+    // 注意:astro:page-load 触发于转场开始(updateCallbackDone),
+    // 延迟 460ms 等转场播完再开打,避免开头几个字被快照盖住
+    await sleep(460, signal);
     if (signal.aborted) return;
     await Promise.all([
       taglineEl ? runTypewriter(taglineEl, { charDelay: 60, signal }) : null,

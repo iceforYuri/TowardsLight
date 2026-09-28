@@ -235,8 +235,9 @@ const popDelay = (name: string) => {
 
   function initTagIndex() {
     document.querySelectorAll<HTMLElement>('[data-tag-index]').forEach((root) => {
-      // 转场结束后触发冒泡入场
-      root.classList.add('ready');
+      // 入场门控:astro:page-load 触发于转场开始(updateCallbackDone),
+      // 延迟 420ms 等转场播完再冒泡,否则被转场快照盖住
+      window.setTimeout(() => root.classList.add('ready'), 420);
 
       const cloud = root.querySelector('[data-tag-cloud]');
       root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((btn) => {

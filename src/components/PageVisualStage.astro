@@ -15,6 +15,13 @@ interface Props {
 const { title, description, image, meta } = Astro.props;
 // 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const typedDesc = description?.replace(/。\s*$/, '');
+/** meta 行拆段:数字包成计数段,打字光标经过时翻滚 */
+const metaSegments = meta
+  ? meta
+      .split(/(\d+)/)
+      .filter(Boolean)
+      .map((part) => (/^\d+$/.test(part) ? { n: Number(part) } : { t: part }))
+  : [];
 ---
 
 <section class="page-stage" data-stage>
@@ -46,7 +53,16 @@ const typedDesc = description?.replace(/。\s*$/, '');
                 aria-hidden="true">_</span>
             </p>
           )}
-          {meta && <p class="stage-meta font-mono">{meta}</p>}
+          {meta && (
+            <p class="stage-meta font-mono" data-typewriter><span data-typewriter-text>{metaSegments.map((seg) =>
+                  'n' in seg ? (
+                    <span class="meta-num" data-count-to={seg.n} data-decimals={0}>{seg.n}</span>
+                  ) : (
+                    <>{seg.t}</>
+                  )
+                )}</span><span class="type-caret" data-typewriter-caret aria-hidden="true">_</span>
+            </p>
+          )}
         </div>
       </div>
     </div>
@@ -153,7 +169,8 @@ const typedDesc = description?.replace(/。\s*$/, '');
   }
 
   /* 下划线光标:零宽度占位(不占布局，不顶动文字),打完代替句号常亮闪烁 */
-  .stage-desc .type-caret {
+  .stage-desc .type-caret,
+  .stage-meta .type-caret {
     display: inline-block;
     width: 0;
     overflow: visible;
@@ -164,9 +181,20 @@ const typedDesc = description?.replace(/。\s*$/, '');
     animation: caret-blink 0.85s steps(1) infinite;
   }
 
-  .stage-desc[data-typing='true'] .type-caret,
-  .stage-desc[data-done='true'] .type-caret {
+  [data-typewriter][data-typing='true'] .type-caret,
+  [data-typewriter][data-done='true'] .type-caret {
     visibility: visible;
+  }
+
+  /* 光标下移:desc 打完、meta 开时,desc 的光标淡出(meta 的光标成为终点) */
+  [data-typewriter][data-caret='fade'][data-done='true'] .type-caret {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .stage-meta .meta-num {
+    color: var(--color-accent-text);
   }
 
   @keyframes caret-blink {
@@ -262,17 +290,27 @@ const typedDesc = description?.replace(/。\s*$/, '');
     });
   }
 
-  /* 页面描述打字机:转场落定后(astro:page-load)打一遍;
+  /* 描述 → meta 顺序打字,光标随行下移(desc 打完淡出,meta 的光标成为终点);
      减少动态偏好时保持 SSR 全文 */
   let typeCtrl: AbortController | undefined;
+
+  async function runStageSequence(signal: AbortSignal) {
+    const desc = document.querySelector<HTMLElement>('.stage-desc[data-typewriter]');
+    const meta = document.querySelector<HTMLElement>('.stage-meta[data-typewriter]');
+    if (!desc && !meta) return;
+    if (desc) await runTypewriter(desc, { charDelay: 45, delay: 460, signal });
+    if (signal.aborted) return;
+    if (meta) {
+      if (desc) desc.dataset.caret = 'fade';
+      await runTypewriter(meta, { charDelay: 34, delay: 60, signal });
+    }
+  }
 
   function initStageTyping() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     typeCtrl?.abort();
     typeCtrl = new AbortController();
-    const desc = document.querySelector<HTMLElement>('.stage-desc[data-typewriter]');
-    if (!desc) return;
-    runTypewriter(desc, { charDelay: 45, delay: 240, signal: typeCtrl.signal });
+    runStageSequence(typeCtrl.signal);
   }
 
   document.addEventListener('astro:page-load', () => {

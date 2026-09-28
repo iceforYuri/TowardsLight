@@ -139,11 +139,14 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
 </style>
 
 <script>
-  /* 转场结束(astro:page-load)后加上 .ready,卡片按 --enter-delay 交错浮现 */
+  /* 入场门控:astro:page-load 在转场动画开始时就触发(updateCallbackDone),
+     转场快照会盖住新页面的入场动画;延迟 420ms(转场时长上限)再加 .ready */
   function initCategoryIndex() {
-    document
-      .querySelectorAll<HTMLElement>('[data-category-index]')
-      .forEach((root) => root.classList.add('ready'));
+    window.setTimeout(() => {
+      document
+        .querySelectorAll<HTMLElement>('[data-category-index]')
+        .forEach((root) => root.classList.add('ready'));
+    }, 420);
   }
   document.addEventListener('astro:page-load', initCategoryIndex);
 </script>
