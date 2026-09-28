@@ -2,7 +2,8 @@
 /**
  * 标签索引:支持 索引(网格) / 列表 两种视图切换
  * - 热度分档:heat = 0.5·√(count/max) + 0.5·排名归一，连续自适应;
- *   只作用于图标颜色与边框浓度(背景不动),由 --heat 派生两个 mix 百分比
+ *   色相沿 靛蓝(--color-cold)→ 褐红(--color-accent)的 OKLCH 路线旅行,
+ *   作用于图标与边框(背景不动),由 --heat-pct 驱动
  * - 冒泡入场:延迟按标签名哈希固定(0~600ms),构建时注入，配置零负担
  */
 import Icon from './Icon.astro';
@@ -60,15 +61,13 @@ const popDelay = (name: string) => {
   <ul class="tag-cloud view-grid" data-tag-cloud>
     {
       tags.map(([tag, count]) => {
-        const heat = heatOf(count);
-        const iconMix = Math.round(35 + heat * 65);
-        const borderMix = Math.round(heat * 40);
+        const heat = Math.round(heatOf(count) * 100);
         return (
           <li>
             <a
               href={`/tags/${encodeURIComponent(tag)}`}
               class="tag-chip"
-              style={`--icon-mix: ${iconMix}%; --border-mix: ${borderMix}%; --pop-delay: ${popDelay(tag)}ms`}
+              style={`--heat-pct: ${heat}%; --pop-delay: ${popDelay(tag)}ms`}
             >
               <Icon name="tag" size={13} class="chip-tag-icon" />
               <span class="tag-name">{tag}</span>
@@ -139,9 +138,9 @@ const popDelay = (name: string) => {
     gap: 7px;
     padding: 8px 15px;
     background: var(--color-surface-raised);
-    /* 热度越高边框越偏 accent */
-    border: 1px solid
-      color-mix(in oklab, var(--color-accent) var(--border-mix, 0%), var(--color-border));
+    /* 热度色相:靛蓝 → 褐红,沿 OKLCH 路线;图标实色,边框 48% 混合 */
+    --heat-hue: color-mix(in oklab, var(--color-accent) var(--heat-pct, 0%), var(--color-cold));
+    border: 1px solid color-mix(in oklab, var(--heat-hue) 48%, var(--color-border));
     border-radius: 999px;
     color: var(--color-text);
     font-family: var(--font-ui);
@@ -159,13 +158,9 @@ const popDelay = (name: string) => {
     transform: translateY(-1px);
   }
 
-  /* 小标签图标:热度越高越接近 accent 实色，冷标签退回 muted */
+  /* 小标签图标:沿热度色相路线,冷标签靛蓝、热标签褐红 */
   .tag-chip :global(.chip-tag-icon) {
-    color: color-mix(
-      in oklab,
-      var(--color-accent-text) var(--icon-mix, 35%),
-      var(--color-muted)
-    );
+    color: var(--heat-hue);
     flex-shrink: 0;
     align-self: center;
   }
