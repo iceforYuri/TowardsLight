@@ -27,17 +27,19 @@ npm run preview    # 本地预览构建产物
 
 ## 档案机制(展示站 / 个人站)
 
-全站所有"属于身份"的内容——站点配置、技术链接、文章、图片——都收在**档案目录**里，代码通过 `src/profiles/active` 这个统一指向读取：
+全站所有"属于身份"的内容——站点配置、技术链接、文章、图片——都收在**档案目录**里，代码通过 `src/profiles/active` 这个统一指向读取。档案按以下优先级解析：
 
-- **不设任何配置**:active 指向内置的 `src/profiles/showcase/`(示例内容),构建出来就是展示站
-- **设置 `SITE_PROFILE_DIR`**(环境变量或 `.env` 里一行)指向个人档案目录：整站切换为个人内容，示例数据一个字节都不会出现
+1. **`SITE_PROFILE_DIR`**（环境变量或 `.env` 里一行）——显式指定，优先级最高
+2. **`personal/`**（项目根目录，已 gitignore)——存在即自动命中；在里面 `git init` 就是独立的私有仓库，模板库永不跟踪
+3. **`src/profiles/showcase/`**——内置示例，前两者都没有时的默认值，构建出来就是展示站
 
-切换是整体替换而非字段合并——个人档案配错或缺字段会在构建期直接报错，示例数据没有机会漏进个人站。
+切换是整体替换而非字段合并——个人档案配错或缺字段会在构建期直接报错，示例数据没有机会漏进个人站。每次 dev/build 前日志会打印当前档案，不会静默切错。
 
 ```bash
-node scripts/new-profile.mjs ../my-blog-data   # 生成个人档案骨架
-SITE_PROFILE_DIR=../my-blog-data npm run dev   # 本地以个人档案预览
-npm run build:personal                          # 构建个人站 → dist-personal/
+node scripts/new-profile.mjs                 # 生成个人档案骨架(默认 ./personal)
+npm run dev                                  # personal/ 存在即预览个人站
+SITE_PROFILE_DIR=src/profiles/showcase npm run build   # 显式回切展示站
+npm run build:personal                        # 个人站 → dist-personal/
 ```
 
 档案目录结构(`site.ts`、`links.ts`、`posts/` 必填,`images/` 可选):

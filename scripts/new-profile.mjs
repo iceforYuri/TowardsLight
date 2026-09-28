@@ -6,13 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const target = process.argv[2];
-if (!target) {
-  console.error('用法: node scripts/new-profile.mjs <目标目录>');
-  console.error('例:   node scripts/new-profile.mjs ../my-blog-data');
-  process.exit(1);
-}
-
+const target = process.argv[2] ?? 'personal';
 const dest = path.resolve(target);
 if (fs.existsSync(dest) && fs.readdirSync(dest).length > 0) {
   console.error(`目标目录不为空: ${dest}`);
@@ -53,4 +47,10 @@ console.log('接下来:');
 console.log('  1. 编辑 site.ts(站点名/作者/bio/翻牌栏/分类配置)和 links.ts');
 console.log('  2. 把 _模板.md 复制改名开始写,draft 改 false 即发布');
 console.log('  3. 头像/封面图放进 images/,以 /images/... 引用');
-console.log(`  4. 预览: SITE_PROFILE_DIR=${dest} npm run dev`);
+if (path.dirname(dest) === process.cwd()) {
+  console.log('  4. 该目录在项目内且已被 gitignore;作为独立仓库维护:');
+  console.log('     cd personal && git init && git remote add origin <你的私有库地址>');
+  console.log('  5. dev/build 会自动命中 personal/,无需环境变量');
+} else {
+  console.log(`  4. 预览: SITE_PROFILE_DIR=${dest} npm run dev`);
+}

@@ -11,7 +11,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const profileDir = path.resolve(process.env.SITE_PROFILE_DIR ?? 'src/profiles/showcase');
+// 解析顺序:SITE_PROFILE_DIR 环境变量 > ./personal/(gitignore 的私有档案,约定位置)> 内置 showcase
+const conventional = path.join(root, 'personal');
+const profileDir = process.env.SITE_PROFILE_DIR
+  ? path.resolve(process.env.SITE_PROFILE_DIR)
+  : fs.existsSync(path.join(conventional, 'site.ts'))
+    ? conventional
+    : path.join(root, 'src/profiles/showcase');
 
 // 档案完整性校验:缺件直接报错并给出指引
 for (const required of ['site.ts', 'links.ts', 'posts']) {
@@ -51,5 +57,7 @@ fs.mkdirSync(imagesDir, { recursive: true });
 linkDir(profileDir, path.join(root, 'src/profiles/active'));
 linkDir(imagesDir, path.join(root, 'public/images'));
 
-const isDefault = profileDir === path.join(root, 'src/profiles/showcase');
-console.log(`[profile] 当前档案: ${isDefault ? 'showcase(内置示例)' : profileDir}`);
+const isShowcase = profileDir === path.join(root, 'src/profiles/showcase');
+console.log(
+  `[profile] 当前档案: ${isShowcase ? 'showcase(内置示例)' : profileDir}${!isShowcase && !process.env.SITE_PROFILE_DIR ? '(约定位置 personal/ 自动命中)' : ''}`,
+);
