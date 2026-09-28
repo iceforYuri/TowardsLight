@@ -134,9 +134,25 @@ npm run build      # 产物在 dist/
 **Vercel 双站部署方案**(后续启用):
 
 - 展示站：直接连接模板库，默认构建即是 showcase 档案
-- 个人站：连接个人库，构建命令改为现场拉模板：
-  `git clone https://github.com/<你>/TowardsLight.git t && cd t && npm ci && SITE_PROFILE_DIR=.. npm run build`，输出目录 `t/dist`
+- 个人站：连接个人库，模板在构建命令里现场克隆（详见下方"个人站 Vercel 配置")
 - 域名/子路径变化时用 `SITE_URL` / `SITE_BASE` 环境变量覆盖，内部链接全部是 base 感知的，无需改代码
+
+### 个人站 Vercel 配置(个人库只有数据,不能独立构建)
+
+Vercel 新建项目时连接**个人库**,然后:
+
+| 配置项 | 值 |
+| --- | --- |
+| Framework Preset | Other(数据库没有 package.json,检测不到 Astro) |
+| Build Command | `git clone https://x-access-token:$TEMPLATE_TOKEN@github.com/<你>/TowardsLight.git t && cd t && npm ci && SITE_PROFILE_DIR=.. npm run build` |
+| Output Directory | `t/dist` |
+| Install Command | `echo skip`(安装在 Build Command 里完成) |
+
+环境变量：`TEMPLATE_TOKEN` = 只读 PAT(与 GitHub Secret 同一个；模板库公开后改为普通 `git clone https://github.com/...` 即可删除该变量)。
+
+原理：Vercel 检出个人库后，构建命令把模板库克隆到 `t/`，再让模板的构建系统以 `SITE_PROFILE_DIR=..`（即个人库根目录）为数据源构建——与 GitHub Actions 里"两个 checkout 并排"完全同构。
+
+模板更新后个人站的重建触发：下次推文章时自动带上；或 Vercel 里手动 Redeploy;或给项目建一个 Deploy Hook(URL 存为个人库 Secret，由 ci.yml 里加个 curl 步骤每日触发)。
 
 ## 图标与字体
 
