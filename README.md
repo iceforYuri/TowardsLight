@@ -129,6 +129,8 @@ npm run build      # 产物在 dist/
 
 两个仓库各有一条**构建校验** CI(`ci.yml`):push 后验证各自可构建——模板库构建内置 showcase 档案，个人库拉模板库最新 main + 本库数据做完整构建。个人库只含数据，模板更新无需任何合并动作。
 
+**模板库私有期间**：个人库 CI 拉取模板需要一个只读凭证——GitHub 创建 fine-grained PAT（权限只选模板库的 `Contents: read`)，存为个人库的 Secret `TEMPLATE_REPO_TOKEN` 即可；模板库公开后删掉 workflow 里的 `token` 行并删除该 Secret，恢复零凭证。
+
 **Vercel 双站部署方案**(后续启用):
 
 - 展示站：直接连接模板库，默认构建即是 showcase 档案

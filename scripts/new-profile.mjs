@@ -67,9 +67,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           path: data
+      # ② 模板(私有期间需要只读 PAT;模板库公开后可删掉 token 这行)
       - uses: actions/checkout@v4
         with:
           repository: ${templateRepo}
+          token: \${{ secrets.TEMPLATE_REPO_TOKEN }}
           path: site
       - uses: actions/setup-node@v4
         with:
