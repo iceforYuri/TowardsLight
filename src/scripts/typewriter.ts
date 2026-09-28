@@ -49,7 +49,7 @@ const PUNCT_PAUSE: Record<string, number> = {
   '·': 3,
 };
 
-function countUp(
+export function countUp(
   el: HTMLElement,
   target: number,
   decimals: number,

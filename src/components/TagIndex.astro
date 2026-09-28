@@ -1,6 +1,9 @@
 ---
 /**
  * 标签索引:支持 索引(网格) / 列表 两种视图切换
+ * - 热度分档:heat = 0.5·√(count/max) + 0.5·排名归一，连续自适应;
+ *   只作用于图标颜色与边框浓度(背景不动),由 --heat 派生两个 mix 百分比
+ * - 冒泡入场:延迟按标签名哈希固定(0~600ms),构建时注入，配置零负担
  */
 import Icon from './Icon.astro';
 
@@ -9,6 +12,22 @@ interface Props {
 }
 
 const { tags } = Astro.props;
+
+const max = Math.max(1, ...tags.map(([, c]) => c));
+const distinct = [...new Set(tags.map(([, c]) => c))].sort((a, b) => a - b);
+
+const heatOf = (count: number) => {
+  const sqrtPart = Math.sqrt(count / max);
+  const rankPart = distinct.length > 1 ? distinct.indexOf(count) / (distinct.length - 1) : 1;
+  return 0.5 * sqrtPart + 0.5 * rankPart;
+};
+
+/** 标签名 → 固定伪随机延迟，同一标签每次访问在同一时刻冒泡 */
+const popDelay = (name: string) => {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return h % 600;
+};
 ---
 
 <div class="tag-index" data-tag-index>
@@ -40,15 +59,24 @@ const { tags } = Astro.props;
 
   <ul class="tag-cloud view-grid" data-tag-cloud>
     {
-      tags.map(([tag, count]) => (
-        <li>
-          <a href={`/tags/${encodeURIComponent(tag)}`} class="tag-chip">
-            <Icon name="tag" size={13} class="chip-tag-icon" />
-            <span class="tag-name">{tag}</span>
-            <span class="tag-count font-mono">{count}</span>
-          </a>
-        </li>
-      ))
+      tags.map(([tag, count]) => {
+        const heat = heatOf(count);
+        const iconMix = Math.round(35 + heat * 65);
+        const borderMix = Math.round(heat * 40);
+        return (
+          <li>
+            <a
+              href={`/tags/${encodeURIComponent(tag)}`}
+              class="tag-chip"
+              style={`--icon-mix: ${iconMix}%; --border-mix: ${borderMix}%; --pop-delay: ${popDelay(tag)}ms`}
+            >
+              <Icon name="tag" size={13} class="chip-tag-icon" />
+              <span class="tag-name">{tag}</span>
+              <span class="tag-count font-mono">{count}</span>
+            </a>
+          </li>
+        );
+      })
     }
   </ul>
 </div>
@@ -111,7 +139,9 @@ const { tags } = Astro.props;
     gap: 7px;
     padding: 8px 15px;
     background: var(--color-surface-raised);
-    border: 1px solid var(--color-border);
+    /* 热度越高边框越偏 accent */
+    border: 1px solid
+      color-mix(in oklab, var(--color-accent) var(--border-mix, 0%), var(--color-border));
     border-radius: 999px;
     color: var(--color-text);
     font-family: var(--font-ui);
@@ -129,9 +159,13 @@ const { tags } = Astro.props;
     transform: translateY(-1px);
   }
 
-  /* 小标签图标:与列表元信息同一色系(褐红 accent) */
+  /* 小标签图标:热度越高越接近 accent 实色，冷标签退回 muted */
   .tag-chip :global(.chip-tag-icon) {
-    color: var(--color-accent-text);
+    color: color-mix(
+      in oklab,
+      var(--color-accent-text) var(--icon-mix, 35%),
+      var(--color-muted)
+    );
     flex-shrink: 0;
     align-self: center;
   }
@@ -146,6 +180,25 @@ const { tags } = Astro.props;
   .tag-count {
     font-size: 11px;
     color: var(--color-muted);
+  }
+
+  /* 冒泡入场:JS+动效允许时先隐藏，转场结束后由 .ready 触发，
+     每个 chip 按 --pop-delay(标签名哈希)在不同时刻弹现 */
+  :global(html[data-typewriter='on']) .tag-cloud.view-grid .tag-chip {
+    opacity: 0;
+  }
+
+  :global(html[data-typewriter='on']) [data-tag-index].ready .tag-cloud.view-grid .tag-chip {
+    opacity: 1;
+    animation: chip-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    animation-delay: var(--pop-delay, 0ms);
+  }
+
+  @keyframes chip-pop {
+    from {
+      opacity: 0;
+      transform: scale(0.5) translateY(6px);
+    }
   }
 
   /* 列表视图 */
@@ -171,8 +224,13 @@ const { tags } = Astro.props;
 </style>
 
 <script>
+  import { countUp } from '../scripts/typewriter';
+
   function initTagIndex() {
     document.querySelectorAll<HTMLElement>('[data-tag-index]').forEach((root) => {
+      // 转场结束后触发冒泡入场
+      root.classList.add('ready');
+
       const cloud = root.querySelector('[data-tag-cloud]');
       root.querySelectorAll<HTMLButtonElement>('[data-view]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -184,6 +242,24 @@ const { tags } = Astro.props;
           cloud?.classList.toggle('view-grid', view === 'grid');
           cloud?.classList.toggle('view-list', view === 'list');
         });
+      });
+
+      // hover / 聚焦时篇数从 0 翻滚到真实值
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) return;
+      root.querySelectorAll<HTMLElement>('.tag-chip').forEach((chip) => {
+        const countEl = chip.querySelector<HTMLElement>('.tag-count');
+        if (!countEl) return;
+        const target = Number(countEl.textContent) || 0;
+        let rolling = false;
+        const roll = () => {
+          if (rolling) return;
+          rolling = true;
+          countUp(countEl, target, 0, 350);
+          window.setTimeout(() => (rolling = false), 380);
+        };
+        chip.addEventListener('mouseenter', roll);
+        chip.addEventListener('focusin', roll);
       });
     });
   }

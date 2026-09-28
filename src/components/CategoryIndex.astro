@@ -2,6 +2,7 @@
 import Icon from './Icon.astro';
 import type { Post } from '../utils/posts';
 import { formatDate } from '../utils/posts';
+import { site } from '../data/site';
 
 interface Props {
   categories: [string, Post[]][];
@@ -9,33 +10,32 @@ interface Props {
 
 const { categories } = Astro.props;
 
-const descriptions: Record<string, string> = {
-  前端: '浏览器里发生的事:渲染、性能、框架与交互细节',
-  后端: '服务端、数据库与接口设计的取舍',
-  工具: '提升日常效率的软件与工作流',
-  随笔: '技术之外,或技术与生活交界处的想法',
-  折腾记录: '从零到一把某个东西跑起来的过程',
-  博客搭建: '关于这个博客本身:内容模型、配置与主题系统',
-};
+const fallback = { icon: 'folder', tone: 'accent' as const, description: '这个分类下的文章' };
+const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
 ---
 
-<div class="category-index">
+<div class="category-index" data-category-index>
   {
-    categories.map(([name, posts]) => (
-      <a href={`/categories/${encodeURIComponent(name)}`} class="category-card">
-        <div class="card-head">
-          <span class="card-icon" aria-hidden="true">
-            <Icon name="folder" size={17} />
-          </span>
-          <span class="card-count font-mono">{posts.length} 篇</span>
-        </div>
-        <h2 class="card-name font-display">{name}</h2>
-        <p class="card-desc">{descriptions[name] ?? '这个分类下的文章'}</p>
-        <p class="card-latest font-mono">
-          最近更新 {formatDate(posts[0].data.pubDate)}
-        </p>
-      </a>
-    ))
+    categories.map(([name, posts], i) => {
+      const meta = metaOf(name);
+      return (
+        <a
+          href={`/categories/${encodeURIComponent(name)}`}
+          class="category-card"
+          style={`--enter-delay: ${i * 40}ms`}
+        >
+          <div class="card-head">
+            <span class:list={['card-icon', `tone-${meta.tone}`]} aria-hidden="true">
+              <Icon name={meta.icon} size={17} />
+            </span>
+            <span class="card-count font-mono">{posts.length} 篇</span>
+          </div>
+          <h2 class="card-name font-display">{name}</h2>
+          <p class="card-desc">{meta.description}</p>
+          <p class="card-latest font-mono">最近更新 {formatDate(posts[0].data.pubDate)}</p>
+        </a>
+      );
+    })
   }
 </div>
 
@@ -67,6 +67,24 @@ const descriptions: Record<string, string> = {
     color: var(--color-text);
   }
 
+  /* 入场交错浮现:JS+动效允许时先隐藏，转场结束后由 .ready 触发 */
+  :global(html[data-typewriter='on']) .category-card {
+    opacity: 0;
+  }
+
+  :global(html[data-typewriter='on']) [data-category-index].ready .category-card {
+    opacity: 1;
+    animation: card-rise 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+    animation-delay: var(--enter-delay, 0ms);
+  }
+
+  @keyframes card-rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
   .card-head {
     display: flex;
     justify-content: space-between;
@@ -81,8 +99,17 @@ const descriptions: Record<string, string> = {
     width: 34px;
     height: 34px;
     border-radius: 9px;
+  }
+
+  /* 双色池:青(contrast)/ 褐红(accent),由 categoryMeta 固定分配 */
+  .card-icon.tone-contrast {
     background: var(--color-contrast-soft);
     color: var(--color-contrast);
+  }
+
+  .card-icon.tone-accent {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-text);
   }
 
   .card-count {
@@ -110,3 +137,13 @@ const descriptions: Record<string, string> = {
     opacity: 0.8;
   }
 </style>
+
+<script>
+  /* 转场结束(astro:page-load)后加上 .ready,卡片按 --enter-delay 交错浮现 */
+  function initCategoryIndex() {
+    document
+      .querySelectorAll<HTMLElement>('[data-category-index]')
+      .forEach((root) => root.classList.add('ready'));
+  }
+  document.addEventListener('astro:page-load', initCategoryIndex);
+</script>
