@@ -3,6 +3,7 @@ import { ClientRouter } from 'astro:transitions';
 import FloatingCenteredHeader from '../components/FloatingCenteredHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { site } from '../data/site';
+import { u } from '../utils/url';
 import '../styles/global.css';
 
 interface Props {
@@ -21,8 +22,8 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="alternate" type="application/rss+xml" title={site.siteName} href="/rss.xml" />
+    <link rel="icon" type="image/svg+xml" href={u('/favicon.svg')} />
+    <link rel="alternate" type="application/rss+xml" title={site.siteName} href={u('/rss.xml')} />
 
     <!-- 字体加载:display=swap,失败时回退到系统字体栈 -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

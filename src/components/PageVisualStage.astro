@@ -4,6 +4,7 @@
  * 无图片时退化为纯色主题背景
  */
 import Icon from './Icon.astro';
+import { u } from '../utils/url';
 
 interface Props {
   title: string;
@@ -29,7 +30,7 @@ const metaSegments = meta
     image && (
       <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
         <img
-          src={image}
+          src={u(image)}
           alt=""
           class="stage-img img-reveal"
           loading="eager"

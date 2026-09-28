@@ -3,6 +3,7 @@ import Icon from './Icon.astro';
 import type { Post } from '../utils/posts';
 import { formatDate } from '../utils/posts';
 import { site } from '../data/site';
+import { u } from '../utils/url';
 
 interface Props {
   categories: [string, Post[]][];
@@ -20,7 +21,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
       const meta = metaOf(name);
       return (
         <a
-          href={`/categories/${encodeURIComponent(name)}`}
+          href={u(`/categories/${encodeURIComponent(name)}`)}
           class="category-card"
           style={`--enter-delay: ${i * 40}ms`}
         >

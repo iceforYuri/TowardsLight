@@ -4,6 +4,7 @@ import PageVisualStage from '../../components/PageVisualStage.astro';
 import FloatingMainCard from '../../components/FloatingMainCard.astro';
 import PostList from '../../components/PostList.astro';
 import { getAllPosts, collectCategories } from '../../utils/posts';
+import { u } from '../../utils/url';
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
@@ -23,7 +24,7 @@ const { category, posts } = Astro.props;
     <FloatingMainCard overlap="stage">
       <PostList posts={posts} showUpdated />
       <p class="back-line">
-        <a href="/categories">← 返回所有分类</a>
+        <a href={u('/categories')}>← 返回所有分类</a>
       </p>
     </FloatingMainCard>
   </div>

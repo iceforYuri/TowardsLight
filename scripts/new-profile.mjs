@@ -5,6 +5,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 
 const target = process.argv[2] ?? 'personal';
 const dest = path.resolve(target);
@@ -40,6 +41,66 @@ draft: true
 想给它配图标和颜色,在 site.ts 的 categoryMeta 里加一条即可(不配则用默认样式)。
 `;
 fs.writeFileSync(path.join(dest, 'posts', '_模板.md'), templatePost);
+
+// 部署流水线:从模板库的 git remote 解析 owner/repo,写入档案的 workflow
+let templateRepo = '你的用户名/模板库名';
+try {
+  const url = execSync('git config --get remote.origin.url', { encoding: 'utf-8' }).trim();
+  const m = url.match(/[:/]([^/:]+\/[^/]+?)(?:\.git)?$/);
+  if (m) templateRepo = m[1];
+} catch {
+  /* 无 remote 时用占位符,用户自行替换 */
+}
+const deployYaml = `# 个人站流水线:本仓库只有数据,模板在构建时拉取公开库最新 main
+name: 构建并部署个人站
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 19 * * *' # 每天 UTC 19:23 同步模板最新代码
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages-personal
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: data
+      - uses: actions/checkout@v4
+        with:
+          repository: ${templateRepo}
+          path: site
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: cd site && npm ci
+      - name: 构建(数据目录指向本仓库)
+        run: cd site && npm run build
+        env:
+          SITE_PROFILE_DIR: \${{ github.workspace }}/data
+          SITE_URL: \${{ vars.SITE_URL || 'https://example.github.io/改成你的域名' }}
+          SITE_BASE: \${{ vars.SITE_BASE || '/' }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+      - uses: actions/deploy-pages@v4
+`;
+const workflowDir = path.join(dest, '.github', 'workflows');
+fs.mkdirSync(workflowDir, { recursive: true });
+fs.writeFileSync(path.join(workflowDir, 'deploy.yml'), deployYaml);
 
 console.log(`档案骨架已生成: ${dest}`);
 console.log('');

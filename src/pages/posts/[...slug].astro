@@ -8,6 +8,7 @@ import ReadingProgress from '../../components/ReadingProgress.astro';
 import PostNavigation from '../../components/PostNavigation.astro';
 import Icon from '../../components/Icon.astro';
 import { getAllPosts, formatDate, readingTime } from '../../utils/posts';
+import { u } from '../../utils/url';
 import '../../styles/prose.css';
 
 export async function getStaticPaths() {
@@ -38,7 +39,7 @@ const minutes = readingTime(post.body ?? '');
       cover && (
         <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
           <img
-            src={cover}
+            src={u(cover)}
             alt={coverAlt ?? ''}
             class="stage-img img-reveal"
             style={`object-position: ${coverPosition};`}
@@ -58,7 +59,7 @@ const minutes = readingTime(post.body ?? '');
         {/* 文章头部 */}
         <header class="article-header">
           <div class="article-breadcrumb font-mono">
-            <a href={`/categories/${encodeURIComponent(category)}`} class="crumb-category">
+            <a href={u(`/categories/${encodeURIComponent(category)}`)} class="crumb-category">
               <Icon name="folder" size={13} />
               {category}
             </a>
@@ -88,7 +89,7 @@ const minutes = readingTime(post.body ?? '');
               <ul class="article-tags" aria-label="文章标签">
                 {tags.map((tag) => (
                   <li>
-                    <a href={`/tags/${encodeURIComponent(tag)}`} class="tag-pill font-mono">
+                    <a href={u(`/tags/${encodeURIComponent(tag)}`)} class="tag-pill font-mono">
                       #{tag}
                     </a>
                   </li>

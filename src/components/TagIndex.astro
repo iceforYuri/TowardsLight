@@ -7,6 +7,7 @@
  * - 冒泡入场:延迟按标签名哈希固定(0~600ms),构建时注入，配置零负担
  */
 import Icon from './Icon.astro';
+import { u } from '../utils/url';
 
 interface Props {
   tags: [string, number][];
@@ -72,7 +73,7 @@ const popDelay = (name: string) => {
         return (
           <li>
             <a
-              href={`/tags/${encodeURIComponent(tag)}`}
+              href={u(`/tags/${encodeURIComponent(tag)}`)}
               class="tag-chip"
               style={`--heat-pct: ${heat}%; --pop-delay: ${popDelay(tag)}ms`}
             >

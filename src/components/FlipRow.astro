@@ -7,6 +7,7 @@
  */
 import Icon from './Icon.astro';
 import { site } from '../data/site';
+import { u } from '../utils/url';
 
 const { panels, interval } = site.flipRow;
 ---
@@ -22,7 +23,7 @@ const { panels, interval } = site.flipRow;
               <li>
                 {item.href ? (
                   <a
-                    href={item.href}
+                    href={u(item.href)}
                     class="panel-chip"
                     {...(item.href.startsWith('http')
                       ? { target: '_blank', rel: 'noopener noreferrer' }

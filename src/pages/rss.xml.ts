@@ -5,6 +5,8 @@ import { site } from '../data/site';
 
 export async function GET(context: APIContext) {
   const posts = await getAllPosts();
+  // link 需带上部署 base(BASE_URL 以 / 结尾),否则子路径部署时 RSS 链接丢前缀
+  const base = import.meta.env.BASE_URL;
   return rss({
     title: site.siteName,
     description: site.bio,
@@ -13,7 +15,7 @@ export async function GET(context: APIContext) {
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,
-      link: `/posts/${post.id}`,
+      link: `${base}posts/${post.id}`,
     })),
   });
 }

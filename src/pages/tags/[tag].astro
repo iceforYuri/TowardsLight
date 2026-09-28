@@ -4,6 +4,7 @@ import PageVisualStage from '../../components/PageVisualStage.astro';
 import FloatingMainCard from '../../components/FloatingMainCard.astro';
 import PostList from '../../components/PostList.astro';
 import { getAllPosts, collectTags } from '../../utils/posts';
+import { u } from '../../utils/url';
 
 export async function getStaticPaths() {
   const posts = await getAllPosts();
@@ -23,7 +24,7 @@ const { tag, posts } = Astro.props;
     <FloatingMainCard overlap="stage">
       <PostList posts={posts} showUpdated />
       <p class="back-line">
-        <a href="/tags">← 返回所有标签</a>
+        <a href={u('/tags')}>← 返回所有标签</a>
       </p>
     </FloatingMainCard>
   </div>

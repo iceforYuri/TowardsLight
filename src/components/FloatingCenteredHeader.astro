@@ -2,8 +2,11 @@
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { site } from '../data/site';
+import { u } from '../utils/url';
 
-const pathname = Astro.url.pathname.replace(/\/+$/, '') || '/';
+// Astro.url.pathname 含部署 base,先剥掉再与裸导航路径比较
+const basePrefix = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const pathname = (Astro.url.pathname.replace(/\/+$/, '') || '/').slice(basePrefix.length) || '/';
 
 function isActive(href: string) {
   if (href === '/') return pathname === '/';
@@ -18,7 +21,7 @@ function isActive(href: string) {
     <svg class="pill-skin" aria-hidden="true">
       <path data-pill-path d="" />
     </svg>
-    <a href="/" class="site-mark" aria-label={`${site.siteName} 首页`}>
+    <a href={u('/')} class="site-mark" aria-label={`${site.siteName} 首页`}>
       <span class="mark-dot" aria-hidden="true"></span>
       <span class="mark-text">{site.siteName}</span>
     </a>
@@ -28,7 +31,7 @@ function isActive(href: string) {
       {
         site.navigation.map((item) => (
           <a
-            href={item.href}
+            href={u(item.href)}
             class:list={['dock-item', 'dock-nav-item', { active: isActive(item.href) }]}
             data-dock-item
             data-tip={item.label}
@@ -47,7 +50,7 @@ function isActive(href: string) {
       {
         site.socialLinks.map((link) => (
           <a
-            href={link.href}
+            href={u(link.href)}
             class="dock-item"
             data-dock-item
             data-tip={link.label}
@@ -82,7 +85,7 @@ function isActive(href: string) {
         site.navigation.map((item) => (
           <li>
             <a
-              href={item.href}
+              href={u(item.href)}
               class:list={['mobile-link', { active: isActive(item.href) }]}
               aria-current={isActive(item.href) ? 'page' : undefined}
             >

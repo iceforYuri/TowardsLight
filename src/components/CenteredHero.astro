@@ -1,5 +1,6 @@
 ---
 import { site } from '../data/site';
+import { u } from '../utils/url';
 import CurrentStatus from './CurrentStatus.astro';
 
 type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
@@ -25,7 +26,7 @@ const intro = stripEnd(hero.intro);
     hero.background && (
       <div class="hero-backdrop" aria-hidden="true" transition:name="stage-media">
         <img
-          src={hero.background}
+          src={u(hero.background)}
           alt=""
           class="hero-img img-reveal"
           loading="eager"

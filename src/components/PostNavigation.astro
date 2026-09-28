@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { formatDate, type Post } from '../utils/posts';
+import { u } from '../utils/url';
 
 interface Props {
   prev?: Post;
@@ -14,7 +15,7 @@ const { prev, next } = Astro.props;
   (prev || next) && (
     <nav class="post-nav" aria-label="上一篇 / 下一篇">
       {prev ? (
-        <a href={`/posts/${prev.id}`} class="nav-card prev">
+        <a href={u(`/posts/${prev.id}`)} class="nav-card prev">
           <span class="nav-label font-mono">
             <Icon name="arrow-left" size={13} /> 上一篇
           </span>
@@ -25,7 +26,7 @@ const { prev, next } = Astro.props;
         <span />
       )}
       {next ? (
-        <a href={`/posts/${next.id}`} class="nav-card next">
+        <a href={u(`/posts/${next.id}`)} class="nav-card next">
           <span class="nav-label font-mono">
             下一篇 <Icon name="arrow-right" size={13} />
           </span>

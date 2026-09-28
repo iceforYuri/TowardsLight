@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { site } from '../data/site';
+import { u } from '../utils/url';
 
 const year = new Date().getFullYear();
 ---
@@ -15,7 +16,7 @@ const year = new Date().getFullYear();
       {
         site.socialLinks.map((link) => (
           <a
-            href={link.href}
+            href={u(link.href)}
             class="footer-link"
             {...(link.href.startsWith('http')
               ? { target: '_blank', rel: 'noopener noreferrer' }

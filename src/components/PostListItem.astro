@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { formatDate, type Post } from '../utils/posts';
+import { u } from '../utils/url';
 
 interface Props {
   post: Post;
@@ -17,17 +18,17 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     <time class="post-date font-mono" datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
     <div class="post-main">
       <h3 class="post-title">
-        <a href={`/posts/${post.id}`} class="title-link">{title}</a>
+        <a href={u(`/posts/${post.id}`)} class="title-link">{title}</a>
       </h3>
       {showDescription && <p class="post-desc">{description}</p>}
       <div class="post-meta font-mono">
-        <a href={`/categories/${encodeURIComponent(category)}`} class="meta-category">
+        <a href={u(`/categories/${encodeURIComponent(category)}`)} class="meta-category">
           <Icon name="folder" size={13} />
           {category}
         </a>
         {
           tags.slice(0, 4).map((tag) => (
-            <a href={`/tags/${encodeURIComponent(tag)}`} class="meta-tag">
+            <a href={u(`/tags/${encodeURIComponent(tag)}`)} class="meta-tag">
               <Icon name="tag" size={12} />
               {tag}
             </a>

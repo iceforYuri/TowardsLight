@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FloatingMainCard from '../components/FloatingMainCard.astro';
 import Icon from '../components/Icon.astro';
+import { u } from '../utils/url';
 ---
 
 <BaseLayout title="404">
@@ -16,21 +17,21 @@ import Icon from '../components/Icon.astro';
   <div class="shell-container">
     <FloatingMainCard overlap="stage" class="nf-card">
       <nav class="nf-links" aria-label="可用入口">
-        <a href="/" class="nf-link">
+        <a href={u('/')} class="nf-link">
           <Icon name="home" size={16} />
           <span>
             <strong>回到首页</strong>
             <small>近期文章和近况</small>
           </span>
         </a>
-        <a href="/archive" class="nf-link">
+        <a href={u('/archive')} class="nf-link">
           <Icon name="archive" size={16} />
           <span>
             <strong>文章归档</strong>
             <small>按年份翻一翻</small>
           </span>
         </a>
-        <a href="/tags" class="nf-link">
+        <a href={u('/tags')} class="nf-link">
           <Icon name="tag" size={16} />
           <span>
             <strong>标签索引</strong>

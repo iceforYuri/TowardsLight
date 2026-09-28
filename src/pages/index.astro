@@ -8,6 +8,7 @@ import FlipRow from '../components/FlipRow.astro';
 import TechLinkCard from '../components/TechLinkCard.astro';
 import Icon from '../components/Icon.astro';
 import { getAllPosts, formatDate, countWords, collectTags } from '../utils/posts';
+import { u } from '../utils/url';
 import { site } from '../data/site';
 import { techLinks } from '../data/links';
 
@@ -56,7 +57,7 @@ const statsSegments: StatSegment[] = firstPost
       {/* 个人介绍 */}
       <section class="home-intro">
         <img
-          src={site.avatar}
+          src={u(site.avatar)}
           alt={`${site.author} 的头像`}
           class="intro-avatar"
           width="64"
@@ -75,7 +76,7 @@ const statsSegments: StatSegment[] = firstPost
 
       {/* 近期文章 */}
       <section>
-        <SectionHeader title="近期文章" count={posts.length} href="/archive" linkText="归档" />
+        <SectionHeader title="近期文章" count={posts.length} href={u('/archive')} linkText="归档" />
         <PostList posts={recentPosts} />
       </section>
 
@@ -83,7 +84,7 @@ const statsSegments: StatSegment[] = firstPost
 
       {/* 精选技术链接 */}
       <section>
-        <SectionHeader title="常用去处" href="/links" linkText="完整目录" />
+        <SectionHeader title="常用去处" href={u('/links')} linkText="完整目录" />
         <div class="featured-links">
           {featuredLinks.map((link) => <TechLinkCard link={link} />)}
         </div>
@@ -94,10 +95,10 @@ const statsSegments: StatSegment[] = firstPost
       {/* 联系与订阅 */}
       <section class="home-contact">
         <p class="contact-text">
-          文章通过 <a href="/rss.xml">RSS</a> 发布更新，也欢迎邮件交流:
+          文章通过 <a href={u('/rss.xml')}>RSS</a> 发布更新，也欢迎邮件交流:
           <a href={`mailto:${site.email}`}>{site.email}</a>
         </p>
-        <a href="/archive" class="contact-cta font-ui">
+        <a href={u('/archive')} class="contact-cta font-ui">
           浏览全部文章 <Icon name="arrow-right" size={15} />
         </a>
       </section>
