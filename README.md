@@ -25,30 +25,62 @@ npm run preview    # 本地预览构建产物
 
 要求 Node.js ≥ 18.17(推荐 22+)。
 
+## 档案机制(展示站 / 个人站)
+
+全站所有"属于身份"的内容——站点配置、技术链接、文章、图片——都收在**档案目录**里，代码通过 `src/profiles/active` 这个统一指向读取：
+
+- **不设任何配置**:active 指向内置的 `src/profiles/showcase/`(示例内容),构建出来就是展示站
+- **设置 `SITE_PROFILE_DIR`**(环境变量或 `.env` 里一行)指向个人档案目录：整站切换为个人内容，示例数据一个字节都不会出现
+
+切换是整体替换而非字段合并——个人档案配错或缺字段会在构建期直接报错，示例数据没有机会漏进个人站。
+
+```bash
+node scripts/new-profile.mjs ../my-blog-data   # 生成个人档案骨架
+SITE_PROFILE_DIR=../my-blog-data npm run dev   # 本地以个人档案预览
+npm run build:personal                          # 构建个人站 → dist-personal/
+```
+
+档案目录结构(`site.ts`、`links.ts`、`posts/` 必填,`images/` 可选):
+
+```text
+my-blog-data/
+├── site.ts      # 站名、作者、bio、Hero、状态、翻牌栏、分类图标配置
+├── links.ts     # 技术链接目录
+├── posts/       # Markdown 文章(draft: true 不发布)
+└── images/      # 头像、封面、Hero 背景,以 /images/... 引用
+```
+
+个人档案可以放本地私有目录，也可以是独立私有仓库——它只含数据，模板更新由构建时拉取最新代码自动获得，无需合并。
+
 ## 目录结构
 
 ```text
 ├── astro.config.mjs          # Astro 配置(站点 URL、prefetch、Shiki 双主题)
+├── scripts/
+│   ├── use-profile.mjs       # 档案切换:维护 profiles/active 与 public/images 指向
+│   └── new-profile.mjs       # 个人档案骨架脚手架
 ├── src/
-│   ├── content.config.ts     # 内容集合 Schema(posts)
-│   ├── content/posts/        # 全部文章(Markdown)
+│   ├── content.config.ts     # 内容集合 Schema(posts,源指向 profiles/active/posts)
+│   ├── profiles/
+│   │   ├── showcase/         # 内置示例档案(site/links/posts/images)
+│   │   └── active -> ...     # 当前档案指向(junction,gitignore)
 │   ├── data/
-│   │   ├── site.ts           # 站点配置:名称、简介、导航、Hero、状态、技术栈
-│   │   └── links.ts          # 技术链接目录数据
+│   │   ├── site.ts           # 转发层:profiles/active/site
+│   │   └── links.ts          # 转发层:profiles/active/links
 │   ├── layouts/
 │   │   └── BaseLayout.astro  # 页面壳层:head、主题初始化、导航、页脚
-│   ├── components/           # 24 个职责单一的组件
+│   ├── components/           # 职责单一的组件
 │   ├── pages/                # 路由:index / archive / tags / categories / links / posts / 404 / rss.xml
 │   ├── styles/
 │   │   ├── global.css        # 设计变量、双主题、基础排版
 │   │   └── prose.css         # 文章正文排版(含代码块双主题)
 │   └── utils/posts.ts        # 文章查询、日期格式化、标签/分类聚合
-└── public/images/            # Hero 背景、封面、头像、favicon
+└── public/images -> ...      # 指向当前档案的 images/(junction,gitignore)
 ```
 
 ## 写一篇文章
 
-在 `src/content/posts/` 新建 `.md` 文件,frontmatter 遵循以下 schema(`src/content.config.ts`):
+在当前档案的 `posts/` 目录新建 `.md` 文件(默认为 `src/profiles/showcase/posts/`),frontmatter 遵循以下 schema(`src/content.config.ts`):
 
 ```yaml
 ---
@@ -72,8 +104,8 @@ featured: false                 # 可选
 
 | 配置项 | 位置 |
 | --- | --- |
-| 站名、作者、简介、导航、Hero 文案与背景、当前状态、技术栈 | `src/data/site.ts` |
-| 技术链接目录(分组、图标、精选、状态) | `src/data/links.ts` |
+| 站名、作者、简介、导航、Hero 文案与背景、当前状态、翻牌栏、分类图标 | 当前档案的 `site.ts`(默认为 `src/profiles/showcase/site.ts`) |
+| 技术链接目录(分组、图标、精选、状态) | 当前档案的 `links.ts` |
 | 双色主题变量(画布/表面/文字/边框/强调色/阴影) | `src/styles/global.css` 顶部 |
 | 部署站点 URL(影响 RSS / canonical) | `astro.config.mjs` 的 `site` |
 

@@ -4,9 +4,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/use-profile.mjs",
     "dev": "astro dev",
     "start": "astro dev",
+    "prebuild": "node scripts/use-profile.mjs",
     "build": "astro check && astro build",
+    "build:personal": "npm run build -- --outDir dist-personal",
+    "precheck": "node scripts/use-profile.mjs",
+    "check": "astro check",
+    "new-profile": "node scripts/new-profile.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
