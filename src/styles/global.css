@@ -409,6 +409,19 @@ html[data-nav-dir='back'] ::view-transition-new(main-card) {
   }
 }
 
+/* ============ 打字机:待打文本首绘即隐藏 ============ */
+/* JS 可用且非减少动态时,由内联脚本给 html 打 data-typewriter='on';
+   待打文本 visibility 隐藏(占位不塌陷),打到哪行哪行显现。
+   无 JS / 减少动态偏好:不隐藏,SSR 全文直接可见 */
+html[data-typewriter='on'] [data-typewriter] [data-typewriter-text] {
+  visibility: hidden;
+}
+
+html[data-typewriter='on'] [data-typewriter][data-typing] [data-typewriter-text],
+html[data-typewriter='on'] [data-typewriter][data-done] [data-typewriter-text] {
+  visibility: visible;
+}
+
 /* ============ 通用工具 ============ */
 
 .skip-link {

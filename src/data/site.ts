@@ -12,8 +12,8 @@ export interface FlipPanel {
 export const site = {
   siteName: '拾光集',
   siteNameEn: 'SHIGUANG',
-  author: '陈拾光',
-  bio: '一名写代码的普通人,喜欢把事情弄清楚,再把弄清楚的过程写下来。目前在杭州,做全栈开发,关心 Web 性能、开发工具和个人知识管理。',
+  author: '拾光捡金',
+  bio: '逐梦的年华，于斑驳树影中，窥见细数的曾经',
   shortBio: '写代码,写文字,记录把问题想清楚的过程。',
   avatar: '/images/avatar.svg',
   /** 头像裁切焦点(object-position),竖向人像建议 'center 30%' */
@@ -33,9 +33,9 @@ export const site = {
   ],
   homeHero: {
     greeting: '拾光集',
-    tagline: '一名全栈工程师的数字自留地',
+    tagline: '一名数字守望者的赛博自留地',
     intro:
-      '在这里记录技术文章、折腾过的工具、读到一半的书,以及一些想清楚了和还没想清楚的事。',
+      '于拾光中窥见昨日的恍惚，那犹豫与今日一致',
     background: '/images/hero-bg.svg',
   },
   pageBackdrops: {

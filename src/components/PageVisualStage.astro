@@ -13,6 +13,8 @@ interface Props {
 }
 
 const { title, description, image, meta } = Astro.props;
+// 打字机文本:去掉行尾句号,由闪烁的下划线光标接替终止符
+const typedDesc = description?.replace(/。\s*$/, '');
 ---
 
 <section class="page-stage" data-stage>
@@ -36,12 +38,12 @@ const { title, description, image, meta } = Astro.props;
       <h1 class="stage-title font-display" transition:name="page-title">{title}</h1>
       <div class="stage-extra">
         <div class="stage-extra-inner">
-          {description && (
+          {typedDesc && (
             <p class="stage-desc" data-typewriter>
-              <span data-typewriter-text>{description}</span><span
+              <span data-typewriter-text>{typedDesc}</span><span
                 class="type-caret"
                 data-typewriter-caret
-                aria-hidden="true"></span>
+                aria-hidden="true">_</span>
             </p>
           )}
           {meta && <p class="stage-meta font-mono">{meta}</p>}
@@ -150,29 +152,18 @@ const { title, description, image, meta } = Astro.props;
     color: var(--color-muted);
   }
 
-  /* 打字光标:打字中闪烁,打完淡出 */
+  /* 下划线光标:打字中闪烁,打完代替句号常亮闪烁(动画常驻,多光标同步) */
   .stage-desc .type-caret {
-    display: none;
+    visibility: hidden;
+    margin-left: 1px;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    animation: caret-blink 0.85s steps(1) infinite;
   }
 
   .stage-desc[data-typing='true'] .type-caret,
   .stage-desc[data-done='true'] .type-caret {
-    display: inline-block;
-    width: 2px;
-    height: 1em;
-    margin-left: 2px;
-    vertical-align: -0.12em;
-    background: var(--color-accent);
-  }
-
-  .stage-desc[data-typing='true'] .type-caret {
-    animation: caret-blink 0.85s steps(1) infinite;
-  }
-
-  .stage-desc[data-done='true'] .type-caret {
-    animation: none;
-    opacity: 0;
-    transition: opacity 0.7s ease;
+    visibility: visible;
   }
 
   @keyframes caret-blink {
@@ -278,7 +269,7 @@ const { title, description, image, meta } = Astro.props;
     typeCtrl = new AbortController();
     const desc = document.querySelector<HTMLElement>('.stage-desc[data-typewriter]');
     if (!desc) return;
-    runTypewriter(desc, { charDelay: 26, delay: 240, signal: typeCtrl.signal });
+    runTypewriter(desc, { charDelay: 45, delay: 240, signal: typeCtrl.signal });
   }
 
   document.addEventListener('astro:page-load', () => {

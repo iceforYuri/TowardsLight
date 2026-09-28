@@ -14,6 +14,10 @@ interface Props {
 
 const { statsSegments } = Astro.props;
 const hero = site.homeHero;
+// 打字机文本:去掉行尾句号,由闪烁的下划线光标接替终止符
+const stripEnd = (s: string) => s.replace(/。\s*$/, '');
+const tagline = stripEnd(hero.tagline);
+const intro = stripEnd(hero.intro);
 ---
 
 <section class="hero">
@@ -40,17 +44,17 @@ const hero = site.homeHero;
     </div>
     <h1 class="hero-title font-display" transition:name="page-title">{hero.greeting}</h1>
     <div class="hero-body" transition:name="hero-body">
-      <p class="hero-tagline" data-typewriter>
-        <span data-typewriter-text>{hero.tagline}</span><span
+      <p class="hero-tagline" data-typewriter data-caret="fade">
+        <span data-typewriter-text>{tagline}</span><span
           class="type-caret"
           data-typewriter-caret
-          aria-hidden="true"></span>
+          aria-hidden="true">_</span>
       </p>
       <p class="hero-intro" data-typewriter>
-        <span data-typewriter-text>{hero.intro}</span><span
+        <span data-typewriter-text>{intro}</span><span
           class="type-caret"
           data-typewriter-caret
-          aria-hidden="true"></span>
+          aria-hidden="true">_</span>
       </p>
       <p class="hero-meta font-mono" data-typewriter>
         <span data-typewriter-text>{
@@ -61,7 +65,7 @@ const hero = site.homeHero;
               <>{seg.v}</>
             ),
           )
-        }</span><span class="type-caret" data-typewriter-caret aria-hidden="true"></span>
+        }</span><span class="type-caret" data-typewriter-caret aria-hidden="true">_</span>
       </p>
     </div>
   </div>
@@ -169,29 +173,26 @@ const hero = site.homeHero;
     color: var(--color-accent-text);
   }
 
+  /* 下划线光标:打字中跟随,打完代替句号常亮闪烁。
+     动画从首帧就挂在元素上(visibility 隐藏也走时钟),多处光标闪烁同步 */
   .type-caret {
-    display: none;
-  }
-
-  /* 打字中 / 刚打完:显示光标;打完后淡出 */
-  [data-typewriter][data-typing='true'] .type-caret,
-  [data-typewriter][data-done='true'] .type-caret {
-    display: inline-block;
-    width: 2px;
-    height: 1.05em;
-    margin-left: 2px;
-    vertical-align: -0.15em;
-    background: var(--color-accent);
-  }
-
-  [data-typewriter][data-typing='true'] .type-caret {
+    visibility: hidden;
+    margin-left: 1px;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
     animation: caret-blink 0.85s steps(1) infinite;
   }
 
+  [data-typewriter][data-typing='true'] .type-caret,
   [data-typewriter][data-done='true'] .type-caret {
+    visibility: visible;
+  }
+
+  /* 标题行的光标只是打字指示,打完即淡出;句子行的光标代替句号常驻 */
+  [data-typewriter][data-caret='fade'][data-done='true'] .type-caret {
     animation: none;
     opacity: 0;
-    transition: opacity 0.7s ease;
+    transition: opacity 0.5s ease;
   }
 
   @keyframes caret-blink {
@@ -238,20 +239,19 @@ const hero = site.homeHero;
     });
 
   async function runHeroSequence(signal: AbortSignal) {
-    const tagline = document.querySelector<HTMLElement>('.hero-tagline[data-typewriter]');
-    const intro = document.querySelector<HTMLElement>('.hero-intro[data-typewriter]');
-    const stats = document.querySelector<HTMLElement>('.hero-meta[data-typewriter]');
-    if (!tagline && !intro && !stats) return;
+    const taglineEl = document.querySelector<HTMLElement>('.hero-tagline[data-typewriter]');
+    const introEl = document.querySelector<HTMLElement>('.hero-intro[data-typewriter]');
+    const statsEl = document.querySelector<HTMLElement>('.hero-meta[data-typewriter]');
+    if (!taglineEl && !introEl && !statsEl) return;
 
-    await sleep(260, signal);
+    // 多行同时打印,各自按自己的速度走完
+    await sleep(300, signal);
     if (signal.aborted) return;
-    if (tagline) await runTypewriter(tagline, { charDelay: 32, signal });
-    await sleep(90, signal);
-    if (signal.aborted) return;
-    if (intro) await runTypewriter(intro, { charDelay: 22, signal });
-    await sleep(110, signal);
-    if (signal.aborted) return;
-    if (stats) await runTypewriter(stats, { charDelay: 22, signal });
+    await Promise.all([
+      taglineEl ? runTypewriter(taglineEl, { charDelay: 60, signal }) : null,
+      introEl ? runTypewriter(introEl, { charDelay: 48, signal }) : null,
+      statsEl ? runTypewriter(statsEl, { charDelay: 42, signal }) : null,
+    ]);
   }
 
   function initHeroTyping() {

@@ -49,6 +49,10 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
         } catch (e) {
           document.documentElement.dataset.theme = 'light';
         }
+        // 打字机:JS 可用且非减少动态时,待打文本首绘即隐藏(见 global.css)
+        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.dataset.typewriter = 'on';
+        }
       })();
     </script>
 
@@ -69,7 +73,7 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
         const from = document.documentElement;
         const to = (e as unknown as { newDocument: Document }).newDocument.documentElement;
         // html 属性会被新文档整体替换,需要带过去的状态都在这里复制
-        for (const key of ['theme', 'navDir', 'softFade'] as const) {
+        for (const key of ['theme', 'navDir', 'softFade', 'typewriter'] as const) {
           const value = from.dataset[key];
           if (value) to.dataset[key] = value;
         }

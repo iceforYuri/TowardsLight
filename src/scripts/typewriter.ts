@@ -140,6 +140,8 @@ export async function runTypewriter(
   // (多行文本的末行重新居中;窗口缩放时可自然回流)
   window.setTimeout(() => {
     if (signal?.aborted) return;
+    // 光标要淡出的行(如标题行):淡出后移除,避免不可见光标占位导致文字偏离中心
+    if (root.dataset.caret === 'fade') caret?.remove();
     textEl.style.display = '';
     textEl.style.minWidth = '';
     textEl.style.minHeight = '';
