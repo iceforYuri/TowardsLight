@@ -51,26 +51,17 @@ try {
 } catch {
   /* 无 remote 时用占位符,用户自行替换 */
 }
-const deployYaml = `# 个人站流水线:本仓库只有数据,模板在构建时拉取公开库最新 main
-name: 构建并部署个人站
+const deployYaml = `# 个人库 CI:push 后拉模板库最新 main 做完整构建,校验文章/配置合法
+# (部署由 Vercel 承担;模板更新无需任何动作,每次构建自动拉最新)
+name: 构建校验
 
 on:
   push:
     branches: [main]
-  schedule:
-    - cron: '23 19 * * *' # 每天 UTC 19:23 同步模板最新代码
   workflow_dispatch:
 
-permissions:
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages-personal
-  cancel-in-progress: true
-
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -90,17 +81,10 @@ jobs:
         run: cd site && npm run build
         env:
           SITE_PROFILE_DIR: \${{ github.workspace }}/data
-          SITE_URL: \${{ vars.SITE_URL || 'https://example.github.io/改成你的域名' }}
-          SITE_BASE: \${{ vars.SITE_BASE || '/' }}
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site/dist
-      - uses: actions/deploy-pages@v4
 `;
 const workflowDir = path.join(dest, '.github', 'workflows');
 fs.mkdirSync(workflowDir, { recursive: true });
-fs.writeFileSync(path.join(workflowDir, 'deploy.yml'), deployYaml);
+fs.writeFileSync(path.join(workflowDir, 'ci.yml'), deployYaml);
 
 console.log(`档案骨架已生成: ${dest}`);
 console.log('');

@@ -127,23 +127,14 @@ featured: false                 # 可选
 npm run build      # 产物在 dist/
 ```
 
-### GitHub Pages 双站自动化(推荐)
+两个仓库各有一条**构建校验** CI(`ci.yml`):push 后验证各自可构建——模板库构建内置 showcase 档案，个人库拉模板库最新 main + 本库数据做完整构建。个人库只含数据，模板更新无需任何合并动作。
 
-仓库内置两条流水线，覆盖"模板更新 + 内容更新"的全自动双站部署：
+**Vercel 双站部署方案**(后续启用):
 
-- **模板库** `.github/workflows/showcase.yml`:push 到 main → 构建展示站(内置 showcase 档案)→ 部署 Pages
-- **个人库** `.github/workflows/deploy.yml`(`new-profile` 脚手架自动生成):push 文章/配置 → 拉模板库最新 main 构建个人站；另有每天定时同步模板 + 手动触发
-
-个人库只含数据，模板永远在构建时现场拉取，所以**模板更新对个人库完全透明，无需任何合并/拉取动作**。
-
-首次启用需要在两个仓库各自点一次：Settings → Pages → Source 选 **GitHub Actions**。之后全部自动。
-
-| 部署相关变量 | 作用 | 默认值 |
-| --- | --- | --- |
-| `SITE_URL`(仓库 Variables) | 站点完整 URL,影响 RSS/canonical | 该库的 Pages 地址 |
-| `SITE_BASE`(仓库 Variables) | 部署子路径(如 `/TowardsLight_context/`) | 项目页子路径 |
-
-绑定自定义域名时把 `SITE_URL` 改为域名、`SITE_BASE` 改为 `/` 即可，内部链接全部是 base 感知的。
+- 展示站：直接连接模板库，默认构建即是 showcase 档案
+- 个人站：连接个人库，构建命令改为现场拉模板：
+  `git clone https://github.com/<你>/TowardsLight.git t && cd t && npm ci && SITE_PROFILE_DIR=.. npm run build`，输出目录 `t/dist`
+- 域名/子路径变化时用 `SITE_URL` / `SITE_BASE` 环境变量覆盖，内部链接全部是 base 感知的，无需改代码
 
 ## 图标与字体
 

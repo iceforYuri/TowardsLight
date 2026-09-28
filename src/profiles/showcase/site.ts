@@ -12,7 +12,7 @@ export interface FlipPanel {
 export const site = {
   siteName: '拾光集',
   /** 站点完整 URL(影响 RSS/canonical);部署时可用 SITE_URL 环境变量覆盖 */
-  siteUrl: 'https://iceforyuri.github.io/TowardsLight',
+  siteUrl: 'https://blog.example.com',
   siteNameEn: 'SHIGUANG',
   author: '拾光捡金',
   bio: '逐梦的年华，于斑驳树影中，窥见细数的曾经',
