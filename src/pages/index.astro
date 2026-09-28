@@ -45,7 +45,7 @@ const statsSegments: StatSegment[] = firstPost
       { t: 'num', v: tagCount },
       { t: 'text', v: ' 个标签' },
     ]
-  : [{ t: 'text', v: '还没有文章,敬请期待' }];
+  : [{ t: 'text', v: '还没有文章，敬请期待' }];
 ---
 
 <BaseLayout>
@@ -94,7 +94,7 @@ const statsSegments: StatSegment[] = firstPost
       {/* 联系与订阅 */}
       <section class="home-contact">
         <p class="contact-text">
-          文章通过 <a href="/rss.xml">RSS</a> 发布更新,也欢迎邮件交流:
+          文章通过 <a href="/rss.xml">RSS</a> 发布更新，也欢迎邮件交流:
           <a href={`mailto:${site.email}`}>{site.email}</a>
         </p>
         <a href="/archive" class="contact-cta font-ui">
@@ -120,11 +120,11 @@ const statsSegments: StatSegment[] = firstPost
   .intro-avatar {
     width: 64px;
     height: 64px;
-    /* 圆角方形,与卡片同一圆角语言 */
+    /* 圆角方形，与卡片同一圆角语言 */
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
     flex-shrink: 0;
-    /* 任意比例的原图都居中裁切成正方形,不变形 */
+    /* 任意比例的原图都居中裁切成正方形，不变形 */
     object-fit: cover;
   }
 

@@ -35,6 +35,20 @@ function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   });
 }
 
+/** 标点停顿:打到这些字符后多停几拍(charDelay 的倍数),模拟真实打字的呼吸感 */
+const PUNCT_PAUSE: Record<string, number> = {
+  ',': 6,
+  '，': 6,
+  '、': 5,
+  ';': 6,
+  '；': 6,
+  ':': 5,
+  '：': 5,
+  '。': 8,
+  '—': 5,
+  '·': 3,
+};
+
 function countUp(
   el: HTMLElement,
   target: number,
@@ -120,6 +134,9 @@ export async function runTypewriter(
         seg.node.nodeValue = seg.value.slice(0, i);
         if (caret) textEl.appendChild(caret);
         await sleep(charDelay, signal);
+        // 标点处多停一拍
+        const pause = PUNCT_PAUSE[seg.value[i - 1]];
+        if (pause) await sleep(charDelay * pause, signal);
       }
     } else {
       // 数字段:光标经过即开始翻动,不等待,继续向后打字

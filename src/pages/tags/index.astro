@@ -13,7 +13,7 @@ const tags = [...collectTags(posts).entries()].map(([tag, list]) => [tag, list.l
 <BaseLayout title="Tags" description={`${site.siteName} 的文章标签`}>
   <PageVisualStage
     title="标签"
-    description="文章按主题打的标签,比分类更细一些。"
+    description="文章按主题打的标签，比分类更细一些。"
     image={site.pageBackdrops.tags || undefined}
     meta={`共 ${tags.length} 个标签`}
   />

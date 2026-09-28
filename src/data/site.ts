@@ -14,7 +14,7 @@ export const site = {
   siteNameEn: 'SHIGUANG',
   author: '拾光捡金',
   bio: '逐梦的年华，于斑驳树影中，窥见细数的曾经',
-  shortBio: '写代码,写文字,记录把问题想清楚的过程。',
+  shortBio: '写代码，写文字，记录把问题想清楚的过程。',
   avatar: '/images/avatar.svg',
   /** 头像裁切焦点(object-position),竖向人像建议 'center 30%' */
   avatarPosition: 'center',

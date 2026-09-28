@@ -41,7 +41,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'Astro',
-    description: '这个博客现在跑在它上面,内容优先,交付的 JS 很少',
+    description: '这个博客现在跑在它上面，内容优先，交付的 JS 很少',
     href: 'https://astro.build',
     group: 'Build',
     icon: 'rocket',
@@ -51,7 +51,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'Vite',
-    description: '日常项目的默认构建工具,快得理所当然',
+    description: '日常项目的默认构建工具，快得理所当然',
     href: 'https://vite.dev',
     group: 'Build',
     icon: 'zap',
@@ -59,7 +59,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'MDN Web Docs',
-    description: '查 Web API 的第一站,比任何二手教程都可靠',
+    description: '查 Web API 的第一站，比任何二手教程都可靠',
     href: 'https://developer.mozilla.org',
     group: 'Explore',
     icon: 'book-open',
@@ -68,7 +68,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'web.dev',
-    description: '性能和可用性相关的系统文章,常翻常新',
+    description: '性能和可用性相关的系统文章，常翻常新',
     href: 'https://web.dev',
     group: 'Explore',
     icon: 'compass',
@@ -76,7 +76,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'Hacker News',
-    description: '每天扫一眼标题,深读靠运气',
+    description: '每天扫一眼标题，深读靠运气',
     href: 'https://news.ycombinator.com',
     group: 'Community',
     icon: 'message-square',
@@ -84,7 +84,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'V2EX',
-    description: '中文技术社区,看大家折腾什么东西',
+    description: '中文技术社区，看大家折腾什么东西',
     href: 'https://www.v2ex.com',
     group: 'Community',
     icon: 'messages-square',
@@ -100,7 +100,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'Obsidian',
-    description: '文章草稿都在本地 Markdown 里,先写好再发布',
+    description: '文章草稿都在本地 Markdown 里，先写好再发布',
     href: 'https://obsidian.md',
     group: 'Write',
     icon: 'notebook-pen',
@@ -109,7 +109,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'Raycast',
-    description: '启动器、剪贴板历史、窗口管理,一个顶好几个',
+    description: '启动器、剪贴板历史、窗口管理，一个顶好几个',
     href: 'https://www.raycast.com',
     group: 'Tools',
     icon: 'command',
@@ -117,7 +117,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'Excalidraw',
-    description: '画架构草图和手示意图,不需要好看,需要快',
+    description: '画架构草图和手示意图，不需要好看，需要快',
     href: 'https://excalidraw.com',
     group: 'Tools',
     icon: 'pen-tool',
@@ -133,7 +133,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'RSS 阅读器',
-    description: '用 RSS 追博客,信息来源自己做主',
+    description: '用 RSS 追博客，信息来源自己做主',
     href: 'https://netnewswire.com',
     group: 'Currently Using',
     icon: 'rss',
