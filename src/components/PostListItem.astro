@@ -87,7 +87,7 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     font-weight: 600;
     line-height: 1.5;
     color: var(--color-text);
-    /* 超长标题:最多两行,优雅截断 */
+    /* 超长标题:最多两行，优雅截断 */
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -96,7 +96,7 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     transition: color 0.2s ease;
   }
 
-  /* 标题链接:文字本身可点,点击范围通过 ::after 拉伸到整行 */
+  /* 标题链接:文字本身可点，点击范围通过 ::after 拉伸到整行 */
   .title-link {
     color: inherit;
   }
@@ -160,7 +160,7 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     background: var(--color-contrast-soft);
   }
 
-  /* 标签:褐红 + 小标签图标,不用 # 前缀 */
+  /* 标签:褐红 + 小标签图标，不用 # 前缀 */
   .meta-tag {
     color: var(--color-accent-text);
   }

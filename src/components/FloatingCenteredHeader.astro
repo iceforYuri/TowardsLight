@@ -13,8 +13,8 @@ function isActive(href: string) {
 
 <header class="site-header" transition:name="site-header" transition:animate="none">
   <nav class="nav-pill" aria-label="主导航" data-dock-zone>
-    {/* 液体皮肤:整条下轮廓(含圆头)是一条以鼠标为中心的光滑包络,
-        单路径单描边,鼓包自然流入圆头,无接缝无截断面 */}
+    {/* 液体皮肤:整条下轮廓(含圆头)是一条以鼠标为中心的光滑包络，
+        单路径单描边，鼓包自然流入圆头，无接缝无截断面 */}
     <svg class="pill-skin" aria-hidden="true">
       <path data-pill-path d="" />
     </svg>
@@ -23,7 +23,7 @@ function isActive(href: string) {
       <span class="mark-text">{site.siteName}</span>
     </a>
 
-    {/* 方案 A:图标 Dock 导航,悬停 tooltip + 距离感应放大 */}
+    {/* 方案 A:图标 Dock 导航，悬停 tooltip + 距离感应放大 */}
     <div class="dock-nav">
       {
         site.navigation.map((item) => (
@@ -43,7 +43,7 @@ function isActive(href: string) {
     </div>
 
     <div class="nav-actions">
-      {/* 功能区小 Dock:图标圆钮,鼠标靠近按距离放大 */}
+      {/* 功能区小 Dock:图标圆钮，鼠标靠近按距离放大 */}
       {
         site.socialLinks.map((link) => (
           <a
@@ -114,7 +114,7 @@ function isActive(href: string) {
     pointer-events: auto;
     position: relative;
     display: flex;
-    /* 顶部锚定 + 固定高度:轨道纵向不动,宽度随内容横向伸缩 */
+    /* 顶部锚定 + 固定高度:轨道纵向不动，宽度随内容横向伸缩 */
     align-items: flex-start;
     gap: 6px;
     height: var(--nav-height);
@@ -128,7 +128,7 @@ function isActive(href: string) {
       border-color 0.35s ease;
   }
 
-  /* JS 液体皮肤就位后,矩形的背景/边框/阴影交给 SVG 路径 */
+  /* JS 液体皮肤就位后，矩形的背景/边框/阴影交给 SVG 路径 */
   .nav-pill.has-skin {
     background: none;
     border-color: transparent;
@@ -209,7 +209,7 @@ function isActive(href: string) {
     margin-top: 0;
   }
 
-  /* Dock 圆钮:真尺寸驱动,放大时向下鼓出并推开邻居 */
+  /* Dock 圆钮:真尺寸驱动，放大时向下鼓出并推开邻居 */
   .dock-item {
     position: relative;
     display: inline-flex;
@@ -241,7 +241,7 @@ function isActive(href: string) {
     color: var(--color-accent-text);
   }
 
-  /* 泡泡光影:环境光 + 追踪高光 + 表面色,随放大浮现 */
+  /* 泡泡光影:环境光 + 追踪高光 + 表面色，随放大浮现 */
   /* (:global 是因为主题切换按钮在子组件里) */
   :global(.dock-bubble) {
     position: absolute;
@@ -290,7 +290,7 @@ function isActive(href: string) {
     background: var(--color-accent);
   }
 
-  /* Dock tooltip:导航在顶部,提示向下弹出 */
+  /* Dock tooltip:导航在顶部，提示向下弹出 */
   .nav-pill :global([data-dock-item])::after {
     content: attr(data-tip);
     position: absolute;
@@ -319,7 +319,7 @@ function isActive(href: string) {
     transform: translateX(-50%) translateY(0);
   }
 
-  /* 转场期间恢复悬停态时禁用过渡,让快照直接捕获最终状态 */
+  /* 转场期间恢复悬停态时禁用过渡，让快照直接捕获最终状态 */
   .nav-pill.no-anim .dock-item,
   .nav-pill.no-anim :global(.theme-toggle),
   .nav-pill.no-anim :global(.dock-bubble) {
@@ -470,7 +470,7 @@ function isActive(href: string) {
       }
     });
 
-    // 主题切换:事件委托,兼容 View Transitions
+    // 主题切换:事件委托，兼容 View Transitions
     document.addEventListener('click', (e) => {
       const toggle = (e.target as HTMLElement).closest('[data-theme-toggle]');
       if (!toggle) return;
@@ -486,12 +486,12 @@ function isActive(href: string) {
   bindHeaderGlobal();
 
   // Dock 真尺寸放大 + 液体皮肤:
-  // 按钮由 JS 驱动宽高等比放大,邻居被真实推开;
-  // 胶囊皮肤是 SVG 路径,下边缘在鼠标位置局部下垂,把鼓出的按钮裹住。
-  // --grow 同时驱动泡泡光影与投影,--mx/--my 让高光跟随鼠标。
+  // 按钮由 JS 驱动宽高等比放大，邻居被真实推开;
+  // 胶囊皮肤是 SVG 路径，下边缘在鼠标位置局部下垂，把鼓出的按钮裹住。
+  // --grow 同时驱动泡泡光影与投影，--mx/--my 让高光跟随鼠标。
 
-  // 常驻记录鼠标位置:换页后新导航初始化时,若鼠标仍悬停在胶囊上,
-  // 用最后已知位置合成一次激活,避免"闪现缩回"
+  // 常驻记录鼠标位置:换页后新导航初始化时，若鼠标仍悬停在胶囊上，
+  // 用最后已知位置合成一次激活，避免"闪现缩回"
   let lastMouse: { x: number; y: number } | null = null;
   document.addEventListener(
     'mousemove',
@@ -510,14 +510,14 @@ function isActive(href: string) {
       const items = [...zone.querySelectorAll<HTMLElement>('[data-dock-item]')];
       if (items.length === 0) return;
 
-      const RADIUS = 100; // 影响半径:目标 + 两侧邻居,余弦钟形衰减
+      const RADIUS = 100; // 影响半径:目标 + 两侧邻居，余弦钟形衰减
       const MAX_GROW = 19; // 最大增量 38→57(1.5x),鼓包恰好裹住珠子
       const bases = new Map(items.map((el) => [el, el.offsetWidth]));
 
       // ---- 液体皮肤:连续曲线 ----
       // 整条下轮廓(含两个圆头)由一条以鼠标为中心的光滑包络一次生成:
       // y(x) = 56 + depth · 余弦衰减(x - cx),圆头按所在位置的包络值
-      // 整体下沉。单路径、单填充、单描边,无钳制、无接缝、无截断面。
+      // 整体下沉。单路径、单填充、单描边，无钳制、无接缝、无截断面。
       const path = zone.querySelector<SVGPathElement>('[data-pill-path]');
       const PILL_H = 56;
       const CORNER = 28;
@@ -528,7 +528,7 @@ function isActive(href: string) {
       let rafId = 0;
 
       function buildSkin(W: number, cx: number, depth: number) {
-        const w = 78 + depth * 1.4; // 波形半径:随深度略增,包住两侧邻居
+        const w = 78 + depth * 1.4; // 波形半径:随深度略增，包住两侧邻居
         const yb = PILL_H;
         const falloff = (x: number) => {
           const d = Math.abs(x - cx);
@@ -575,7 +575,7 @@ function isActive(href: string) {
       }
 
       if (path) {
-        // 初始画一次平面皮肤,再接管胶囊的表面
+        // 初始画一次平面皮肤，再接管胶囊的表面
         path.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
         zone.classList.add('has-skin');
         const onResize = () => {
@@ -584,7 +584,7 @@ function isActive(href: string) {
           }
         };
         window.addEventListener('resize', onResize);
-        // 导航 DOM 每次换页都会重建,清理旧实例上的 window 监听
+        // 导航 DOM 每次换页都会重建，清理旧实例上的 window 监听
         document.addEventListener(
           'astro:before-swap',
           () => window.removeEventListener('resize', onResize),
@@ -618,7 +618,7 @@ function isActive(href: string) {
       }
 
       // 换页初始化时鼠标仍在胶囊上:无动画直接恢复到悬停状态。
-      // 在 astro:after-swap(新页快照捕获前)运行,新旧快照里的导航完全一致。
+      // 在 astro:after-swap(新页快照捕获前)运行，新旧快照里的导航完全一致。
       if (lastMouse) {
         const zr = zone.getBoundingClientRect();
         const inside =
@@ -632,7 +632,7 @@ function isActive(href: string) {
           curCx = targetCx;
           curDepth = targetDepth;
           path?.setAttribute('d', buildSkin(zone.offsetWidth, curCx, curDepth));
-          void zone.offsetWidth; // 强制同步布局,让快照捕获到最终状态
+          void zone.offsetWidth; // 强制同步布局，让快照捕获到最终状态
           zone.classList.remove('no-anim');
         }
       }

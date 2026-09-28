@@ -74,12 +74,12 @@ const { panels, interval } = site.flipRow;
   }
 
   .flip-viewport {
-    /* 面板用 grid 同格堆叠而非绝对定位,参与固有宽度计算;
+    /* 面板用 grid 同格堆叠而非绝对定位，参与固有宽度计算;
        注意不能写 flex:1:flex-basis:0 会把固有宽度贡献坍缩成 0,
        翻牌栏又会退回去跟随 bio 行宽 */
     display: grid;
     min-width: 0;
-    /* 栏高固定,两套内容在同一位置滚换 */
+    /* 栏高固定，两套内容在同一位置滚换 */
     height: 36px;
     overflow: hidden;
   }
@@ -192,13 +192,13 @@ const { panels, interval } = site.flipRow;
 
   @media (max-width: 640px) {
     .flip-viewport {
-      /* 移动端铺满整行,chips 自然换行 */
+      /* 移动端铺满整行，chips 自然换行 */
       flex: 1;
       height: auto;
       min-height: 36px;
     }
 
-    /* 移动端只渲染当前面板,宽度随容器 */
+    /* 移动端只渲染当前面板，宽度随容器 */
     .flip-panel {
       display: none;
     }
@@ -245,7 +245,7 @@ const { panels, interval } = site.flipRow;
         timer = undefined;
       };
 
-      // 悬停或聚焦时暂停,不翻走正在看的内容
+      // 悬停或聚焦时暂停，不翻走正在看的内容
       root.addEventListener('mouseenter', stop);
       root.addEventListener('mouseleave', start);
       root.addEventListener('focusin', stop);

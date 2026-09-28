@@ -13,7 +13,7 @@ interface Props {
 }
 
 const { title, description, image, meta } = Astro.props;
-// 打字机文本:去掉行尾句号,由闪烁的下划线光标接替终止符
+// 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const typedDesc = description?.replace(/。\s*$/, '');
 ---
 
@@ -130,7 +130,7 @@ const typedDesc = description?.replace(/。\s*$/, '');
     transition: font-size 0.4s ease;
   }
 
-  /* 描述与 meta:grid 行高动画,折叠/展开对称平滑 */
+  /* 描述与 meta:grid 行高动画，折叠/展开对称平滑 */
   .stage-extra {
     display: grid;
     grid-template-rows: 1fr;
@@ -152,7 +152,7 @@ const typedDesc = description?.replace(/。\s*$/, '');
     color: var(--color-muted);
   }
 
-  /* 下划线光标:零宽度占位(不占布局,不顶动文字),打完代替句号常亮闪烁 */
+  /* 下划线光标:零宽度占位(不占布局，不顶动文字),打完代替句号常亮闪烁 */
   .stage-desc .type-caret {
     display: inline-block;
     width: 0;
@@ -217,7 +217,7 @@ const typedDesc = description?.replace(/。\s*$/, '');
     transition: transform 0.3s ease;
   }
 
-  /* 折叠状态:与展开共用同一组可动画属性,双向平滑 */
+  /* 折叠状态:与展开共用同一组可动画属性，双向平滑 */
   .page-stage.is-collapsed {
     min-height: 0;
   }

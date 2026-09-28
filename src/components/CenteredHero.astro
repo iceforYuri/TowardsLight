@@ -6,7 +6,7 @@ type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number 
 
 interface Props {
   /**
-   * 统计行分段:文本逐字打出,数字段(num)在光标经过时翻动计数。
+   * 统计行分段:文本逐字打出，数字段(num)在光标经过时翻动计数。
    * 构建时从内容集合算出;d 为小数位数(如 8.4 万字)。
    */
   statsSegments: StatSegment[];
@@ -14,7 +14,7 @@ interface Props {
 
 const { statsSegments } = Astro.props;
 const hero = site.homeHero;
-// 打字机文本:去掉行尾句号,由闪烁的下划线光标接替终止符
+// 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const stripEnd = (s: string) => s.replace(/。\s*$/, '');
 const tagline = stripEnd(hero.tagline);
 const intro = stripEnd(hero.intro);
@@ -106,7 +106,7 @@ const intro = stripEnd(hero.intro);
     );
   }
 
-  /* 深色主题:整幅再压一层,保证标题区对比度 */
+  /* 深色主题:整幅再压一层，保证标题区对比度 */
   :global(html[data-theme='dark']) .hero-scrim {
     background: linear-gradient(
       to bottom,
@@ -174,7 +174,7 @@ const intro = stripEnd(hero.intro);
   }
 
   /* 下划线光标:零宽度占位(字形画出但不占布局),
-     出现/消失/淡出都不会顶动文字;动画常驻,多光标闪烁同步 */
+     出现/消失/淡出都不会顶动文字;动画常驻，多光标闪烁同步 */
   .type-caret {
     display: inline-block;
     width: 0;
@@ -191,7 +191,7 @@ const intro = stripEnd(hero.intro);
     visibility: visible;
   }
 
-  /* 标题行的光标只是打字指示,打完即淡出;句子行的光标代替句号常驻 */
+  /* 标题行的光标只是打字指示，打完即淡出;句子行的光标代替句号常驻 */
   [data-typewriter][data-caret='fade'][data-done='true'] .type-caret {
     animation: none;
     opacity: 0;
@@ -220,8 +220,8 @@ const intro = stripEnd(hero.intro);
 <script>
   /**
    * Hero 入场打字序列:tagline → 介绍 → 统计行(数字翻动)。
-   * astro:page-load 在转场结束后触发,打字不会与转场快照打架。
-   * SSR 已输出全文,减少动态偏好时全部保持静态。
+   * astro:page-load 在转场结束后触发，打字不会与转场快照打架。
+   * SSR 已输出全文，减少动态偏好时全部保持静态。
    */
   import { runTypewriter } from '../scripts/typewriter';
 
@@ -247,7 +247,7 @@ const intro = stripEnd(hero.intro);
     const statsEl = document.querySelector<HTMLElement>('.hero-meta[data-typewriter]');
     if (!taglineEl && !introEl && !statsEl) return;
 
-    // 多行同时打印,各自按自己的速度走完
+    // 多行同时打印，各自按自己的速度走完
     await sleep(300, signal);
     if (signal.aborted) return;
     await Promise.all([

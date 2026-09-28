@@ -8,7 +8,7 @@ interface Props {
 }
 
 const { headings, variant } = Astro.props;
-// 正文里 h1–h3 都进目录,h1 与 h2 同级展示
+// 正文里 h1–h3 都进目录，h1 与 h2 同级展示
 const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 3);
 ---
 
