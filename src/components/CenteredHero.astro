@@ -173,11 +173,14 @@ const intro = stripEnd(hero.intro);
     color: var(--color-accent-text);
   }
 
-  /* 下划线光标:打字中跟随,打完代替句号常亮闪烁。
-     动画从首帧就挂在元素上(visibility 隐藏也走时钟),多处光标闪烁同步 */
+  /* 下划线光标:零宽度占位(字形画出但不占布局),
+     出现/消失/淡出都不会顶动文字;动画常驻,多光标闪烁同步 */
   .type-caret {
+    display: inline-block;
+    width: 0;
+    overflow: visible;
     visibility: hidden;
-    margin-left: 1px;
+    transform: translateX(1px);
     font-family: var(--font-mono);
     color: var(--color-accent);
     animation: caret-blink 0.85s steps(1) infinite;

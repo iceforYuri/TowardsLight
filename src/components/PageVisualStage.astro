@@ -152,10 +152,13 @@ const typedDesc = description?.replace(/。\s*$/, '');
     color: var(--color-muted);
   }
 
-  /* 下划线光标:打字中闪烁,打完代替句号常亮闪烁(动画常驻,多光标同步) */
+  /* 下划线光标:零宽度占位(不占布局,不顶动文字),打完代替句号常亮闪烁 */
   .stage-desc .type-caret {
+    display: inline-block;
+    width: 0;
+    overflow: visible;
     visibility: hidden;
-    margin-left: 1px;
+    transform: translateX(1px);
     font-family: var(--font-mono);
     color: var(--color-accent);
     animation: caret-blink 0.85s steps(1) infinite;

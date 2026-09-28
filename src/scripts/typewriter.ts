@@ -98,14 +98,10 @@ export async function runTypewriter(
   if (opts.delay) await sleep(opts.delay, signal);
   if (signal?.aborted) return;
 
-  // 量出全文尺寸并锁定,打字过程中不抖动、不折行跳动
-  const w = textEl.offsetWidth;
+  // 只锁行高(段落预留整行高度,打字时布局不跳);
+  // 宽度不锁——文字随打字逐字重新居中,从中心向两边展开
   const h = textEl.offsetHeight;
-  textEl.style.display = 'inline-block';
-  textEl.style.minWidth = `${w}px`;
-  textEl.style.minHeight = `${h}px`;
-  textEl.style.maxWidth = '100%';
-  textEl.style.textAlign = 'left';
+  root.style.minHeight = `${h}px`;
 
   for (const seg of segments) {
     if ('node' in seg) seg.node.nodeValue = '';
@@ -136,16 +132,9 @@ export async function runTypewriter(
   if (caret) textEl.appendChild(caret);
   root.dataset.done = 'true';
 
-  // 光标淡出后撤掉尺寸锁与对齐覆盖,恢复自然排版
-  // (多行文本的末行重新居中;窗口缩放时可自然回流)
+  // 光标淡出后撤掉行高锁,恢复自然排版(窗口缩放时可自然回流)
   window.setTimeout(() => {
     if (signal?.aborted) return;
-    // 光标要淡出的行(如标题行):淡出后移除,避免不可见光标占位导致文字偏离中心
-    if (root.dataset.caret === 'fade') caret?.remove();
-    textEl.style.display = '';
-    textEl.style.minWidth = '';
-    textEl.style.minHeight = '';
-    textEl.style.maxWidth = '';
-    textEl.style.textAlign = '';
+    root.style.minHeight = '';
   }, 750);
 }
