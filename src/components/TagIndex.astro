@@ -1,9 +1,9 @@
 ---
 /**
  * 标签索引:支持 索引(网格) / 列表 两种视图切换
- * - 热度分档:heat = 0.5·√(count/max) + 0.5·排名归一，连续自适应;
- *   色相沿 靛蓝(--color-cold)→ 褐红(--color-accent)的 OKLCH 路线旅行,
- *   作用于图标与边框(背景不动),由 --heat-pct 驱动
+ * - 热度分档:heat = 0.5·√(count/max) + 0.5·排名归一,再 min-max 拉伸铺满色域;
+ *   色相沿色轮长路旅行:靛蓝 → 青 → 绿 → 黄 → 橙 → 褐红(oklch longer hue),
+ *   明度彩度不变;作用于图标与边框(背景不动),由 --heat-pct 驱动
  * - 冒泡入场:延迟按标签名哈希固定(0~600ms),构建时注入，配置零负担
  */
 import Icon from './Icon.astro';
@@ -17,11 +17,18 @@ const { tags } = Astro.props;
 const max = Math.max(1, ...tags.map(([, c]) => c));
 const distinct = [...new Set(tags.map(([, c]) => c))].sort((a, b) => a - b);
 
-const heatOf = (count: number) => {
+const rawHeatOf = (count: number) => {
   const sqrtPart = Math.sqrt(count / max);
   const rankPart = distinct.length > 1 ? distinct.indexOf(count) / (distinct.length - 1) : 1;
   return 0.5 * sqrtPart + 0.5 * rankPart;
 };
+
+/* min-max 拉伸:最冷标签吃满靛蓝、最热吃满褐红,中间始终铺满整条色相路线 */
+const raws = tags.map(([, c]) => rawHeatOf(c));
+const minRaw = Math.min(...raws);
+const maxRaw = Math.max(...raws);
+const heatOf = (count: number) =>
+  maxRaw > minRaw ? (rawHeatOf(count) - minRaw) / (maxRaw - minRaw) : 0;
 
 /** 标签名 → 固定伪随机延迟，同一标签每次访问在同一时刻冒泡 */
 const popDelay = (name: string) => {
@@ -138,8 +145,13 @@ const popDelay = (name: string) => {
     gap: 7px;
     padding: 8px 15px;
     background: var(--color-surface-raised);
-    /* 热度色相:靛蓝 → 褐红,沿 OKLCH 路线;图标实色,边框 48% 混合 */
-    --heat-hue: color-mix(in oklab, var(--color-accent) var(--heat-pct, 0%), var(--color-cold));
+    /* 热度色相:靛蓝 → 青 → 绿 → 黄 → 橙 → 褐红(longer hue 绕色轮长路),
+       明度彩度不变保持同一色系;图标实色,边框 48% 混合 */
+    --heat-hue: color-mix(
+      in oklch longer hue,
+      var(--color-accent) var(--heat-pct, 0%),
+      var(--color-cold)
+    );
     border: 1px solid color-mix(in oklab, var(--heat-hue) 48%, var(--color-border));
     border-radius: 999px;
     color: var(--color-text);
