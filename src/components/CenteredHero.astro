@@ -2,12 +2,17 @@
 import { site } from '../data/site';
 import CurrentStatus from './CurrentStatus.astro';
 
+type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
+
 interface Props {
-  /** 一行式统计文案,构建时从内容集合算出;支持打字机效果,无 JS 时直接显示全文 */
-  statsText: string;
+  /**
+   * 统计行分段:文本逐字打出,数字段(num)在光标经过时翻动计数。
+   * 构建时从内容集合算出;d 为小数位数(如 8.4 万字)。
+   */
+  statsSegments: StatSegment[];
 }
 
-const { statsText } = Astro.props;
+const { statsSegments } = Astro.props;
 const hero = site.homeHero;
 ---
 
@@ -35,11 +40,28 @@ const hero = site.homeHero;
     </div>
     <h1 class="hero-title font-display" transition:name="page-title">{hero.greeting}</h1>
     <div class="hero-body" transition:name="hero-body">
-      <p class="hero-tagline">{hero.tagline}</p>
-      <p class="hero-intro">{hero.intro}</p>
+      <p class="hero-tagline" data-typewriter>
+        <span data-typewriter-text>{hero.tagline}</span><span
+          class="type-caret"
+          data-typewriter-caret
+          aria-hidden="true"></span>
+      </p>
+      <p class="hero-intro" data-typewriter>
+        <span data-typewriter-text>{hero.intro}</span><span
+          class="type-caret"
+          data-typewriter-caret
+          aria-hidden="true"></span>
+      </p>
       <p class="hero-meta font-mono" data-typewriter>
-        <span data-typewriter-text>{statsText}</span><span class="type-caret" aria-hidden="true"
-        ></span>
+        <span data-typewriter-text>{
+          statsSegments.map((seg) =>
+            seg.t === 'num' ? (
+              <span class="type-num" data-count-to={seg.v} data-decimals={seg.d ?? 0}>{seg.d ? seg.v.toFixed(seg.d) : seg.v}</span>
+            ) : (
+              <>{seg.v}</>
+            ),
+          )
+        }</span><span class="type-caret" data-typewriter-caret aria-hidden="true"></span>
       </p>
     </div>
   </div>
@@ -143,26 +165,30 @@ const hero = site.homeHero;
     color: var(--color-muted);
   }
 
+  .type-num {
+    color: var(--color-accent-text);
+  }
+
   .type-caret {
     display: none;
   }
 
   /* 打字中 / 刚打完:显示光标;打完后淡出 */
-  .hero-meta[data-typing='true'] .type-caret,
-  .hero-meta[data-done='true'] .type-caret {
+  [data-typewriter][data-typing='true'] .type-caret,
+  [data-typewriter][data-done='true'] .type-caret {
     display: inline-block;
     width: 2px;
     height: 1.05em;
-    margin-left: 3px;
+    margin-left: 2px;
     vertical-align: -0.15em;
     background: var(--color-accent);
   }
 
-  .hero-meta[data-typing='true'] .type-caret {
+  [data-typewriter][data-typing='true'] .type-caret {
     animation: caret-blink 0.85s steps(1) infinite;
   }
 
-  .hero-meta[data-done='true'] .type-caret {
+  [data-typewriter][data-done='true'] .type-caret {
     animation: none;
     opacity: 0;
     transition: opacity 0.7s ease;
@@ -189,44 +215,52 @@ const hero = site.homeHero;
 
 <script>
   /**
-   * Hero 统计行打字机:只打一遍,打完光标淡出。
-   * SSR 已输出全文,减少动态偏好或无 JS 时直接保持全文显示。
+   * Hero 入场打字序列:tagline → 介绍 → 统计行(数字翻动)。
+   * astro:page-load 在转场结束后触发,打字不会与转场快照打架。
+   * SSR 已输出全文,减少动态偏好时全部保持静态。
    */
-  function initTypewriter() {
-    document.querySelectorAll<HTMLElement>('[data-typewriter]').forEach((el) => {
-      const span = el.querySelector<HTMLElement>('[data-typewriter-text]');
-      if (!span) return;
-      const text = span.textContent ?? '';
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (reduced || !text) return;
+  import { runTypewriter } from '../scripts/typewriter';
 
-      // 先量出全文宽度并固定,打字时文字从稳定的左缘生长,整行不晃动
-      const fullWidth = span.offsetWidth;
-      span.style.display = 'inline-block';
-      span.style.minWidth = `${fullWidth}px`;
-      span.style.maxWidth = '100%';
-      span.style.textAlign = 'left';
-      span.textContent = '';
-      el.dataset.typing = 'true';
+  let ctrl: AbortController | undefined;
 
-      let i = 0;
-      let timer: number | undefined;
-      const tick = () => {
-        i += 1;
-        span.textContent = text.slice(0, i);
-        if (i < text.length) {
-          timer = window.setTimeout(tick, 34);
-        } else {
-          // 保留 typing 让光标继续显示,由 done 状态把它淡出
-          el.dataset.done = 'true';
-        }
-      };
-      timer = window.setTimeout(tick, 420);
-
-      document.addEventListener('astro:before-swap', () => window.clearTimeout(timer), {
-        once: true,
-      });
+  const sleep = (ms: number, signal?: AbortSignal) =>
+    new Promise<void>((resolve) => {
+      if (signal?.aborted) return resolve();
+      const t = window.setTimeout(resolve, ms);
+      signal?.addEventListener(
+        'abort',
+        () => {
+          window.clearTimeout(t);
+          resolve();
+        },
+        { once: true },
+      );
     });
+
+  async function runHeroSequence(signal: AbortSignal) {
+    const tagline = document.querySelector<HTMLElement>('.hero-tagline[data-typewriter]');
+    const intro = document.querySelector<HTMLElement>('.hero-intro[data-typewriter]');
+    const stats = document.querySelector<HTMLElement>('.hero-meta[data-typewriter]');
+    if (!tagline && !intro && !stats) return;
+
+    await sleep(260, signal);
+    if (signal.aborted) return;
+    if (tagline) await runTypewriter(tagline, { charDelay: 32, signal });
+    await sleep(90, signal);
+    if (signal.aborted) return;
+    if (intro) await runTypewriter(intro, { charDelay: 22, signal });
+    await sleep(110, signal);
+    if (signal.aborted) return;
+    if (stats) await runTypewriter(stats, { charDelay: 22, signal });
   }
-  document.addEventListener('astro:page-load', initTypewriter);
+
+  function initHeroTyping() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    ctrl?.abort();
+    ctrl = new AbortController();
+    runHeroSequence(ctrl.signal);
+  }
+
+  document.addEventListener('astro:page-load', initHeroTyping);
+  document.addEventListener('astro:before-swap', () => ctrl?.abort());
 </script>

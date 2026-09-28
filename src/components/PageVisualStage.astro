@@ -36,7 +36,14 @@ const { title, description, image, meta } = Astro.props;
       <h1 class="stage-title font-display" transition:name="page-title">{title}</h1>
       <div class="stage-extra">
         <div class="stage-extra-inner">
-          {description && <p class="stage-desc">{description}</p>}
+          {description && (
+            <p class="stage-desc" data-typewriter>
+              <span data-typewriter-text>{description}</span><span
+                class="type-caret"
+                data-typewriter-caret
+                aria-hidden="true"></span>
+            </p>
+          )}
           {meta && <p class="stage-meta font-mono">{meta}</p>}
         </div>
       </div>
@@ -143,6 +150,42 @@ const { title, description, image, meta } = Astro.props;
     color: var(--color-muted);
   }
 
+  /* 打字光标:打字中闪烁,打完淡出 */
+  .stage-desc .type-caret {
+    display: none;
+  }
+
+  .stage-desc[data-typing='true'] .type-caret,
+  .stage-desc[data-done='true'] .type-caret {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.12em;
+    background: var(--color-accent);
+  }
+
+  .stage-desc[data-typing='true'] .type-caret {
+    animation: caret-blink 0.85s steps(1) infinite;
+  }
+
+  .stage-desc[data-done='true'] .type-caret {
+    animation: none;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+
+  @keyframes caret-blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+
   .stage-meta {
     margin-top: 14px;
     font-size: 12.5px;
@@ -208,6 +251,8 @@ const { title, description, image, meta } = Astro.props;
 </style>
 
 <script>
+  import { runTypewriter } from '../scripts/typewriter';
+
   function initBackdropToggle() {
     document.querySelectorAll<HTMLElement>('[data-stage]').forEach((stage) => {
       const btn = stage.querySelector<HTMLButtonElement>('[data-backdrop-toggle]');
@@ -222,5 +267,23 @@ const { title, description, image, meta } = Astro.props;
       });
     });
   }
-  document.addEventListener('astro:page-load', initBackdropToggle);
+
+  /* 页面描述打字机:转场落定后(astro:page-load)打一遍;
+     减少动态偏好时保持 SSR 全文 */
+  let typeCtrl: AbortController | undefined;
+
+  function initStageTyping() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    typeCtrl?.abort();
+    typeCtrl = new AbortController();
+    const desc = document.querySelector<HTMLElement>('.stage-desc[data-typewriter]');
+    if (!desc) return;
+    runTypewriter(desc, { charDelay: 26, delay: 240, signal: typeCtrl.signal });
+  }
+
+  document.addEventListener('astro:page-load', () => {
+    initBackdropToggle();
+    initStageTyping();
+  });
+  document.addEventListener('astro:before-swap', () => typeCtrl?.abort());
 </script>
