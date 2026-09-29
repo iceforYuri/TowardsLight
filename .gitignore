@@ -28,3 +28,6 @@ dist-personal/
 
 # 个人档案:嵌套独立私有仓库,模板库永不跟踪
 personal/
+
+# 本地 VS Code 写作工具(编辑器扩展,不进模板库)
+editor/
