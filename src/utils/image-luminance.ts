@@ -61,18 +61,29 @@ export async function sampleImageLuminance(
   }
 }
 
-/** 中位亮度 → 图上文字模式;阈值取 128,采样失败返回 null */
-export function imageTextMode(lum: number | null): ImageTextMode | null {
-  if (lum == null) return null;
-  return lum < 128 ? 'on-dark' : 'on-light';
+export interface ImageTreatment {
+  /** 亮色主题:文字模式与遮罩强度(雾的方向与图一致——暗图暗雾、亮图亮雾) */
+  mode: ImageTextMode;
+  scrim: number;
+  /**
+   * 深色主题:遮罩强度。一律暗雾收暗,按"处理后文字区 ≤85 亮度"反推(0.45~0.68)。
+   * 处理后亮度上限 ~94 < 128,故深色主题文字恒为浅色——这是推导结果,不是硬编码。
+   */
+  scrimDark: number;
 }
 
 /**
- * 亮度 → 文字区遮罩强度(0.15~0.55)。
- * 图本身已够暗(on-dark)或够亮(on-light)时只需轻雾;越接近中调越需要强遮罩。
+ * 图片中位亮度 → 两个主题各自的遮罩处理。
+ * 文字色按"处理后"的背景亮度决定;采样失败返回 null,组件回退主题默认遮罩。
  */
-export function scrimStrength(lum: number | null, mode: ImageTextMode | null): number {
-  if (lum == null || mode == null) return 0.35;
-  const t = mode === 'on-dark' ? (lum - 50) / 160 : (205 - lum) / 160;
-  return Math.min(0.55, Math.max(0.15, Math.round(t * 100) / 100));
+export function imageTreatment(lum: number | null): ImageTreatment | null {
+  if (lum == null) return null;
+  // 亮色主题:保留图的明暗性格
+  const mode: ImageTextMode = lum < 128 ? 'on-dark' : 'on-light';
+  const s = mode === 'on-dark' ? (lum - 50) / 160 : (205 - lum) / 160;
+  const scrim = Math.min(0.55, Math.max(0.15, Math.round(s * 100) / 100));
+  // 深色主题:统一收暗;暗图保持明显暗化(0.45),亮图压到文字区 ≤85
+  const sd = lum <= 85 ? 0.45 : 1 - (85 - 18) / (lum - 18);
+  const scrimDark = Math.round(Math.min(0.68, Math.max(0.45, sd)) * 100) / 100;
+  return { mode, scrim, scrimDark };
 }

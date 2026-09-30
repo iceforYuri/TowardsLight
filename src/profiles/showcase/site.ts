@@ -41,7 +41,7 @@ export const site = {
     intro:
       '于拾光中窥见昨日的恍惚，那犹豫与今日一致',
     background: '/images/hero-bg.svg',
-    /** 图上文字模式:auto=按图片亮度自动;on-dark=浅字;on-light=深字 */
+    /** 图上文字模式:auto=按处理后背景亮度自动;on-dark=浅字;on-light=深字(仅影响亮色主题,深色主题一律收暗配浅字) */
     textMode: 'auto' as 'auto' | 'on-dark' | 'on-light',
   },
   pageBackdrops: {

@@ -1,7 +1,7 @@
 ---
 import { site } from '../data/site';
 import { u } from '../utils/url';
-import { imageTextMode, sampleImageLuminance, scrimStrength } from '../utils/image-luminance';
+import { imageTreatment, sampleImageLuminance } from '../utils/image-luminance';
 import CurrentStatus from './CurrentStatus.astro';
 
 type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
@@ -18,16 +18,18 @@ const { statsSegments } = Astro.props;
 const hero = site.homeHero;
 // 构建期采样背景图亮度:决定图上文字模式(on-dark 浅字 / on-light 深字)与遮罩强度
 const imgLum = await sampleImageLuminance(hero.background, 'hero');
+const treatment = imageTreatment(imgLum);
 const manualMode = hero.textMode === 'on-dark' || hero.textMode === 'on-light' ? hero.textMode : null;
-const imgMode = manualMode ?? imageTextMode(imgLum);
-const imgScrim = scrimStrength(imgLum, imgMode);
+const imgMode = manualMode ?? treatment?.mode ?? null;
+const imgScrim = treatment?.scrim ?? 0.35;
+const imgScrimDark = treatment?.scrimDark ?? 0.45;
 // 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const stripEnd = (s: string) => s.replace(/。\s*$/, '');
 const tagline = stripEnd(hero.tagline);
 const intro = stripEnd(hero.intro);
 ---
 
-<section class="hero" data-img-mode={imgMode} style={imgMode ? `--img-scrim: ${imgScrim}` : undefined}>
+<section class="hero" data-img-mode={imgMode} style={imgMode ? `--img-scrim: ${imgScrim}; --img-scrim-dark: ${imgScrimDark}` : undefined}>
   {
     hero.background && (
       <div class="hero-backdrop" aria-hidden="true" transition:name="stage-media">
@@ -129,8 +131,8 @@ const intro = stripEnd(hero.intro);
   }
 
 
-  /* 图上文字模式:构建期按图片亮度采样决定(见 utils/image-luminance),
-     与明暗主题解耦;遮罩强度由 --img-scrim 内联注入 */
+  /* 图上文字模式:构建期按图片亮度采样决定(见 utils/image-luminance);
+     亮色主题按模式走,深色主题一律收暗配浅字;遮罩强度由 --img-scrim(--img-scrim-dark) 注入 */
   .hero[data-img-mode='on-dark'] {
     --hero-fg: #f2f3ec;
     --hero-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
@@ -159,6 +161,24 @@ const intro = stripEnd(hero.intro);
       rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.55)) 0%,
       rgba(244, 245, 241, var(--img-scrim, 0.35)) 42%,
       rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.8)) 68%,
+      var(--color-canvas) 96%
+    );
+  }
+
+
+  /* 深色主题:有图一律收暗 + 浅字(处理后亮度恒 <128) */
+  :global(html[data-theme='dark']) .hero[data-img-mode] {
+    --hero-fg: #f2f3ec;
+    --hero-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
+    --hero-fg-m: rgba(242, 243, 236, 0.74);
+  }
+
+  :global(html[data-theme='dark']) .hero[data-img-mode] .hero-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.7)) 0%,
+      rgba(18, 20, 17, var(--img-scrim-dark, 0.45)) 42%,
+      rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.85)) 68%,
       var(--color-canvas) 96%
     );
   }
