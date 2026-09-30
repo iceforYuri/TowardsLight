@@ -16,6 +16,15 @@ try {
 export default defineConfig({
   site: process.env.SITE_URL ?? profileSiteUrl,
   base: process.env.SITE_BASE ?? '/',
+  vite: {
+    server: {
+      watch: {
+        // editor/(扩展,含上万个图标文件)和构建产物与站点渲染无关,
+        // 不进 watch,避免 Windows 上多 server 并存时句柄耗尽(EMFILE)
+        ignored: ['**/.git/**', '**/node_modules/**', '**/editor/**', '**/dist/**'],
+      },
+    },
+  },
   prefetch: {
     prefetchAll: true,
     defaultStrategy: 'hover',
