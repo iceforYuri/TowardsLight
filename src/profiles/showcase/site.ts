@@ -39,12 +39,26 @@ export const site = {
     intro:
       '于拾光中窥见昨日的恍惚，那犹豫与今日一致',
     background: '/images/hero-bg.svg',
+    /** 图上文字模式:auto=按图片亮度自动;on-dark=浅字;on-light=深字 */
+    textMode: 'auto' as 'auto' | 'on-dark' | 'on-light',
   },
   pageBackdrops: {
     archive: '',
     tags: '',
     categories: '',
     links: '',
+  },
+
+  /** 各内容页文案:标题 + 描述;详情页标题为插值模板,留在代码里 */
+  pages: {
+    archive: { title: '归档', description: '写过的所有文章，按年份排列。' },
+    tags: { title: '标签', description: '文章按主题打的标签，比分类更细一些。' },
+    categories: { title: '分类', description: '文章的大致归属，每个分类是一种长期关心的事。' },
+    links: { title: '链接', description: '我常用的工具、常去的社区、认可的平台。不是导航站，是个人选择。' },
+    notFound: {
+      title: '这一页不存在',
+      description: '链接可能已经过期，或者地址打错了。文章都还在，从下面回去就能找到。',
+    },
   },
   currentStatus: {
     mode: 'building' as 'writing' | 'building' | 'available' | 'offline',
@@ -86,11 +100,11 @@ export const site = {
       {
         label: 'STACK',
         items: [
-          { icon: '', text: 'Astro' },
-          { icon: '', text: 'TypeScript' },
-          { icon: '', text: 'Node.js' },
-          { icon: '', text: 'SQLite' },
-          { icon: '', text: 'Tailwind-free CSS' },
+          { icon: 'omega', text: 'Astro' },
+          { icon: 'file-type', text: 'TypeScript' },
+          { icon: 'cpu', text: 'Node.js' },
+          { icon: 'database', text: 'SQLite' },
+          { icon: 'wind', text: 'Tailwind-free CSS' },
         ],
       },
       {

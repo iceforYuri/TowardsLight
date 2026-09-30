@@ -4,6 +4,7 @@ import PageVisualStage from '../../components/PageVisualStage.astro';
 import FloatingMainCard from '../../components/FloatingMainCard.astro';
 import PostList from '../../components/PostList.astro';
 import { getAllPosts, collectCategories } from '../../utils/posts';
+import { site } from '../../data/site';
 import { u } from '../../utils/url';
 
 export async function getStaticPaths() {
@@ -19,7 +20,11 @@ const { category, posts } = Astro.props;
 ---
 
 <BaseLayout title={`分类 · ${category}`} description={`分类「${category}」下的所有文章`}>
-  <PageVisualStage title={category} meta={`${posts.length} 篇文章`} />
+  <PageVisualStage
+    title={category}
+    image={site.pageBackdrops.categories || undefined}
+    meta={`${posts.length} 篇文章`}
+  />
   <div class="shell-container">
     <FloatingMainCard overlap="stage">
       <PostList posts={posts} showUpdated />

@@ -5,6 +5,7 @@
  */
 import Icon from './Icon.astro';
 import { u } from '../utils/url';
+import { imageTextMode, sampleImageLuminance, scrimStrength } from '../utils/image-luminance';
 
 interface Props {
   title: string;
@@ -14,6 +15,10 @@ interface Props {
 }
 
 const { title, description, image, meta } = Astro.props;
+// 构建期采样背景图底部(文字所在区)亮度:决定图上文字模式与遮罩强度
+const imgLum = await sampleImageLuminance(image, 'stage');
+const imgMode = imageTextMode(imgLum);
+const imgScrim = scrimStrength(imgLum, imgMode);
 // 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const typedDesc = description?.replace(/。\s*$/, '');
 /** meta 行拆段:数字包成计数段,打字光标经过时翻滚 */
@@ -25,7 +30,7 @@ const metaSegments = meta
   : [];
 ---
 
-<section class="page-stage" data-stage>
+<section class="page-stage" data-stage data-img-mode={imgMode} style={imgMode ? `--img-scrim: ${imgScrim}` : undefined}>
   {
     image && (
       <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
@@ -91,6 +96,10 @@ const metaSegments = meta
     padding-top: calc(var(--nav-height) + 60px);
     background: var(--color-canvas);
     overflow: hidden;
+    /* 文字色变量:默认取主题色,有背景图时由 data-img-mode 覆盖 */
+    --stage-fg: var(--color-text);
+    --stage-fg-2: var(--color-accent-text);
+    --stage-fg-m: var(--color-muted);
     transition: min-height 0.4s ease;
   }
 
@@ -123,11 +132,50 @@ const metaSegments = meta
     );
   }
 
-  :global(html[data-theme='dark']) .stage-scrim {
+  :global(html[data-theme='dark']) .page-stage:not([data-img-mode]) .stage-scrim {
     background: linear-gradient(
       to bottom,
       rgba(23, 25, 22, 0.35) 0%,
       var(--color-overlay) 58%,
+      var(--color-canvas) 98%
+    );
+  }
+
+
+  /* 图上文字模式:构建期按图片底部采样带亮度决定(见 utils/image-luminance) */
+  .page-stage[data-img-mode='on-dark'] {
+    --stage-fg: #f2f3ec;
+    --stage-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
+    --stage-fg-m: rgba(242, 243, 236, 0.74);
+  }
+
+  .page-stage[data-img-mode='on-light'] {
+    --stage-fg: #1b1d1a;
+    --stage-fg-2: color-mix(in oklab, var(--color-accent-text) 78%, #1b1d1a);
+    --stage-fg-m: rgba(27, 29, 26, 0.74);
+  }
+
+  /* 折叠后背景图隐藏,文字回落主题色 */
+  .page-stage[data-img-mode].is-collapsed {
+    --stage-fg: var(--color-text);
+    --stage-fg-2: var(--color-accent-text);
+    --stage-fg-m: var(--color-muted);
+  }
+
+  .page-stage[data-img-mode='on-dark'] .stage-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(18, 20, 17, calc(var(--img-scrim, 0.35) * 0.55)) 0%,
+      rgba(18, 20, 17, var(--img-scrim, 0.35)) 55%,
+      var(--color-canvas) 98%
+    );
+  }
+
+  .page-stage[data-img-mode='on-light'] .stage-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.45)) 0%,
+      rgba(244, 245, 241, var(--img-scrim, 0.35)) 55%,
       var(--color-canvas) 98%
     );
   }
@@ -142,9 +190,11 @@ const metaSegments = meta
   .stage-title {
     font-size: clamp(32px, 5vw, 46px);
     font-weight: 700;
-    color: var(--color-text);
+    color: var(--stage-fg);
     overflow-wrap: anywhere;
-    transition: font-size 0.4s ease;
+    transition:
+      font-size 0.4s ease,
+      color 0.3s ease;
   }
 
   /* 描述与 meta:grid 行高动画，折叠/展开对称平滑 */
@@ -166,7 +216,7 @@ const metaSegments = meta
     margin: 12px auto 0;
     max-width: 560px;
     font-size: 15.5px;
-    color: var(--color-muted);
+    color: var(--stage-fg-m);
   }
 
   /* 下划线光标:零宽度占位(不占布局，不顶动文字),打完代替句号常亮闪烁 */
@@ -178,7 +228,7 @@ const metaSegments = meta
     visibility: hidden;
     transform: translateX(1px);
     font-family: var(--font-mono);
-    color: var(--color-accent);
+    color: var(--stage-fg-2, var(--color-accent));
     animation: caret-blink 0.85s steps(1) infinite;
   }
 
@@ -195,7 +245,7 @@ const metaSegments = meta
   }
 
   .stage-meta .meta-num {
-    color: var(--color-accent-text);
+    color: var(--stage-fg-2);
   }
 
   @keyframes caret-blink {
@@ -213,7 +263,7 @@ const metaSegments = meta
     margin-top: 14px;
     font-size: 12.5px;
     letter-spacing: 0.04em;
-    color: var(--color-muted);
+    color: var(--stage-fg-m);
   }
 
   .backdrop-toggle {
