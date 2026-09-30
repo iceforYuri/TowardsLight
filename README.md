@@ -49,7 +49,8 @@ my-blog-data/
 ├── site.ts      # 站名、作者、bio、Hero、状态、翻牌栏、分类图标、页面文案与背景、图片文字模式配置
 ├── links.ts     # 技术链接目录
 ├── posts/       # Markdown 文章(draft: true 不发布)
-└── images/      # 头像、封面、Hero 背景,以 /images/... 引用
+│   └── image/   # 文章级图片(封面/正文插图),按文章名归档,相对路径引用
+└── images/      # 站点级图片:头像、Hero/页面背景、共用封面,以 /images/... 引用
 ```
 
 个人档案可以放本地私有目录，也可以是独立私有仓库——它只含数据，模板更新由构建时拉取最新代码自动获得，无需合并。
@@ -93,7 +94,7 @@ updatedDate: 2026-09-06      # 可选
 category: 前端               # 任意字符串,自动聚合成分类页
 tags: [Astro, 博客]          # 自动聚合成标签页
 draft: false                 # true 则不构建
-cover: /images/covers/wide.svg  # 可选
+cover: /images/covers/wide.svg  # 可选;/ 开头走 images/,否则相对文章文件(如 image/my-post/cover.jpg)
 coverAlt: 封面描述              # 可选
 coverPosition: center 30%       # 可选,object-position 焦点
 featured: false                 # 可选

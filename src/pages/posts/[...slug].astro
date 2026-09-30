@@ -28,18 +28,39 @@ const { Content, headings } = await render(post);
 const { title, description, pubDate, updatedDate, category, tags, cover, coverAlt, coverPosition } =
   post.data;
 const minutes = readingTime(post.body ?? '');
+
+/**
+ * 封面双模式:
+ * - `/images/...`(或 http)走 public/junction,原样引用
+ * - 相对路径(如 image/my-post/cover.jpg)相对文章 .md 解析,经 Vite 资产管线输出
+ */
+const postAssets = import.meta.glob<string>(
+  '../../profiles/active/posts/**/*.{png,jpg,jpeg,webp,avif,gif,svg}',
+  { eager: true, query: '?url', import: 'default' },
+);
+let coverSrc: string | undefined;
+if (cover) {
+  if (cover.startsWith('/')) {
+    coverSrc = u(cover);
+  } else if (/^https?:/.test(cover)) {
+    coverSrc = cover;
+  } else {
+    coverSrc = postAssets[`../../profiles/active/posts/${cover}`];
+    if (!coverSrc) console.warn(`[posts] 封面文件不存在:posts/${cover}(${post.id})`);
+  }
+}
 ---
 
 <BaseLayout title={title} description={description}>
   <ReadingProgress />
 
   {/* 文章顶部视觉区:有封面用封面,无封面用纯色 */}
-  <section class:list={['article-stage', { 'has-cover': cover }]}>
+  <section class:list={['article-stage', { 'has-cover': coverSrc }]}>
     {
-      cover && (
+      coverSrc && (
         <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
           <img
-            src={u(cover)}
+            src={coverSrc}
             alt={coverAlt ?? ''}
             class="stage-img img-reveal"
             style={`object-position: ${coverPosition};`}

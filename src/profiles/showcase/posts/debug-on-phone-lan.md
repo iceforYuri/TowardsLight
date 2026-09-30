@@ -4,7 +4,7 @@ description: 在手机上调试桌面开发的页面,不需要装任何东西,�
 pubDate: 2026-08-06
 category: 工具
 tags: [调试, 开发工具, 移动端]
-cover: /images/covers/wide.svg
+cover: image/debug-on-phone-lan/wide.svg
 coverAlt: 横向抽象渐变封面,苔绿色与珊瑚色的柔和过渡
 coverPosition: center
 draft: false
