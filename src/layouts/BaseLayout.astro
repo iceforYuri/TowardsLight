@@ -16,7 +16,7 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-default-theme={site.themeDefault}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,12 +40,15 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
       (function () {
         try {
           var stored = localStorage.getItem('theme');
+          var def = document.documentElement.dataset.defaultTheme;
           var theme =
             stored === 'light' || stored === 'dark'
               ? stored
-              : window.matchMedia('(prefers-color-scheme: dark)').matches
-                ? 'dark'
-                : 'light';
+              : def === 'light' || def === 'dark'
+                ? def
+                : window.matchMedia('(prefers-color-scheme: dark)').matches
+                  ? 'dark'
+                  : 'light';
           document.documentElement.dataset.theme = theme;
         } catch (e) {
           document.documentElement.dataset.theme = 'light';

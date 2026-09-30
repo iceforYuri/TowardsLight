@@ -20,6 +20,8 @@ export const site = {
   avatar: '/images/avatar.svg',
   /** 头像裁切焦点(object-position),竖向人像建议 'center 30%' */
   avatarPosition: 'center',
+  /** 默认主题:system=跟随系统;light/dark=固定默认(访客手动切换后仍记住其选择) */
+  themeDefault: 'system' as 'system' | 'light' | 'dark',
   email: 'hi@example.com',
   navigation: [
     { label: 'Home', href: '/', icon: 'home' },
