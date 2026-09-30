@@ -6,10 +6,9 @@ category: 博客搭建
 tags: [VS Code, 工具, 工作流]
 draft: false
 ---
-
 博客搭好之后，日常操作其实就剩三类：写文章、改配置、看效果。这三件事本来都要离开编辑器——开终端起 dev server、找到 site.ts 翻字段、去浏览器刷新。为了把这条链路收回编辑器，我写了一个本地 VS Code 扩展（不发布，vsix 直装），这篇文章是它的使用说明。
 
-![侧边栏全景:文章、站点配置、预览三个视图区](image/editor-extension/01-sidebar.svg)
+![1790776907274](image/editor-extension/1790776907274.png)
 
 ## 安装
 
@@ -27,13 +26,15 @@ code --install-extension towards-light-editor-0.6.1.vsix
 
 模板和内容在这个博客里本来就是两回事——模板是 Astro 工程，档案是 site.ts + links.ts + posts/ 的内容包。两个位置都是**自动识别、可手动覆盖**：模板认 `package.json` + 档案切换钩子，档案认 `site.ts` + `links.ts` + `posts/` 三件套，工作区往下两层内自动扫描。
 
-![预览区:模板/档案两行可点击更换,下面是运行中的 server](image/editor-extension/02-preview.svg)
+![1790776950792](image/editor-extension/1790776950792.png)
 
 点「启动预览」，扩展在模板目录里起 `npm run dev`，把档案目录通过环境变量传进去。起好的 server 会列在预览区，带端口和档案名，点击在浏览器打开，行内按钮停止。几个值得知道的细节:
 
 - **server 是记账制的**：同一个「模板 + 档案」组合复用已有进程，端口被占自动顺延 4322、4323;
 - **Reload Window 不会攒僵尸进程**——扩展激活时按上次记下的 PID 把孤儿 server 收掉（这个之前引发过 EMFILE);
 - 你在自己终端里手动起的 dev server 它不动。
+
+![1790777170213](image/editor-extension/1790777170213.png)
 
 ## 文章区
 
@@ -49,7 +50,7 @@ code --install-extension towards-light-editor-0.6.1.vsix
 
 最常用的表单：站点名、作者、签名、头像、当前状态、Hero、默认主题、各页背景与文案。长表单带**左侧目录**,scrollspy 高亮当前分区。
 
-![站点信息表单:左侧目录 + 卡片分区,图片字段带缩略图](image/editor-extension/03-site-config.svg)
+![1790776963067](image/editor-extension/1790776963067.png)
 
 图片字段（头像、各页背景）输入框旁有**实时缩略图**，也能从电脑选图自动归档。两个不显眼的机制：
 
@@ -60,19 +61,19 @@ code --install-extension towards-light-editor-0.6.1.vsix
 
 新建和编辑合一：顶部下拉切换「新建 / 已有分类」。编辑模式回填图标、色调、描述，底部胶囊实时预览。**分类名是文章引用的 key**——有文章引用的分类不能改名也不能删除，下拉里直接标注引用篇数；无引用的分类才开放这两个操作。
 
-![管理分类:编辑模式回填,底部胶囊实时预览图标与色调](image/editor-extension/04-category.svg)
+![1790777059443](image/editor-extension/1790777059443.png)
 
 ### 管理链接
 
 链接不是表单，是一个**有序列表**：按分组分段，每行一个链接，还原了博客里链接行的样子（图标、名称、描述、域名、状态徽章）。
 
-![链接管理:分组分段 + 行内展开的编辑器](image/editor-extension/05-links.svg)
+![1790777065906](image/editor-extension/1790777065906.png)
 
 - 点 ✎ 行内展开编辑器，同一时刻只展开一个；URL 是 key，不可改，要换地址就删了重建；
 - 组内排序用行尾的 ↑↓；**分组排序直接拖分组头**，拖到目标分段上半/下半决定插前插后；
 - 删除是两段式（✕ → 确认删除），空分组才能删。
 
-![拖动分组头排序,指示线标出落点](image/editor-extension/06-drag.svg)
+![1790777127030](image/editor-extension/1790777127030.png)
 
 ## 为什么值得做
 
