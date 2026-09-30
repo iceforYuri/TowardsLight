@@ -13,7 +13,8 @@ const groups = linksByGroup();
 
 <div class="tech-directory">
   {
-    [...groups.entries()].map(([group, links]) => {
+    groups.map((group) => {
+      let links = group.links;
       if (links.length === 0) return null;
       if (compact) {
         links = links.filter((l) => l.featured);
@@ -25,7 +26,7 @@ const groups = linksByGroup();
         <section class="link-group">
           <h2 class="group-title font-ui">
             <span class="group-marker" aria-hidden="true" />
-            {group}
+            {group.label}
             <span class="group-count font-mono">{links.length}</span>
           </h2>
           {featured.length > 0 && (
