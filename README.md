@@ -37,6 +37,8 @@ npm run preview    # 本地预览构建产物
 
 切换是整体替换而非字段合并——个人档案配错或缺字段会在构建期直接报错，示例数据没有机会漏进个人站。每次 dev/build 前日志会打印当前档案，不会静默切错。
 
+> **注意**:junction 切换对运行中的 dev server 不生效——内容集合在启动时同步,静态目录却是实时解析的。构建命令改变指向后,务必重启 dev server,否则会出现"文章是 A 档案、图片找 B 档案"的 500(ImageNotFound)。
+
 ```bash
 node scripts/new-profile.mjs                 # 生成个人档案骨架(默认 ./personal)
 npm run dev                                  # personal/ 存在即预览个人站
