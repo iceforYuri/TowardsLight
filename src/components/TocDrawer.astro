@@ -11,7 +11,10 @@ interface Props {
 }
 
 const { headings } = Astro.props;
-const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 3);
+const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 6);
+// 与 TableOfContents 同一套归一化:按最小层级定顶级
+const minDepth = Math.min(...toc.map((h) => h.depth));
+const levelOf = (depth: number) => Math.min(depth - minDepth, 5);
 ---
 
 {
@@ -54,7 +57,7 @@ const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 3);
         <nav>
           <ul>
             {toc.map((h) => (
-              <li class:list={[{ 'depth-3': h.depth === 3 }]}>
+              <li class={`lv-${levelOf(h.depth)}`}>
                 <a href={`#${h.slug}`} data-toc-link={h.slug}>
                   {h.text}
                 </a>
@@ -196,16 +199,50 @@ const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 3);
   }
 
   .drawer-panel a.is-current {
-    color: var(--color-accent-text);
-    font-weight: 500;
+    color: var(--color-text);
+    font-weight: 600;
   }
 
-  .drawer-panel .depth-3 {
+  .drawer-panel .lv-1 {
     padding-left: 16px;
   }
 
-  .drawer-panel .depth-3 a {
+  .drawer-panel .lv-2,
+  .drawer-panel .lv-3,
+  .drawer-panel .lv-4,
+  .drawer-panel .lv-5 {
+    padding-left: 30px;
+  }
+
+  .drawer-panel .lv-0 a:not(.is-current),
+  .drawer-panel .lv-1 a:not(.is-current),
+  .drawer-panel .lv-2 a:not(.is-current) {
+    color: var(--color-accent);
+  }
+
+  .drawer-panel .lv-1 a {
     font-size: 13px;
+  }
+
+  .drawer-panel .lv-2 a {
+    font-size: 12.5px;
+  }
+
+  .drawer-panel .lv-3 a:not(.is-current) {
+    font-size: 12px;
+    color: var(--color-contrast);
+  }
+
+  .drawer-panel .lv-4 a:not(.is-current) {
+    font-size: 11.5px;
+    color: var(--color-contrast);
+    opacity: 0.8;
+  }
+
+  .drawer-panel .lv-5 a:not(.is-current) {
+    font-size: 11px;
+    color: var(--color-contrast);
+    opacity: 0.6;
   }
 </style>
 

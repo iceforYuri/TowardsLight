@@ -17,31 +17,87 @@
 .prose h1,
 .prose h2,
 .prose h3,
-.prose h4 {
-  font-family: var(--font-display);
-  font-weight: 600;
+.prose h4,
+.prose h5,
+.prose h6 {
   line-height: 1.4;
-  color: var(--color-text);
   scroll-margin-top: calc(var(--nav-height) + 48px);
 }
 
-/* 正文中的 h1 与 h2 同级对待 */
+/* 标题族统一珊瑚系:h1–h4 用亮珊瑚 accent;h5 字号小,用深一号 accent-text 保对比;
+   h6 是等宽标注,保持弱化灰 */
 .prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: var(--color-accent);
+}
+
+/* 六级标题分两族:大三级(h1–h3)用展示衬线,是"章节";
+   小三级(h4–h6)用界面体/等宽,是"标注" */
+
+/* h1 章 */
+.prose h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.7em;
+  margin-top: 2.2em;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* h2 节 */
 .prose h2 {
-  font-size: 1.55em;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.45em;
   margin-top: 2.4em;
   padding-top: 0.6em;
   border-top: 1px solid var(--color-border);
 }
 
+/* h3 小节 */
 .prose h3 {
-  font-size: 1.25em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.22em;
   margin-top: 2em;
 }
 
+/* h4 条目:无衬线 + 强调色竖条 */
 .prose h4 {
-  font-size: 1.05em;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 1.02em;
   margin-top: 1.8em;
+  padding-left: 0.65em;
+  border-left: 3px solid var(--color-accent);
+}
+
+/* h5 小注:无衬线小号 + 强调色文字 */
+.prose h5 {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 0.92em;
+  letter-spacing: 0.04em;
+  color: var(--color-accent-text);
+  margin-top: 1.6em;
+}
+
+/* h6 标注:等宽大写 */
+.prose h6 {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.78em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-top: 1.5em;
+}
+
+/* 正文起手就是标题时去掉多余的上间距 */
+.prose > :is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
 }
 
 .prose p {
