@@ -10,7 +10,7 @@
 - **阅读体验**:720px 正文列、中文优化排版、桌面粘性目录 + 移动端目录折叠、阅读进度条、上一篇/下一篇
 - **技术链接目录**:分组 + 精选卡片/链接行两级形态,数据集中维护
 - **克制的动效**:CSS 过渡 + Astro View Transitions,尊重 `prefers-reduced-motion`,几乎零客户端 JS
-- **图片健壮性**:封面可选,支持焦点位置、加载失败自动降级为主题背景
+- **图片健壮性**:封面可选,支持焦点位置、加载失败自动降级为主题背景;正文图片引用文件缺失时自动换成占位图并告警(remark-image-guard),一张缺席的图不再让全站 500
 - **Shiki 双主题代码高亮**:github-light / github-dark 随主题自动切换
 - **KaTeX 公式渲染**:remark-math + rehype-katex 构建期输出 HTML,零客户端 JS
 - **正文图片灯箱**:点击放大,ESC/点击遮罩关闭,支持键盘操作
@@ -37,7 +37,7 @@ npm run preview    # 本地预览构建产物
 
 切换是整体替换而非字段合并——个人档案配错或缺字段会在构建期直接报错，示例数据没有机会漏进个人站。每次 dev/build 前日志会打印当前档案，不会静默切错。
 
-> **注意**:junction 切换对运行中的 dev server 不生效——内容集合在启动时同步,静态目录却是实时解析的。构建命令改变指向后,务必重启 dev server,否则会出现"文章是 A 档案、图片找 B 档案"的 500(ImageNotFound)。
+> **注意**:junction 切换对运行中的 dev server 不生效——内容集合在启动时同步,静态目录却是实时解析的。构建命令改变指向后,务必重启 dev server,否则会出现"文章是 A 档案、图片找 B 档案"的错位(图片缺失已由哨兵降级为占位图,不再 500,但内容仍是错的)。
 
 ```bash
 node scripts/new-profile.mjs                 # 生成个人档案骨架(默认 ./personal)
@@ -81,6 +81,8 @@ my-blog-data/
 │   ├── styles/
 │   │   ├── global.css        # 设计变量、双主题、基础排版
 │   │   └── prose.css         # 文章正文排版(含代码块双主题)
+│   ├── plugins/
+│   │   └── remark-image-guard.mjs # 正文图片哨兵:引用文件缺失时换占位图 + 告警,不拖垮全站
 │   └── utils/posts.ts        # 文章查询、日期格式化、标签/分类聚合
 └── public/images -> ...      # 指向当前档案的 images/(junction,gitignore)
 ```

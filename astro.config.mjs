@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import { remarkImageGuard } from './src/plugins/remark-image-guard.mjs';
 
 // 把 fence 的语言写到 <pre data-language> 上,由 CSS 生成右上角语言徽章;
 // 未识别语言由 Shiki 自动回退 plaintext(构建期告警),徽章保留作者原写法
@@ -43,7 +44,8 @@ export default defineConfig({
   },
   markdown: {
     // 公式:remark-math 解析 $..$/$$..$$,rehype-katex 构建期渲染为 HTML(零客户端 JS)
-    remarkPlugins: [remarkMath],
+    // remark-image-guard 放在最前:缺席的正文图片换成占位图,避免一张图拖垮全站
+    remarkPlugins: [remarkImageGuard, remarkMath],
     rehypePlugins: [rehypeKatex],
     shikiConfig: {
       transformers: [langBadge],
