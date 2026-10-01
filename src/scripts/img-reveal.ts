@@ -23,7 +23,7 @@ if (typeof document !== 'undefined' && document.startViewTransition) {
   }) as typeof document.startViewTransition;
 }
 
-async function reveal(img: HTMLImageElement) {
+async function revealAfterTransition(img: HTMLImageElement) {
   const vt = activeTransition;
   if (vt) {
     try {
@@ -41,10 +41,11 @@ export function initImgReveal() {
     .forEach((img) => {
       img.dataset.revealBound = '1';
       if (img.complete && img.naturalWidth > 0) {
-        // 已缓存:转场结束后再亮(快照里已有图,视觉无差)
-        reveal(img);
+        // 已缓存:立即亮,能进转场新快照,视觉无缝
+        img.classList.add('is-loaded');
       } else {
-        img.addEventListener('load', () => reveal(img), { once: true });
+        // 未加载完:等转场结束再淡入,避免淡入在快照覆盖下空播(闪入)
+        img.addEventListener('load', () => revealAfterTransition(img), { once: true });
       }
     });
 }
