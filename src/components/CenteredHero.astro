@@ -38,6 +38,7 @@ const intro = stripEnd(hero.intro);
           alt=""
           class="hero-img img-reveal"
           loading="eager"
+          decoding="async"
           fetchpriority="high"
           onload="this.classList.add('is-loaded')"
           onerror="this.closest('.hero-backdrop').remove()"
