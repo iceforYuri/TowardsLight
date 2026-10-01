@@ -417,33 +417,56 @@ for (const h of toc) {
         f.setAttribute('aria-hidden', String(!on));
       });
     };
+    // 检测带:导航栏下方 84~128px 的固定细带(像素计算,不随视口高度漂移)。
+    // 带内取文档序最靠上的标题为当前节;第一个标题未过带时不高亮;
+    // 长小节中段(带内无标题且已过首标题)保持当前节。
+    const BAND_TOP = 84;
+    const BAND_BOTTOM = 128;
+    const headingEls = [
+      ...document.querySelectorAll<HTMLElement>('.prose :is(h1, h2, h3, h4, h5, h6)[id]'),
+    ];
+    const orderedIds = headingEls.map((h) => h.id);
+    const intersecting = new Set<string>();
+
+    const setCurrent = (id: string | null) => {
+      links.forEach((l) => l.classList.remove('is-current'));
+      if (id) {
+        map.get(id)?.forEach((l) => l.classList.add('is-current'));
+        setActiveFamily(id);
+      } else {
+        setActiveFamily('');
+      }
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            links.forEach((l) => l.classList.remove('is-current'));
-            map.get(entry.target.id)?.forEach((l) => l.classList.add('is-current'));
-            setActiveFamily(entry.target.id);
-          }
+          if (entry.isIntersecting) intersecting.add(entry.target.id);
+          else intersecting.delete(entry.target.id);
         }
+        if (intersecting.size > 0) {
+          setCurrent(orderedIds.find((id) => intersecting.has(id)) ?? null);
+        } else if (headingEls[0] && headingEls[0].getBoundingClientRect().top > BAND_BOTTOM) {
+          setCurrent(null);
+        }
+        // 否则:长小节中段,保持当前节
       },
-      { rootMargin: '-96px 0px -65% 0px' },
+      { rootMargin: `-${BAND_TOP}px 0px -${Math.max(0, window.innerHeight - BAND_BOTTOM)}px 0px` },
     );
-    document
-      .querySelectorAll('.prose :is(h1, h2, h3, h4, h5, h6)[id]')
-      .forEach((h) => observer.observe(h));
+    headingEls.forEach((h) => observer.observe(h));
 
-    // 目录初始位置与正文第一个小节的顶部对齐
+    // 目录初始位置与文章卡片的内容顶缘对齐(目录与正文两栏同高起读)
     const aside = document.querySelector<HTMLElement>('.article-aside');
-    const firstHeading = document.querySelector('.prose h1[id], .prose h2[id]');
-    if (aside && firstHeading) {
+    const card = document.querySelector<HTMLElement>('.article-card');
+    if (aside && card) {
       const align = () => {
         if (!window.matchMedia('(min-width: 1280px)').matches) {
           aside.style.paddingTop = '';
           return;
         }
         aside.style.paddingTop = '0px';
-        const delta = firstHeading.getBoundingClientRect().top - aside.getBoundingClientRect().top;
+        const cardPadTop = parseFloat(getComputedStyle(card).paddingTop) || 0;
+        const delta = card.getBoundingClientRect().top + cardPadTop - aside.getBoundingClientRect().top;
         aside.style.paddingTop = `${Math.max(0, Math.round(delta))}px`;
       };
       align();

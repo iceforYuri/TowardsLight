@@ -26,15 +26,20 @@ const REGIONS: Record<'hero' | 'stage', Region> = {
   stage: { left: 0.2, top: 0.52, width: 0.6, height: 0.42 },
 };
 
-/** 采样站内图片(public 相对路径,如 /images/hero-bg.png)文字区的中位亮度(0-255) */
+/** 采样站内图片文字区的中位亮度(0-255)。
+ *  支持两类源:public 相对路径(/images/...)与 cwd 相对文件路径(如档案内的文章封面);
+ *  远程 URL 不采样,返回 null */
 export async function sampleImageLuminance(
   src: string | undefined,
   zone: keyof typeof REGIONS = 'hero',
 ): Promise<number | null> {
-  if (!src || !src.startsWith('/')) return null;
+  if (!src || /^https?:\/\//.test(src)) return null;
   const r = REGIONS[zone];
   try {
-    const img = sharp(path.join(process.cwd(), 'public', src));
+    const file = src.startsWith('/')
+      ? path.join(process.cwd(), 'public', src)
+      : path.resolve(process.cwd(), src);
+    const img = sharp(file);
     const meta = await img.metadata();
     const w = meta.width ?? 0;
     const h = meta.height ?? 0;
