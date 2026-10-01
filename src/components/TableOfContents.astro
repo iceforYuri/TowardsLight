@@ -13,6 +13,16 @@ const { headings, variant } = Astro.props;
 const toc = headings.filter((h) => h.depth >= 1 && h.depth <= 6);
 const minDepth = Math.min(...toc.map((h) => h.depth));
 const levelOf = (depth: number) => Math.min(depth - minDepth, 5);
+
+// 桌面侧栏按族收放:lv-3~5(标注级)归属最近的 lv-0~2 祖先,默认折叠,
+// 滚动进入该族时展开、离开即收;移动面板与抽屉始终完整展开
+type TocItem = { h: (typeof toc)[number]; lv: number };
+const groups: { head: TocItem; subs: TocItem[] }[] = [];
+for (const h of toc) {
+  const lv = levelOf(h.depth);
+  if (lv <= 2 || groups.length === 0) groups.push({ head: { h, lv }, subs: [] });
+  else groups[groups.length - 1].subs.push({ h, lv });
+}
 ---
 
 {
@@ -47,12 +57,29 @@ const levelOf = (depth: number) => Math.min(depth - minDepth, 5);
     <nav class="toc-desktop" aria-label="文章目录">
       <p class="toc-heading font-mono">CONTENTS</p>
       <ul>
-        {toc.map((h) => (
-          <li class={`lv-${levelOf(h.depth)}`}>
-            <a href={`#${h.slug}`} data-toc-link={h.slug} title={h.text}>
-              {h.text}
-            </a>
-          </li>
+        {groups.map((g) => (
+          <>
+            <li class={`lv-${g.head.lv}`}>
+              <a href={`#${g.head.h.slug}`} data-toc-link={g.head.h.slug} title={g.head.h.text}>
+                {g.head.h.text}
+              </a>
+            </li>
+            {g.subs.length > 0 && (
+              <li class="toc-subs" data-family={g.head.h.slug} inert aria-hidden="true">
+                <div class="toc-subs-inner">
+                  <ul>
+                    {g.subs.map((s) => (
+                      <li class={`lv-${s.lv}`}>
+                        <a href={`#${s.h.slug}`} data-toc-link={s.h.slug} title={s.h.text}>
+                          {s.h.text}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+            )}
+          </>
         ))}
       </ul>
       <p class="toc-percent font-mono" data-toc-percent aria-hidden="true" />
@@ -122,6 +149,44 @@ const levelOf = (depth: number) => Math.min(depth - minDepth, 5);
     width: 2px;
     border-radius: 2px;
     background: var(--color-accent);
+  }
+
+  /* 深层级族(lv-3~5):默认折叠,当前族展开(离开即收);
+     margin 抵消 ul flex gap,折叠时不留空位 */
+  .toc-desktop .toc-subs {
+    margin-top: -7px;
+  }
+
+  .toc-desktop .toc-subs-inner {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 0.3s ease,
+      opacity 0.25s ease;
+  }
+
+  .toc-desktop .toc-subs.expanded {
+    margin-top: 0;
+  }
+
+  .toc-desktop .toc-subs.expanded .toc-subs-inner {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .toc-desktop .toc-subs-inner > ul {
+    overflow: hidden;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .toc-desktop .toc-subs-inner {
+      transition: none;
+    }
   }
 
   /* 阅读进度轨道:沿目录左缘生长 */
@@ -313,17 +378,43 @@ const levelOf = (depth: number) => Math.min(depth - minDepth, 5);
       );
     }
 
-    // 桌面目录:滚动高亮当前小节(h1–h6)
+    // 滚动高亮当前小节(h1–h6);桌面目录与抽屉的链接同 slug,一对多映射
     const links = [...document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]')];
     if (links.length === 0) return;
-    const map = new Map<string, HTMLAnchorElement>();
-    links.forEach((l) => map.set(l.dataset.tocLink!, l));
+    const map = new Map<string, HTMLAnchorElement[]>();
+    links.forEach((l) => {
+      const arr = map.get(l.dataset.tocLink!) ?? [];
+      arr.push(l);
+      map.set(l.dataset.tocLink!, arr);
+    });
+
+    // 族归属只看桌面目录的 DOM 结构(抽屉是平铺列表,不含 .toc-subs);
+    // 桌面目录里,不在 .toc-subs 里的链接即族头
+    const familyOf = new Map<string, string>();
+    let curFamily = '';
+    document
+      .querySelectorAll<HTMLAnchorElement>('.toc-desktop [data-toc-link]')
+      .forEach((l) => {
+        if (!l.closest('.toc-subs')) curFamily = l.dataset.tocLink!;
+        familyOf.set(l.dataset.tocLink!, curFamily);
+      });
+    const families = [...document.querySelectorAll<HTMLElement>('.toc-subs')];
+    const setActiveFamily = (slug: string) => {
+      const active = familyOf.get(slug);
+      families.forEach((f) => {
+        const on = f.dataset.family === active;
+        f.classList.toggle('expanded', on);
+        f.toggleAttribute('inert', !on);
+        f.setAttribute('aria-hidden', String(!on));
+      });
+    };
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
             links.forEach((l) => l.classList.remove('is-current'));
-            map.get(entry.target.id)?.classList.add('is-current');
+            map.get(entry.target.id)?.forEach((l) => l.classList.add('is-current'));
+            setActiveFamily(entry.target.id);
           }
         }
       },
