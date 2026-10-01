@@ -33,12 +33,12 @@ const metaSegments = meta
 <section class="page-stage" data-stage data-img-mode={imgMode} style={treatment ? `--img-scrim: ${treatment.scrim}; --img-scrim-dark: ${treatment.scrimDark}` : undefined}>
   {
     image && (
-      <div class="stage-backdrop" aria-hidden="true" transition:name={stageMediaName(image)}>
+      <div class="stage-backdrop img-reveal" aria-hidden="true" transition:name={stageMediaName(image)}>
         <style is:global set:html={`::view-transition-group(${stageMediaName(image)}) { z-index: 1; }`} />
         <img
           src={u(image)}
           alt=""
-          class="stage-img img-reveal"
+          class="stage-img"
           loading="eager"
           decoding="async"
           onerror="this.closest('.stage-backdrop').remove()"

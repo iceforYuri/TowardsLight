@@ -1,8 +1,8 @@
 /**
- * 图片揭示调度:img-reveal 的淡入在两个条件都满足后才开始——
- * 位图可绘制(img.decode())+ 进行中的转场播完(vt.finished)。
- * 快图几乎瞬时满足,等效立即淡入;大图自动"好了再淡",
- * 避免透明度动画跑在还没光栅化好的图层上(闪入/空淡入)。
+ * 图片揭示调度:
+ * - 已就绪(缓存)的图:decode 后立即亮,赶上转场快照,无缝
+ * - 未加载完的图:load + decode + 转场播完(vt.finished)后才淡入——
+ *   位图 ready 淡入才是真的,且不会在快照覆盖下空播
  */
 
 type VT = { finished: Promise<unknown> };
@@ -30,13 +30,13 @@ if (typeof document !== 'undefined' && document.startViewTransition) {
  * - vt.finished:避免淡入在转场快照覆盖下空播(闪入)
  * 小图 decode 几乎瞬时,等效于"快图立即淡入";大图自动变成"好了再淡"。
  */
-async function reveal(img: HTMLImageElement) {
+async function reveal(el: HTMLElement, img: HTMLImageElement, waitForTransition: boolean) {
   try {
     await img.decode();
   } catch {
     return; // 解码失败交给 onerror 路径(移除背景),这里不亮
   }
-  const vt = activeTransition;
+  const vt = waitForTransition ? activeTransition : null;
   if (vt) {
     try {
       await vt.finished;
@@ -44,18 +44,24 @@ async function reveal(img: HTMLImageElement) {
       // 转场中止也照常淡入
     }
   }
-  img.classList.add('is-loaded');
+  el.classList.add('is-loaded');
 }
 
 export function initImgReveal() {
   document
-    .querySelectorAll<HTMLImageElement>('img.img-reveal:not([data-reveal-bound])')
-    .forEach((img) => {
-      img.dataset.revealBound = '1';
+    .querySelectorAll<HTMLElement>('.img-reveal:not([data-reveal-bound])')
+    .forEach((el) => {
+      el.dataset.revealBound = '1';
+      // 容器级:揭示对象是整个背景容器(图+遮罩一起淡入),触发源是其中的 img
+      const img = el instanceof HTMLImageElement ? el : el.querySelector('img');
+      if (!img) {
+        el.classList.add('is-loaded');
+        return;
+      }
       if (img.complete && img.naturalWidth > 0) {
-        reveal(img); // 已下载:decode 立即 resolve
+        reveal(el, img, false); // 已就绪:立即亮(赶上转场快照)
       } else {
-        img.addEventListener('load', () => reveal(img), { once: true });
+        img.addEventListener('load', () => reveal(el, img, true), { once: true });
       }
     });
 }

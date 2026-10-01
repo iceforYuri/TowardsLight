@@ -77,12 +77,12 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
   >
     {
       coverSrc && (
-        <div class="stage-backdrop" aria-hidden="true" transition:name={stageMediaName(coverSrc)}>
+        <div class="stage-backdrop img-reveal" aria-hidden="true" transition:name={stageMediaName(coverSrc)}>
           <style is:global set:html={`::view-transition-group(${stageMediaName(coverSrc ?? '')}) { z-index: 1; }`} />
           <img
             src={coverSrc}
             alt={coverAlt ?? ''}
-            class="stage-img img-reveal"
+            class="stage-img"
             style={`object-position: ${coverPosition};`}
             loading="eager"
             decoding="async"
