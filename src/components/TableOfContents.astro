@@ -133,11 +133,20 @@ for (const h of toc) {
     color: var(--color-text);
   }
 
-  /* 当前小节:翻转强调——正文色 + 加粗 + 左侧珊瑚指示条,
-     与常驻的层级色(前三级珊瑚/后三级青)区分开 */
+  /* 当前小节:沿所在族色相加深 + 加粗 + 下划线,左侧指示条保留 */
   .toc-desktop a.is-current {
-    color: var(--color-text);
+    color: var(--color-accent-text);
     font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 3px;
+  }
+
+  .toc-desktop .lv-3 a.is-current,
+  .toc-desktop .lv-4 a.is-current,
+  .toc-desktop .lv-5 a.is-current {
+    color: color-mix(in oklab, var(--color-contrast) 72%, var(--color-text));
+    text-decoration-color: var(--color-contrast);
   }
 
   .toc-desktop a.is-current::before {

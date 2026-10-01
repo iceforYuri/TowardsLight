@@ -199,8 +199,18 @@ const levelOf = (depth: number) => Math.min(depth - minDepth, 5);
   }
 
   .drawer-panel a.is-current {
-    color: var(--color-text);
+    color: var(--color-accent-text);
     font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 3px;
+  }
+
+  .drawer-panel .lv-3 a.is-current,
+  .drawer-panel .lv-4 a.is-current,
+  .drawer-panel .lv-5 a.is-current {
+    color: color-mix(in oklab, var(--color-contrast) 72%, var(--color-text));
+    text-decoration-color: var(--color-contrast);
   }
 
   .drawer-panel .lv-1 {
