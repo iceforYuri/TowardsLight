@@ -44,20 +44,23 @@ export async function sampleImageLuminance(
     const w = meta.width ?? 0;
     const h = meta.height ?? 0;
     if (!w || !h) return null;
+    // 先缩到 64×48 再在 JS 侧裁区域:避免 extract 强制全尺寸栅格化
+    // (SVG 大模糊滤镜下尤其贵);位图也能吃到 shrink-on-load
     const { data } = await img
-      .extract({
-        left: Math.floor(w * r.left),
-        top: Math.floor(h * r.top),
-        width: Math.max(1, Math.floor(w * r.width)),
-        height: Math.max(1, Math.floor(h * r.height)),
-      })
       .resize(64, 48, { fit: 'fill' })
       .removeAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
+    const x0 = Math.floor(64 * r.left);
+    const y0 = Math.floor(48 * r.top);
+    const rw = Math.max(1, Math.floor(64 * r.width));
+    const rh = Math.max(1, Math.floor(48 * r.height));
     const lums: number[] = [];
-    for (let i = 0; i + 2 < data.length; i += 3) {
-      lums.push(0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]);
+    for (let y = y0; y < y0 + rh; y++) {
+      for (let x = x0; x < x0 + rw; x++) {
+        const i = (y * 64 + x) * 3;
+        lums.push(0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]);
+      }
     }
     lums.sort((a, b) => a - b);
     return lums[Math.floor(lums.length / 2)];
