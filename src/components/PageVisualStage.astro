@@ -4,7 +4,7 @@
  * 无图片时退化为纯色主题背景
  */
 import Icon from './Icon.astro';
-import { u } from '../utils/url';
+import { u, stageMediaName } from '../utils/url';
 import { imageTreatment, sampleImageLuminance } from '../utils/image-luminance';
 
 interface Props {
@@ -33,7 +33,8 @@ const metaSegments = meta
 <section class="page-stage" data-stage data-img-mode={imgMode} style={treatment ? `--img-scrim: ${treatment.scrim}; --img-scrim-dark: ${treatment.scrimDark}` : undefined}>
   {
     image && (
-      <div class="stage-backdrop" aria-hidden="true" transition:name="stage-media">
+      <div class="stage-backdrop" aria-hidden="true" transition:name={stageMediaName(image)}>
+        <style is:global set:html={`::view-transition-group(${stageMediaName(image)}) { z-index: 1; }`} />
         <img
           src={u(image)}
           alt=""

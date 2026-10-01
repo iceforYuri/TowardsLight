@@ -1,6 +1,6 @@
 ---
 import { site } from '../data/site';
-import { u } from '../utils/url';
+import { u, stageMediaName } from '../utils/url';
 import { imageTreatment, sampleImageLuminance } from '../utils/image-luminance';
 import CurrentStatus from './CurrentStatus.astro';
 
@@ -32,7 +32,9 @@ const intro = stripEnd(hero.intro);
 <section class="hero" data-img-mode={imgMode} style={imgMode ? `--img-scrim: ${imgScrim}; --img-scrim-dark: ${imgScrimDark}` : undefined}>
   {
     hero.background && (
-      <div class="hero-backdrop" aria-hidden="true" transition:name="stage-media">
+      <div class="hero-backdrop" aria-hidden="true" transition:name={stageMediaName(hero.background)}>
+        {/* 转场图层序:背景组始终压在卡片之下(转场名按图区分,见 utils/url) */}
+        <style is:global set:html={`::view-transition-group(${stageMediaName(hero.background)}) { z-index: 1; }`} />
         <img
           src={u(hero.background)}
           alt=""

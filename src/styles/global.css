@@ -227,12 +227,9 @@ button {
   animation: none;
 }
 
-/* 图层堆叠:标题最上,卡片压住背景,背景最底
-   (不设置时,进入文章页封面可能盖住滑入的卡片);
-   导航栏永远最高:背景/封面快照交叉淡化时不会盖住导航 */
-::view-transition-group(stage-media) {
-  z-index: 1;
-}
+/* 图层堆叠:标题最上,卡片压住背景,导航栏永远最高。
+   背景/封面组的转场名按图片地址生成(stageMediaName,见 utils/url),
+   各组 z-index 由组件内联 style 按名注入——同图才配对联播,不同图不串场 */
 
 ::view-transition-group(hero-body) {
   z-index: 2;
