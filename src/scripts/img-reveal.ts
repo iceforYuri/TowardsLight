@@ -1,7 +1,8 @@
 /**
- * 图片揭示调度:img-reveal 的淡入等待进行中的页面转场结束后再开始,
- * 避免淡入在转场快照覆盖下悄悄播完、看起来像"闪入"。
- * 无转场(首次加载/直接访问)时立即淡入。
+ * 图片揭示调度:img-reveal 的淡入在两个条件都满足后才开始——
+ * 位图可绘制(img.decode())+ 进行中的转场播完(vt.finished)。
+ * 快图几乎瞬时满足,等效立即淡入;大图自动"好了再淡",
+ * 避免透明度动画跑在还没光栅化好的图层上(闪入/空淡入)。
  */
 
 type VT = { finished: Promise<unknown> };
@@ -23,7 +24,18 @@ if (typeof document !== 'undefined' && document.startViewTransition) {
   }) as typeof document.startViewTransition;
 }
 
-async function revealAfterTransition(img: HTMLImageElement) {
+/**
+ * 揭示 = 位图可绘制(decode)+ 转场播完。两者都满足才开始淡入:
+ * - decode:等位图解码/光栅化完成,淡入开始时图层 ready,避免"透明度在走、画面还没图"的空淡入
+ * - vt.finished:避免淡入在转场快照覆盖下空播(闪入)
+ * 小图 decode 几乎瞬时,等效于"快图立即淡入";大图自动变成"好了再淡"。
+ */
+async function reveal(img: HTMLImageElement) {
+  try {
+    await img.decode();
+  } catch {
+    return; // 解码失败交给 onerror 路径(移除背景),这里不亮
+  }
   const vt = activeTransition;
   if (vt) {
     try {
@@ -41,11 +53,9 @@ export function initImgReveal() {
     .forEach((img) => {
       img.dataset.revealBound = '1';
       if (img.complete && img.naturalWidth > 0) {
-        // 已缓存:立即亮,能进转场新快照,视觉无缝
-        img.classList.add('is-loaded');
+        reveal(img); // 已下载:decode 立即 resolve
       } else {
-        // 未加载完:等转场结束再淡入,避免淡入在快照覆盖下空播(闪入)
-        img.addEventListener('load', () => revealAfterTransition(img), { once: true });
+        img.addEventListener('load', () => reveal(img), { once: true });
       }
     });
 }
