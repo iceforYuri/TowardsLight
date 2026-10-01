@@ -39,6 +39,14 @@ npm run preview    # 本地预览构建产物
 
 > **注意**:junction 切换对运行中的 dev server 不生效——内容集合在启动时同步,静态目录却是实时解析的。切换指向时 `use-profile.mjs` 会自动清理内容缓存(防跨档案残留),下次启动冷同步;但运行中的 server 不会跟随,务必重启 dev server,否则会出现"文章是 A 档案、图片找 B 档案"的错位。
 
+> **同目录同时只能跑一个档案**:`.astro/` 内容缓存的路径在 Astro 5 里写死为项目根,两个不同档案的 dev server 同目录并存必然互写缓存。想并排对照两个档案(比如 showcase 和 personal),用 git worktree 开第二个工作副本——各自有独立的 `.astro`、junction 和 node_modules,完全隔离:
+>
+> ```bash
+> git worktree add ../blog-showcase        # 副本目录
+> cd ../blog-showcase && npm install
+> SITE_PROFILE_DIR=src/profiles/showcase npm run dev   # 副本里跑 showcase,不影响主目录
+> ```
+
 ```bash
 node scripts/new-profile.mjs                 # 生成个人档案骨架(默认 ./personal)
 npm run dev                                  # personal/ 存在即预览个人站

@@ -28,14 +28,24 @@ for (const required of ['site.ts', 'links.ts', 'posts']) {
   }
 }
 
-/** 建立目录指向;已是正确指向则跳过;linkPath 是真实目录则报错保护。返回是否发生了重指向 */
-function linkDir(target, linkPath) {
+const sleep = (ms) => Atomics.wait(new Int32Array(1), 0, 0, ms);
+
+/** 读回校验:链接存在且指向 target */
+function linkPointsTo(target, linkPath) {
   try {
-    const current = fs.readlinkSync(linkPath);
-    if (path.resolve(path.dirname(linkPath), current) === target) return false;
+    return path.resolve(path.dirname(linkPath), fs.readlinkSync(linkPath)) === target;
   } catch {
-    /* 不存在或不是链接,继续 */
+    return false;
   }
+}
+
+/**
+ * 建立目录指向;已是正确指向则跳过;linkPath 是真实目录则报错保护。返回是否发生了重指向。
+ * 加固:unlink+symlink 不是原子的,并发跑两个 use-profile(终端 + 扩展同时起 dev)
+ * 可能互相拆掉对方的链接留下残骸——失败时先读回(也许对方已经建好了),再重试一次。
+ */
+function linkDir(target, linkPath) {
+  if (linkPointsTo(target, linkPath)) return false;
   const st = fs.lstatSync(linkPath, { throwIfNoEntry: false });
   if (st) {
     if (st.isSymbolicLink()) {
@@ -45,7 +55,20 @@ function linkDir(target, linkPath) {
       process.exit(1);
     }
   }
-  fs.symlinkSync(target, linkPath, 'junction');
+  for (let attempt = 1; ; attempt++) {
+    try {
+      fs.symlinkSync(target, linkPath, 'junction');
+      break;
+    } catch (e) {
+      if (linkPointsTo(target, linkPath)) return false; // 并发对家已建好,结果正确即可
+      if (attempt >= 2) throw e;
+      sleep(150);
+    }
+  }
+  if (!linkPointsTo(target, linkPath)) {
+    console.error(`[profile] ${linkPath} 创建后读回校验失败,请手动检查该路径`);
+    process.exit(1);
+  }
   return true;
 }
 
