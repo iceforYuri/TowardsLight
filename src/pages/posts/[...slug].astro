@@ -86,7 +86,6 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
             style={`object-position: ${coverPosition};`}
             loading="eager"
             decoding="async"
-            onload="this.classList.add('is-loaded')"
             onerror="this.closest('.stage-backdrop')?.classList.add('is-broken'); this.remove()"
           />
           <div class="stage-scrim" />
