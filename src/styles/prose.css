@@ -21,7 +21,6 @@
 .prose h5,
 .prose h6 {
   line-height: 1.4;
-  scroll-margin-top: calc(var(--nav-height) + 48px);
 }
 
 /* 标题族统一珊瑚系:h1–h4 用亮珊瑚 accent;h5 字号小,用深一号 accent-text 保对比;

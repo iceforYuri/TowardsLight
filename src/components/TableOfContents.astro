@@ -417,16 +417,13 @@ for (const h of toc) {
         f.setAttribute('aria-hidden', String(!on));
       });
     };
-    // 检测带:导航栏下方 84~128px 的固定细带(像素计算,不随视口高度漂移)。
-    // 带内取文档序最靠上的标题为当前节;第一个标题未过带时不高亮;
-    // 长小节中段(带内无标题且已过首标题)保持当前节。
-    const BAND_TOP = 84;
-    const BAND_BOTTOM = 128;
+    // 当前节判定:位置线规则——最后一个顶部越过判定线(导航底缘 74+20=94px)
+    // 的标题为当前节;线以上没有标题(引言区)则不高亮。上下滚动对称,
+    // 锚点跳转与快速滚动天然正确。
+    const LINE = 94;
     const headingEls = [
       ...document.querySelectorAll<HTMLElement>('.prose :is(h1, h2, h3, h4, h5, h6)[id]'),
     ];
-    const orderedIds = headingEls.map((h) => h.id);
-    const intersecting = new Set<string>();
 
     const setCurrent = (id: string | null) => {
       links.forEach((l) => l.classList.remove('is-current'));
@@ -438,22 +435,33 @@ for (const h of toc) {
       }
     };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) intersecting.add(entry.target.id);
-          else intersecting.delete(entry.target.id);
-        }
-        if (intersecting.size > 0) {
-          setCurrent(orderedIds.find((id) => intersecting.has(id)) ?? null);
-        } else if (headingEls[0] && headingEls[0].getBoundingClientRect().top > BAND_BOTTOM) {
-          setCurrent(null);
-        }
-        // 否则:长小节中段,保持当前节
-      },
-      { rootMargin: `-${BAND_TOP}px 0px -${Math.max(0, window.innerHeight - BAND_BOTTOM)}px 0px` },
-    );
-    headingEls.forEach((h) => observer.observe(h));
+    let currentId: string | null = null;
+    const updateCurrent = () => {
+      let id: string | null = null;
+      for (const h of headingEls) {
+        if (h.getBoundingClientRect().top <= LINE) id = h.id;
+        else break;
+      }
+      if (id !== currentId) {
+        currentId = id;
+        setCurrent(id);
+      }
+    };
+    let tocTicking = false;
+    const onTocScroll = () => {
+      if (!tocTicking) {
+        requestAnimationFrame(() => {
+          updateCurrent();
+          tocTicking = false;
+        });
+        tocTicking = true;
+      }
+    };
+    window.addEventListener('scroll', onTocScroll, { passive: true });
+    updateCurrent();
+    document.addEventListener('astro:before-swap', () => window.removeEventListener('scroll', onTocScroll), {
+      once: true,
+    });
 
     // 目录初始位置与文章卡片的内容顶缘对齐(目录与正文两栏同高起读)
     const aside = document.querySelector<HTMLElement>('.article-aside');

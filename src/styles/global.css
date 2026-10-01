@@ -88,7 +88,7 @@ html[data-theme='dark'] {
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--nav-height) + 40px);
+  scroll-padding-top: calc(var(--nav-height) + 30px);
   -webkit-text-size-adjust: 100%;
 }
 
