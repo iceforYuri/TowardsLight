@@ -2,7 +2,7 @@
 import { defineConfig } from 'astro/config';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import { remarkImageGuard } from './src/plugins/remark-image-guard.mjs';
+import { remarkImageGuard, viteImageGuard } from './src/plugins/image-guard.mjs';
 
 // 把 fence 的语言写到 <pre data-language> 上,由 CSS 生成右上角语言徽章;
 // 未识别语言由 Shiki 自动回退 plaintext(构建期告警),徽章保留作者原写法
@@ -30,6 +30,8 @@ export default defineConfig({
   site: process.env.SITE_URL ?? profileSiteUrl,
   base: process.env.SITE_BASE ?? '/',
   vite: {
+    // 内容图片解析兜底(先于 astro 内部插件):缓存残留的失效引用喂占位图,不抛 ImageNotFound
+    plugins: [viteImageGuard()],
     server: {
       watch: {
         // editor/(扩展,含上万个图标文件)和构建产物与站点渲染无关,

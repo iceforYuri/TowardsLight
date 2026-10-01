@@ -28,11 +28,11 @@ for (const required of ['site.ts', 'links.ts', 'posts']) {
   }
 }
 
-/** 建立目录指向;已是正确指向则跳过;linkPath 是真实目录则报错保护 */
+/** 建立目录指向;已是正确指向则跳过;linkPath 是真实目录则报错保护。返回是否发生了重指向 */
 function linkDir(target, linkPath) {
   try {
     const current = fs.readlinkSync(linkPath);
-    if (path.resolve(path.dirname(linkPath), current) === target) return;
+    if (path.resolve(path.dirname(linkPath), current) === target) return false;
   } catch {
     /* 不存在或不是链接,继续 */
   }
@@ -46,6 +46,7 @@ function linkDir(target, linkPath) {
     }
   }
   fs.symlinkSync(target, linkPath, 'junction');
+  return true;
 }
 
 /** 图片是可选的:档案没有 images/ 时指到空目录 */
@@ -54,8 +55,19 @@ const imagesDir = fs.existsSync(path.join(profileDir, 'images'))
   : path.join(root, 'node_modules', '.profile-empty-images');
 fs.mkdirSync(imagesDir, { recursive: true });
 
-linkDir(profileDir, path.join(root, 'src/profiles/active'));
-linkDir(imagesDir, path.join(root, 'public/images'));
+const relinkedActive = linkDir(profileDir, path.join(root, 'src/profiles/active'));
+const relinkedImages = linkDir(imagesDir, path.join(root, 'public/images'));
+const relinked = relinkedActive || relinkedImages;
+
+// 内容层存储(.astro/data-store.json 等)只增不剪:换档案后旧档案的条目会残留,
+// 其图片 import 在新指向下解析不到文件,ImageNotFound 一拖垮全站。
+// 指向一旦变化就清掉内容缓存,下次 dev/build 冷同步重建(astro 会自动重新生成)。
+if (relinked) {
+  for (const f of ['data-store.json', 'content-assets.mjs', 'content-modules.mjs']) {
+    fs.rmSync(path.join(root, '.astro', f), { force: true });
+  }
+  console.log('[profile] 档案指向已变化,内容缓存已清理(下次启动冷同步)');
+}
 
 const isShowcase = profileDir === path.join(root, 'src/profiles/showcase');
 console.log(

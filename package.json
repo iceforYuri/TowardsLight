@@ -13,6 +13,7 @@
     "precheck": "node scripts/use-profile.mjs",
     "check": "astro check",
     "new-profile": "node scripts/new-profile.mjs",
+    "test": "node scripts/test-image-guard.mjs",
     "preview": "astro preview",
     "astro": "astro"
   },
