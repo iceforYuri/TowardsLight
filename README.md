@@ -12,6 +12,8 @@
 - **克制的动效**:CSS 过渡 + Astro View Transitions,尊重 `prefers-reduced-motion`,几乎零客户端 JS
 - **图片健壮性**:封面可选,支持焦点位置、加载失败自动降级为主题背景
 - **Shiki 双主题代码高亮**:github-light / github-dark 随主题自动切换
+- **KaTeX 公式渲染**:remark-math + rehype-katex 构建期输出 HTML,零客户端 JS
+- **正文图片灯箱**:点击放大,ESC/点击遮罩关闭,支持键盘操作
 - **RSS**:`/rss.xml` 自动生成
 
 ## 快速开始

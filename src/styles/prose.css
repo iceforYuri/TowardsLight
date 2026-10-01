@@ -124,6 +124,21 @@
 .prose pre.astro-code {
   /* 亮主题:用表面色与卡片形成微差,不与卡片同色 */
   background-color: var(--color-surface-raised);
+  position: relative;
+  padding-top: 2.1em;
+}
+
+/* 右上角语言徽章:data-language 由 Shiki transformer 注入 */
+.prose pre.astro-code::before {
+  content: attr(data-language);
+  position: absolute;
+  top: 0.75em;
+  right: 1.1em;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  opacity: 0.65;
 }
 
 html[data-theme='dark'] .prose pre.astro-code {
@@ -182,6 +197,57 @@ html[data-theme='dark'] .prose pre.astro-code span {
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   margin-inline: auto;
+  box-shadow:
+    0 14px 44px rgba(20, 25, 20, 0.1),
+    0 2px 10px rgba(20, 25, 20, 0.05);
+  cursor: zoom-in;
+  transition:
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.prose img:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 20px 56px rgba(20, 25, 20, 0.15),
+    0 4px 14px rgba(20, 25, 20, 0.07);
+}
+
+html[data-theme='dark'] .prose img {
+  box-shadow:
+    0 14px 44px rgba(0, 0, 0, 0.36),
+    0 2px 10px rgba(0, 0, 0, 0.24);
+}
+
+html[data-theme='dark'] .prose img:hover {
+  box-shadow:
+    0 20px 56px rgba(0, 0, 0, 0.46),
+    0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose img {
+    transition: none;
+  }
+
+  .prose img:hover {
+    transform: none;
+  }
+}
+
+/* 公式(KaTeX 构建期渲染,见 astro.config) */
+.prose .katex {
+  font-size: 1.05em;
+}
+
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0.2em;
+}
+
+.prose .katex-display > .katex {
+  white-space: nowrap;
 }
 
 /* 脚注 */

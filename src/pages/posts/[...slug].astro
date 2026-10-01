@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FloatingMainCard from '../../components/FloatingMainCard.astro';
 import TableOfContents from '../../components/TableOfContents.astro';
+import ImageLightbox from '../../components/ImageLightbox.astro';
 import TocDrawer from '../../components/TocDrawer.astro';
 import ReadingProgress from '../../components/ReadingProgress.astro';
 import PostNavigation from '../../components/PostNavigation.astro';
@@ -140,6 +141,9 @@ if (cover) {
 
   {/* 中宽屏:侧边按钮 + 玻璃抽屉目录 */}
   <TocDrawer headings={headings} />
+
+  {/* 正文图片点击放大 */}
+  <ImageLightbox />
 </BaseLayout>
 
 <style>

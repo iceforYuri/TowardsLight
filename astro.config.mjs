@@ -1,5 +1,17 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+// 把 fence 的语言写到 <pre data-language> 上,由 CSS 生成右上角语言徽章;
+// 未识别语言由 Shiki 自动回退 plaintext(构建期告警),徽章保留作者原写法
+/** @type {import('shiki').ShikiTransformer} */
+const langBadge = {
+  name: 'lang-badge',
+  pre(node) {
+    node.properties['data-language'] = this.options.lang;
+  },
+};
 
 // 站点 URL 属于"身份"内容,取自当前档案(siteUrl 字段);
 // 部署时可用 SITE_URL / SITE_BASE 环境变量覆盖(如 GitHub Pages 子路径)
@@ -30,7 +42,11 @@ export default defineConfig({
     defaultStrategy: 'hover',
   },
   markdown: {
+    // 公式:remark-math 解析 $..$/$$..$$,rehype-katex 构建期渲染为 HTML(零客户端 JS)
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
     shikiConfig: {
+      transformers: [langBadge],
       themes: {
         light: 'github-light',
         dark: 'github-dark',
