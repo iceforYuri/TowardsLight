@@ -33,6 +33,8 @@ export interface TechLink {
   icon?: string;
   external?: boolean;
   featured?: boolean;
+  /** 首页「常用去处」展示,与 featured 独立;最多 3 个,超出构建期只取前 3 */
+  home?: boolean;
   status?: string;
 }
 
@@ -45,6 +47,7 @@ export const techLinks: TechLink[] = [
     icon: 'github',
     external: true,
     featured: true,
+    home: true,
     status: '每天使用',
   },
   {
@@ -63,6 +66,7 @@ export const techLinks: TechLink[] = [
     icon: 'rocket',
     external: true,
     featured: true,
+    home: true,
     status: '本站使用',
   },
   {
@@ -81,6 +85,7 @@ export const techLinks: TechLink[] = [
     icon: 'book-open',
     external: true,
     featured: true,
+    home: true,
   },
   {
     title: 'web.dev',

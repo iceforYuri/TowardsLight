@@ -13,5 +13,7 @@
 
 ## 内容组织
 
+- **featured(链接)**:Links 页的卡片形态(大图标卡片),数量不限;只控制展示形态,不决定首页。
+- **home(链接)**:首页「常用去处」展示位,最多 3 个;与 featured 完全独立。
 - **档案(profile)**:一套完整的站点内容包(site.ts + links.ts + posts/ + images/),代码通过统一指向读取;展示站与个人站是同一代码的两副面孔。
 - **junction**:`src/profiles/active` 与 `public/images` 两个目录链接,是「当前档案」的物理实现,全局唯一,同一时间只服务一个档案。

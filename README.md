@@ -123,7 +123,7 @@ featured: false                 # 可选
 | 配置项 | 位置 |
 | --- | --- |
 | 站名、作者、简介、导航、Hero 文案与背景、页面文案与各页背景、当前状态、翻牌栏、分类图标 | 当前档案的 `site.ts`(默认为 `src/profiles/showcase/site.ts`) |
-| 技术链接目录(分组、图标、精选、状态) | 当前档案的 `links.ts` |
+| 技术链接目录(分组、整组色调、图标、卡片形态、首页展示、状态) | 当前档案的 `links.ts`(`featured`=Links 页大卡片;`home`=首页「常用去处」,最多 3 个) |
 | 双色主题变量(画布/表面/文字/边框/强调色/阴影) | `src/styles/global.css` 顶部 |
 | 部署站点 URL(影响 RSS / canonical) | `astro.config.mjs` 的 `site` |
 
