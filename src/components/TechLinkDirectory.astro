@@ -100,14 +100,9 @@ const groups = linksByGroup();
     border-radius: 0;
   }
 
-  /* ── 分组整色:linkGroups[].tone 声明后,整个栏目浸染为该色系 ──
-     纪律:彩色分组不超过 3 个,全彩会滑向资源导航站 */
-  .link-group[data-tone] {
-    background: var(--gt-soft);
-    border: 1px solid color-mix(in oklab, var(--gt) 26%, transparent);
-    border-radius: 20px;
-    padding: 20px 20px 10px;
-  }
+  /* ── 分组整色:linkGroups[].tone 声明后,组内组件归入该色系 ──
+     容器保持中性(不铺整块色版),色落在标题/记号/图标/精选卡/hover 上,
+     与精选卡片的 accent 处理同一套视觉语言。纪律:彩色分组不超过 3 个 */
   .link-group[data-tone='steel'] {
     --gt: var(--color-steel);
     --gt-soft: var(--color-steel-soft);
@@ -132,38 +127,33 @@ const groups = linksByGroup();
     opacity: 0.75;
   }
 
-  /* 组内行/卡统一归入组色:图标徽章、hover、外链箭头、精选卡、分隔线 */
+  /* 行:图标徽章与 hover 归入组色 */
   .link-group[data-tone] :global(.link-icon) {
-    background: color-mix(in oklab, var(--gt) 14%, var(--color-surface));
+    background: var(--gt-soft);
     color: var(--gt);
   }
   .link-group[data-tone] :global(.tech-link-row:hover) {
-    background: color-mix(in oklab, var(--gt) 9%, transparent);
+    background: var(--gt-soft);
   }
   .link-group[data-tone] :global(.tech-link-row:hover .link-external) {
     color: var(--gt);
     opacity: 0.9;
   }
   .link-group[data-tone] .row-list :global(.tech-link-row + .tech-link-row) {
-    border-top-color: color-mix(in oklab, var(--gt) 18%, transparent);
+    border-top-color: color-mix(in oklab, var(--gt) 22%, var(--color-border));
   }
+
+  /* 精选卡:与红色精选卡同套处理,换成组色 */
   .link-group[data-tone] :global(.tech-link-card) {
-    background: var(--color-surface);
-    border-color: color-mix(in oklab, var(--gt) 24%, var(--color-border));
+    background: var(--gt-soft);
   }
   .link-group[data-tone] :global(.tech-link-card:hover) {
     border-color: var(--gt);
   }
   .link-group[data-tone] :global(.tech-link-card .card-icon) {
     color: var(--gt);
-    border-color: color-mix(in oklab, var(--gt) 24%, var(--color-border));
   }
   .link-group[data-tone] :global(.tech-link-card:hover .card-external) {
     color: var(--gt);
-  }
-
-  /* 深色主题:浸染底在炭面上偏薄,补一点表面明度差 */
-  :global(html[data-theme='dark']) .link-group[data-tone] {
-    background: color-mix(in oklab, var(--gt-soft) 70%, var(--color-surface));
   }
 </style>
