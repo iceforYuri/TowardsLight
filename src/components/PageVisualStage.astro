@@ -143,17 +143,25 @@ const metaSegments = meta
   }
 
 
-  /* 图上文字模式:构建期按图片底部采样带亮度决定(见 utils/image-luminance) */
-  .page-stage[data-img-mode='on-dark'] {
+  /* 图上文字模式:构建期按图片底部采样带亮度决定(见 utils/image-luminance)。
+     仅在背景真正揭示后套用(:has .is-loaded):图未到位时底下是主题画布色,
+     图上浅字落在亮底上会隐形,看起来像"标题等图片淡入才显示" */
+  .page-stage[data-img-mode='on-dark']:has(.stage-backdrop.is-loaded):not(.is-collapsed) {
     --stage-fg: #f2f3ec;
     --stage-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
     --stage-fg-m: rgba(242, 243, 236, 0.74);
   }
 
-  .page-stage[data-img-mode='on-light'] {
+  .page-stage[data-img-mode='on-light']:has(.stage-backdrop.is-loaded):not(.is-collapsed) {
     --stage-fg: #1b1d1a;
     --stage-fg-2: color-mix(in oklab, var(--color-accent-text) 78%, #1b1d1a);
     --stage-fg-m: rgba(27, 29, 26, 0.74);
+  }
+
+  /* 图到位/隐藏时,文字色随底色平滑过渡(标题的 color 过渡已在内) */
+  .stage-desc,
+  .stage-meta {
+    transition: color 0.3s ease;
   }
 
   /* 折叠后背景图隐藏,文字回落主题色(含深色主题) */

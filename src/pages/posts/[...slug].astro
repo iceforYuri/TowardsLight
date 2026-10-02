@@ -185,24 +185,33 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
     min-height: clamp(280px, 34vw, 380px);
   }
 
-  /* 图上文字模式(与 Hero/PageVisualStage 同一套,见 utils/image-luminance) */
-  .article-stage[data-img-mode='on-dark'] {
+  /* 图上文字模式(与 Hero/PageVisualStage 同一套,见 utils/image-luminance)。
+     仅在背景真正揭示后套用(:has .is-loaded):图未到位时底下是主题画布色,
+     图上浅字落在亮底上会隐形,看起来像"标题等图片淡入才显示" */
+  .article-stage[data-img-mode='on-dark']:has(.stage-backdrop.is-loaded) {
     --astg-fg: #f2f3ec;
     --astg-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
     --astg-fg-m: rgba(242, 243, 236, 0.78);
   }
 
-  .article-stage[data-img-mode='on-light'] {
+  .article-stage[data-img-mode='on-light']:has(.stage-backdrop.is-loaded) {
     --astg-fg: #1b1d1a;
     --astg-fg-2: color-mix(in oklab, var(--color-accent-text) 78%, #1b1d1a);
     --astg-fg-m: rgba(27, 29, 26, 0.74);
   }
 
-  /* 深色主题:有封面一律收暗 + 浅字 */
-  :global(html[data-theme='dark']) .article-stage[data-img-mode] {
+  /* 深色主题:有封面一律收暗 + 浅字(同样等背景揭示后套用) */
+  :global(html[data-theme='dark']) .article-stage[data-img-mode]:has(.stage-backdrop.is-loaded) {
     --astg-fg: #f2f3ec;
     --astg-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
     --astg-fg-m: rgba(242, 243, 236, 0.78);
+  }
+
+  /* 图到位/隐藏时,文字色随底色平滑过渡 */
+  .article-title,
+  .article-desc,
+  .article-meta {
+    transition: color 0.3s ease;
   }
 
   .stage-backdrop {

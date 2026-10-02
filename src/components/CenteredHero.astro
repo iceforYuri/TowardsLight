@@ -134,14 +134,16 @@ const intro = stripEnd(hero.intro);
 
 
   /* 图上文字模式:构建期按图片亮度采样决定(见 utils/image-luminance);
-     亮色主题按模式走,深色主题一律收暗配浅字;遮罩强度由 --img-scrim(--img-scrim-dark) 注入 */
-  .hero[data-img-mode='on-dark'] {
+     亮色主题按模式走,深色主题一律收暗配浅字;遮罩强度由 --img-scrim(--img-scrim-dark) 注入。
+     仅在背景真正揭示后套用(:has .is-loaded):图未到位时底下是主题画布色,
+     图上浅字落在亮底上会隐形,看起来像"标题等图片淡入才显示" */
+  .hero[data-img-mode='on-dark']:has(.hero-backdrop.is-loaded) {
     --hero-fg: #f2f3ec;
     --hero-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
     --hero-fg-m: rgba(242, 243, 236, 0.74);
   }
 
-  .hero[data-img-mode='on-light'] {
+  .hero[data-img-mode='on-light']:has(.hero-backdrop.is-loaded) {
     --hero-fg: #1b1d1a;
     --hero-fg-2: color-mix(in oklab, var(--color-accent-text) 78%, #1b1d1a);
     --hero-fg-m: rgba(27, 29, 26, 0.74);
@@ -168,11 +170,19 @@ const intro = stripEnd(hero.intro);
   }
 
 
-  /* 深色主题:有图一律收暗 + 浅字(处理后亮度恒 <128) */
-  :global(html[data-theme='dark']) .hero[data-img-mode] {
+  /* 深色主题:有图一律收暗 + 浅字(处理后亮度恒 <128;同样等背景揭示后套用) */
+  :global(html[data-theme='dark']) .hero[data-img-mode]:has(.hero-backdrop.is-loaded) {
     --hero-fg: #f2f3ec;
     --hero-fg-2: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
     --hero-fg-m: rgba(242, 243, 236, 0.74);
+  }
+
+  /* 图到位/隐藏时,文字色随底色平滑过渡 */
+  .hero-title,
+  .hero-tagline,
+  .hero-intro,
+  .hero-meta {
+    transition: color 0.3s ease;
   }
 
   :global(html[data-theme='dark']) .hero[data-img-mode] .hero-scrim {
