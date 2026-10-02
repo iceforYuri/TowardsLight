@@ -4,14 +4,17 @@ import type { TechLink } from '../data/links';
 
 interface Props {
   link: TechLink;
+  /** 所在分组的整组色调;缺省保持珊瑚精选样式 */
+  tone?: string;
 }
 
-const { link } = Astro.props;
+const { link, tone } = Astro.props;
 ---
 
 <a
   href={link.href}
   class="tech-link-card"
+  data-tone={tone || undefined}
   {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
 >
   <div class="card-top">
@@ -107,9 +110,31 @@ const { link } = Astro.props;
     border-radius: 999px;
   }
 
-  /* 移动端单列堆叠时收敛强调色面积 */
+  /* 分组整色(首页精选卡按所在分组的 tone 着色;Links 页则由分组 section 级联,两者一致) */
+  .tech-link-card[data-tone='steel'] {
+    --gt: var(--color-steel);
+    --gt-soft: var(--color-steel-soft);
+  }
+  .tech-link-card[data-tone='contrast'] {
+    --gt: var(--color-contrast);
+    --gt-soft: var(--color-contrast-soft);
+  }
+  .tech-link-card[data-tone] {
+    background: var(--gt-soft);
+  }
+  .tech-link-card[data-tone]:hover {
+    border-color: var(--gt);
+  }
+  .tech-link-card[data-tone] .card-icon {
+    color: var(--gt);
+  }
+  .tech-link-card[data-tone]:hover .card-external {
+    color: var(--gt);
+  }
+
+  /* 移动端单列堆叠时收敛强调色面积(带分组色调的卡保留色调,它是身份而非强调) */
   @media (max-width: 640px) {
-    .tech-link-card {
+    .tech-link-card:not([data-tone]) {
       background: var(--color-surface-raised);
     }
   }

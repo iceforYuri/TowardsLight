@@ -10,11 +10,13 @@ import Icon from '../components/Icon.astro';
 import { getAllPosts, formatDate, countWords, collectTags } from '../utils/posts';
 import { u } from '../utils/url';
 import { site } from '../data/site';
-import { techLinks } from '../data/links';
+import { linkGroups, techLinks } from '../data/links';
 
 const posts = await getAllPosts();
 const recentPosts = posts.slice(0, 5);
 const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
+// 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
+const groupTone = new Map(linkGroups.map((g) => [g.id, 'tone' in g ? g.tone : undefined]));
 
 // Hero 统计行:全部由内容集合在构建时算出;数字段经过打字光标时翻动计数
 type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
@@ -87,7 +89,7 @@ const statsSegments: StatSegment[] = firstPost
       <section>
         <SectionHeader title="常用去处" href={u('/links')} linkText="完整目录" />
         <div class="featured-links">
-          {featuredLinks.map((link) => <TechLinkCard link={link} />)}
+          {featuredLinks.map((link) => <TechLinkCard link={link} tone={groupTone.get(link.group)} />)}
         </div>
       </section>
 
