@@ -1,21 +1,31 @@
-# 拾光集 · Personal Tech Blog
+<p align="center">
+  <img src="docs/screenshots/home-light.png" alt="首页 · 亮色" width="49%">
+  <img src="docs/screenshots/home-dark.png" alt="首页 · 深色" width="49%">
+</p>
 
-一个基于 **Astro 5** 的个人技术博客与数字个人空间。居中 Hero、悬浮胶囊导航、悬浮主内容卡片、双固定主题(明亮/深色)、内容集合驱动的归档/标签/分类,以及面向技术人员的个人链接目录。
+# 拾光集 · TowardsLight
+
+一个基于 Astro 5 的个人技术博客：居中 Hero、悬浮胶囊导航、悬浮主卡片、明亮/深色两套固定主题，文章按归档/标签/分类自动聚合，外加一个面向技术人员的链接目录。
+
+<p align="center">
+  <img src="docs/screenshots/links-light.png" alt="链接目录 · 亮色" width="49%">
+  <img src="docs/screenshots/links-dark.png" alt="链接目录 · 深色" width="49%">
+</p>
+<p align="center">
+  <img src="docs/screenshots/post-light.png" alt="文章页" width="70%">
+</p>
 
 ## 特性
 
-- **内容优先**:Markdown 写作,Content Collections + Zod schema 校验,`draft` 字段控制发布
-- **双色固定主题**:语义化 CSS 变量,系统偏好探测 + localStorage 持久化,首帧无闪烁,View Transitions 软导航下主题不丢失
-- **三色语义池**:褐红(accent,站内/主推)、青绿(contrast,结构/状态)、钢蓝(steel,链接/技术身份)——分类文件夹三色池手动分配,Links 分组支持整组浸染(纪律:彩色分组 ≤ 3)
-- **自动聚合**:归档(按年份)、标签、分类全部由文章自动生成,无需手工维护列表
-- **阅读体验**:720px 正文列、中文优化排版、桌面粘性目录 + 移动端目录折叠、阅读进度条、上一篇/下一篇
-- **技术链接目录**:分组 + 精选卡片/链接行两级形态,数据集中维护
-- **克制的动效**:CSS 过渡 + Astro View Transitions,尊重 `prefers-reduced-motion`,几乎零客户端 JS
-- **图片健壮性**:封面可选,支持焦点位置、加载失败自动降级为主题背景;正文图片引用失效时自动换成占位图并告警(image-guard 双层哨兵:remark 层管真实缺失,vite 层管缓存残留),一张图不再让全站 500
-- **Shiki 双主题代码高亮**:github-light / github-dark 随主题自动切换
-- **KaTeX 公式渲染**:remark-math + rehype-katex 构建期输出 HTML,零客户端 JS
-- **正文图片灯箱**:点击放大,ESC/点击遮罩关闭,支持键盘操作
-- **RSS**:`/rss.xml` 自动生成
+- Markdown 写作，Content Collections + Zod 校验，`draft: true` 不发布
+- 归档、标签、分类全部由文章自动聚合，不用手工维护列表
+- 明亮/深色两套固定主题，语义化 CSS 变量，首帧无闪烁，软导航下主题不丢失
+- 三色语义池：褐红（accent)、青绿（contrast)、钢蓝（steel)。分类文件夹三色选一，Links 分组可整组着色，彩色分组建议不超过 3 个
+- 文章页：桌面粘性目录 + 移动端目录抽屉、阅读进度条、上一篇/下一篇、正文图片点击放大
+- 代码块 Shiki 双主题高亮，KaTeX 公式构建期渲染，两者都不需要客户端 JS
+- 图片有兜底：封面可配焦点位置；正文图片引用失效时换成占位图并告警，不会拖垮整站
+- 动效克制：CSS 过渡 + View Transitions，尊重 `prefers-reduced-motion`
+- RSS:`/rss.xml` 自动生成
 
 ## 快速开始
 
@@ -24,81 +34,49 @@ npm install        # 安装依赖
 npm run dev        # 开发服务器 http://localhost:4321
 npm run build      # astro check + 生产构建 → dist/
 npm run preview    # 本地预览构建产物
+npm test           # 图片哨兵的单元测试
 ```
 
-要求 Node.js ≥ 18.17(推荐 22+)。
+要求 Node.js ≥ 18.17（推荐 22+)。
 
-## 档案机制(展示站 / 个人站)
+## 配套扩展
 
-全站所有"属于身份"的内容——站点配置、技术链接、文章、图片——都收在**档案目录**里，代码通过 `src/profiles/active` 这个统一指向读取。档案按以下优先级解析：
+[TowardsLight 扩展](https://github.com/iceforYuri/TowardsLight_extension)(VS Code，本地安装）：侧边栏管理文章、分类、链接和站点配置，一键启动预览，写作不用离开编辑器。
 
-1. **`SITE_PROFILE_DIR`**（环境变量或 `.env` 里一行）——显式指定，优先级最高
-2. **`personal/`**（项目根目录，已 gitignore)——存在即自动命中；在里面 `git init` 就是独立的私有仓库，模板库永不跟踪
-3. **`src/profiles/showcase/`**——内置示例，前两者都没有时的默认值，构建出来就是展示站
+## 档案机制
 
-切换是整体替换而非字段合并——个人档案配错或缺字段会在构建期直接报错，示例数据没有机会漏进个人站。每次 dev/build 前日志会打印当前档案，不会静默切错。
+文章、站点配置、链接、图片这些"属于身份"的内容都收在一个**档案目录**里，代码通过 `src/profiles/active` 这个统一指向读取。按优先级解析：
 
-> **注意**:junction 切换对运行中的 dev server 不生效——内容集合在启动时同步,静态目录却是实时解析的。切换指向时 `use-profile.mjs` 会自动清理内容缓存(防跨档案残留),下次启动冷同步;但运行中的 server 不会跟随,务必重启 dev server,否则会出现"文章是 A 档案、图片找 B 档案"的错位。
+1. `SITE_PROFILE_DIR` 环境变量（或 `.env` 里一行），显式指定
+2. `personal/`（项目根目录，已 gitignore)，存在即命中；在里面 `git init` 就是独立的内容仓库，模板库永不跟踪
+3. `src/profiles/showcase/`，内置示例，前两者都没有时的默认值
 
-> **同目录同时只能跑一个档案**:`.astro/` 内容缓存的路径在 Astro 5 里写死为项目根,两个不同档案的 dev server 同目录并存必然互写缓存。想并排对照两个档案(比如 showcase 和 personal),用 git worktree 开第二个工作副本——各自有独立的 `.astro`、junction 和 node_modules,完全隔离:
->
-> ```bash
-> git worktree add ../blog-showcase        # 副本目录
-> cd ../blog-showcase && npm install
-> SITE_PROFILE_DIR=src/profiles/showcase npm run dev   # 副本里跑 showcase,不影响主目录
-> ```
+切换是整体替换：档案配错或缺字段会在构建期直接报错，示例内容不会漏进你的站。每次 dev/build 前日志会打印当前档案。
 
 ```bash
-node scripts/new-profile.mjs                 # 生成个人档案骨架(默认 ./personal)
-npm run dev                                  # personal/ 存在即预览个人站
-SITE_PROFILE_DIR=src/profiles/showcase npm run build   # 显式回切展示站
-npm run build:personal                        # 个人站 → dist-personal/
+node scripts/new-profile.mjs                 # 生成档案骨架(默认 ./personal)
+SITE_PROFILE_DIR=src/profiles/showcase npm run build   # 显式指定档案
 ```
 
-档案目录结构(`site.ts`、`links.ts`、`posts/` 必填,`images/` 可选):
+档案目录结构（`site.ts`、`links.ts`、`posts/` 必填，`images/` 可选）:
 
 ```text
 my-blog-data/
-├── site.ts      # 站名、作者、bio、Hero、默认主题、状态、翻牌栏、分类图标、页面文案与背景、图片文字模式配置
-├── links.ts     # 技术链接目录
-├── posts/       # Markdown 文章(draft: true 不发布)
-│   └── image/   # 文章级图片(封面/正文插图),按文章名归档,相对路径引用
+├── site.ts      # 站名、作者、简介、Hero、默认主题、状态、分类图标、页面文案与各页背景
+├── links.ts     # 链接目录:分组、整组色调、图标、卡片形态、首页展示、状态
+├── posts/       # Markdown 文章
+│   └── image/   # 文章级图片,按文章名归档,相对路径引用
 └── images/      # 站点级图片:头像、Hero/页面背景、共用封面,以 /images/... 引用
 ```
 
-个人档案可以放本地私有目录，也可以是独立私有仓库——它只含数据，模板更新由构建时拉取最新代码自动获得，无需合并。
+两个使用注意：
 
-## 目录结构
-
-```text
-├── astro.config.mjs          # Astro 配置(站点 URL、prefetch、Shiki 双主题)
-├── scripts/
-│   ├── use-profile.mjs       # 档案切换:维护 profiles/active 与 public/images 指向
-│   └── new-profile.mjs       # 个人档案骨架脚手架
-├── src/
-│   ├── content.config.ts     # 内容集合 Schema(posts,源指向 profiles/active/posts)
-│   ├── profiles/
-│   │   ├── showcase/         # 内置示例档案(site/links/posts/images)
-│   │   └── active -> ...     # 当前档案指向(junction,gitignore)
-│   ├── data/
-│   │   ├── site.ts           # 转发层:profiles/active/site
-│   │   └── links.ts          # 转发层:profiles/active/links
-│   ├── layouts/
-│   │   └── BaseLayout.astro  # 页面壳层:head、主题初始化、导航、页脚
-│   ├── components/           # 职责单一的组件
-│   ├── pages/                # 路由:index / archive / tags / categories / links / posts / 404 / rss.xml
-│   ├── styles/
-│   │   ├── global.css        # 设计变量、双主题、基础排版
-│   │   └── prose.css         # 文章正文排版(含代码块双主题)
-│   ├── plugins/
-│   │   └── image-guard.mjs     # 正文图片哨兵:remark 层(缺失换占位)+ vite 层(净化缓存残留)
-│   └── utils/posts.ts        # 文章查询、日期格式化、标签/分类聚合
-└── public/images -> ...      # 指向当前档案的 images/(junction,gitignore)
-```
+- junction 切换对运行中的 dev server 不生效。切换指向后重启 dev server，否则内容和图片会错位。
+- 同一目录同时只能跑一个档案（Astro 的内容缓存路径写死在项目根）。想并排对照两个档案，用 `git worktree` 开第二个工作副本，各自独立。
 
 ## 写一篇文章
 
-在当前档案的 `posts/` 目录新建 `.md` 文件(默认为 `src/profiles/showcase/posts/`),frontmatter 遵循以下 schema(`src/content.config.ts`):
+在档案的 `posts/` 下新建 `.md`:
 
 ```yaml
 ---
@@ -109,7 +87,7 @@ updatedDate: 2026-09-06      # 可选
 category: 前端               # 任意字符串,自动聚合成分类页
 tags: [Astro, 博客]          # 自动聚合成标签页
 draft: false                 # true 则不构建
-cover: /images/covers/wide.svg  # 可选;/ 开头走 images/,否则相对文章文件(如 image/my-post/cover.jpg)
+cover: /images/covers/wide.svg  # 可选;相对路径(如 image/my-post/cover.jpg)跟着文章走
 coverAlt: 封面描述              # 可选
 coverPosition: center 30%       # 可选,object-position 焦点
 featured: false                 # 可选
@@ -122,58 +100,28 @@ featured: false                 # 可选
 
 | 配置项 | 位置 |
 | --- | --- |
-| 站名、作者、简介、导航、Hero 文案与背景、页面文案与各页背景、当前状态、翻牌栏、分类图标 | 当前档案的 `site.ts`(默认为 `src/profiles/showcase/site.ts`) |
-| 技术链接目录(分组、整组色调、图标、卡片形态、首页展示、状态) | 当前档案的 `links.ts`(`featured`=Links 页大卡片;`home`=首页「常用去处」,最多 3 个) |
-| 双色主题变量(画布/表面/文字/边框/强调色/阴影) | `src/styles/global.css` 顶部 |
-| 部署站点 URL(影响 RSS / canonical) | `astro.config.mjs` 的 `site` |
+| 站名、作者、简介、导航、Hero 文案与背景、页面文案与各页背景、当前状态、翻牌栏、分类图标 | 档案的 `site.ts` |
+| 链接目录（分组、整组色调、图标、卡片形态、首页展示、状态） | 档案的 `links.ts`(`featured`=大卡片，`home`=首页展示，最多 3 个） |
+| 主题变量（画布/表面/文字/边框/强调色/阴影） | `src/styles/global.css` 顶部 |
+| 站点 URL（影响 RSS / canonical) | `astro.config.mjs` 的 `site`，或部署时 `SITE_URL` 环境变量 |
 
 ## 主题机制
 
-只有 **Bright** 与 **Dark** 两套固定主题。主题由 `<html data-theme>` 驱动:
-
-1. 首帧前内联脚本读取 `localStorage.theme`,无则跟随系统偏好——避免闪烁;
-2. 切换时仅写 `data-theme` 并持久化,只做过渡色变化,不动布局;
-3. View Transitions 软导航时,`astro:before-swap` 把当前主题复制到新文档,保证跨页面不丢失。
+只有 Bright 与 Dark 两套固定主题，由 `<html data-theme>` 驱动。首帧前的内联脚本读 `localStorage.theme`，没有就跟随系统；切换只写 `data-theme` 并持久化；软导航时 `astro:before-swap` 把主题复制到新文档。
 
 ## 部署
 
-任意静态托管均可(Vercel / Netlify / Cloudflare Pages / 自有服务器):
+任意静态托管（Vercel / Netlify / Cloudflare Pages / 自有服务器）:
 
 ```bash
 npm run build      # 产物在 dist/
 ```
 
-两个仓库各有一条**构建校验** CI(`ci.yml`):push 后验证各自可构建——模板库构建内置 showcase 档案，个人库拉模板库最新 main + 本库数据做完整构建。个人库只含数据，模板更新无需任何合并动作。
-
-**模板库私有期间**：个人库 CI 拉取模板需要一个只读凭证——GitHub 创建 fine-grained PAT（权限只选模板库的 `Contents: read`)，存为个人库的 Secret `TEMPLATE_REPO_TOKEN` 即可；模板库公开后删掉 workflow 里的 `token` 行并删除该 Secret，恢复零凭证。
-
-**Vercel 双站部署方案**(后续启用):
-
-- 展示站：直接连接模板库，默认构建即是 showcase 档案
-- 个人站：连接个人库，模板在构建命令里现场克隆（详见下方"个人站 Vercel 配置")
-- 域名/子路径变化时用 `SITE_URL` / `SITE_BASE` 环境变量覆盖，内部链接全部是 base 感知的，无需改代码
-
-### 个人站 Vercel 配置(个人库只有数据,不能独立构建)
-
-Vercel 新建项目时连接**个人库**,然后:
-
-| 配置项 | 值 |
-| --- | --- |
-| Framework Preset | Other(数据库没有 package.json,检测不到 Astro) |
-| Build Command | `git clone https://x-access-token:$TEMPLATE_TOKEN@github.com/<你>/TowardsLight.git t && cd t && npm ci && SITE_PROFILE_DIR=.. npm run build` |
-| Output Directory | `t/dist` |
-| Install Command | `echo skip`(安装在 Build Command 里完成) |
-
-环境变量：`TEMPLATE_TOKEN` = 只读 PAT(与 GitHub Secret 同一个；模板库公开后改为普通 `git clone https://github.com/...` 即可删除该变量)。
-
-原理：Vercel 检出个人库后，构建命令把模板库克隆到 `t/`，再让模板的构建系统以 `SITE_PROFILE_DIR=..`（即个人库根目录）为数据源构建——与 GitHub Actions 里"两个 checkout 并排"完全同构。
-
-模板更新后个人站的重建触发：下次推文章时自动带上；或 Vercel 里手动 Redeploy;或给项目建一个 Deploy Hook(URL 存为个人库 Secret，由 ci.yml 里加个 curl 步骤每日触发)。
+域名或子路径有变化时用 `SITE_URL` / `SITE_BASE` 环境变量覆盖，内部链接全部是 base 感知的。
 
 ## 图标与字体
 
-- 图标:内联 Lucide SVG(`src/components/Icon.astro`,只打包用到的图标,零运行时依赖)
-- 字体:Google Fonts(Playfair Display / Noto Serif SC / Noto Sans SC / Inter / JetBrains Mono),`display=swap` + 系统字体回退
+图标是内联 Lucide SVG(`src/components/Icon.astro`，只打包用到的）。字体走 Google Fonts(Playfair Display / Noto Serif SC / Noto Sans SC / Inter / JetBrains Mono),`display=swap` 加系统字体回退。
 
 ## License
 
