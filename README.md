@@ -10,17 +10,16 @@
 
 ![首页](docs/screenshots/home-light.png)
 
-## ✨ 特性
+## ✨ 为什么选择拾光集
 
-- Markdown 写作，Content Collections + Zod 校验，`draft: true` 不发布
-- 归档、标签、分类全部由文章自动聚合，不用手工维护列表
-- 明亮/深色两套固定主题，语义化 CSS 变量，首帧无闪烁，软导航下主题不丢失
-- 三色语义池：褐红（accent)、青绿（contrast)、钢蓝（steel)。分类文件夹三色选一，Links 分组可整组着色
-- 文章页：桌面粘性目录 + 移动端目录抽屉、阅读进度条、上一篇/下一篇、正文图片点击放大
-- 代码块 Shiki 双主题高亮，KaTeX 公式构建期渲染，都不需要客户端 JS
-- 图片有兜底：封面可配焦点位置；正文图片引用失效时换成占位图并告警，不会拖垮整站
-- 动效克制：CSS 过渡 + View Transitions，尊重 `prefers-reduced-motion`
-- RSS:`/rss.xml` 自动生成
+| 方向 | 能力 |
+| --- | --- |
+| 视觉系统 | 居中 Hero、悬浮胶囊导航、悬浮主卡片的壳层结构;明亮/深色两套固定主题,首帧无闪烁,软导航不丢主题 |
+| 色彩语义 | 三色池([褐红/青绿/钢蓝](CONTEXT.md))管身份:分类文件夹三色选一,Links 分组整组着色,首页精选卡跟随组色;中性即是灰,颜色永远有意义 |
+| 档案机制 | 文章/配置/链接/图片收进独立档案目录,展示站与个人站一套代码两副面孔;切换整体替换,示例内容不会漏进你的站 |
+| 阅读体验 | 桌面目录外挂卡片右侧、中宽屏玻璃抽屉、阅读进度、图片灯箱、KaTeX 公式、双主题代码高亮 |
+| 健壮性 | 图片双层哨兵:正文图片缺失换占位图并告警,缓存残留自动摘除——一张缺席的图拖不垮整站 |
+| 写作闭环 | [配套 VS Code 扩展](https://github.com/iceforYuri/TowardsLight_extension):文章、分类、链接、站点配置和预览都在编辑器里完成 |
 
 ## 📸 界面
 
@@ -122,9 +121,9 @@ featured: false                 # 可选
 
 任意静态托管（Vercel / Netlify / Cloudflare Pages / 自有服务器）:`npm run build` 的产物在 `dist/`。域名或子路径有变化时用 `SITE_URL` / `SITE_BASE` 环境变量覆盖，内部链接全部是 base 感知的。
 
-## 🔌 配套扩展
+## 🔗 相关项目
 
-[TowardsLight_extension](https://github.com/iceforYuri/TowardsLight_extension):VS Code 本地扩展。侧边栏管理文章、分类、链接和站点配置，真实 dev server 一键预览，写作不用离开编辑器。
+- [TowardsLight_extension](https://github.com/iceforYuri/TowardsLight_extension):配套 VS Code 扩展。侧边栏管理文章、分类、链接和站点配置，真实 dev server 一键预览，写作不用离开编辑器
 
 ## 🎨 图标与字体
 
