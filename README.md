@@ -1,25 +1,25 @@
 # 🌇 拾光集 · TowardsLight
 
 ![Astro 5](https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white)
-![Node.js ≥ 18.17](https://img.shields.io/badge/node.js-%3E%3D18.17-brightgreen)
+![Node.js ≥ 18.17](<https://img.shields.io/badge/node.js-%3E%3D18.17-brightgreen>)
 ![License MIT](https://img.shields.io/badge/license-MIT-blue)
 
-一个基于 Astro 5 的个人技术博客模板：居中 Hero、悬浮胶囊导航、悬浮主卡片，明亮/深色两套固定主题，文章按归档/标签/分类自动聚合，外加一个面向技术人员的链接目录。
-
-[配套 VS Code 扩展](https://github.com/iceforYuri/TowardsLight_extension)：侧边栏管理文章、分类、链接和站点配置，一键预览。
+一处自己的赛博自留地：文章、链接、状态和正在做的事都收在这里。基于 Astro 5，内容与代码完全分离，配套的 [VS Code 扩展](https://github.com/iceforYuri/TowardsLight_extension)负责日常写作。
 
 ![首页](docs/screenshots/home-light.png)
 
 ## ✨ 为什么选择拾光集
 
+它给的不是一套页面，而是几条做成了工程事实的能力：
+
 | 方向 | 能力 |
 | --- | --- |
-| 视觉系统 | 居中 Hero、悬浮胶囊导航、悬浮主卡片的壳层结构;明亮/深色两套固定主题,首帧无闪烁,软导航不丢主题 |
-| 色彩语义 | 三色池([褐红/青绿/钢蓝](CONTEXT.md))管身份:分类文件夹三色选一,Links 分组整组着色,首页精选卡跟随组色;中性即是灰,颜色永远有意义 |
-| 档案机制 | 文章/配置/链接/图片收进独立档案目录,展示站与个人站一套代码两副面孔;切换整体替换,示例内容不会漏进你的站 |
-| 阅读体验 | 桌面目录外挂卡片右侧、中宽屏玻璃抽屉、阅读进度、图片灯箱、KaTeX 公式、双主题代码高亮 |
-| 健壮性 | 图片双层哨兵:正文图片缺失换占位图并告警,缓存残留自动摘除——一张缺席的图拖不垮整站 |
-| 写作闭环 | [配套 VS Code 扩展](https://github.com/iceforYuri/TowardsLight_extension):文章、分类、链接、站点配置和预览都在编辑器里完成 |
+| 内容独立成档 | 文章、配置、链接、图片收进独立档案目录，一套代码同时产出展示站和你的自留地；构建期整体替换 + 类型校验，示例内容不会漏进你的站，模板升级零合并 |
+| 拖不垮的图片管线 | remark + vite 双层哨兵：正文缺图换占位并告警，换档案自动清缓存防交叉污染，一张缺席的图不会让全站 500 |
+| 编辑器里的写作闭环 | [配套扩展](https://github.com/iceforYuri/TowardsLight_extension)用 AST 就地改写配置（不丢格式和注释）,dev server 账本制 + 日志面板，写作和预览不离开编辑器 |
+| 主题是系统不是皮肤 | 语义化变量的双主题，首帧无闪烁、软导航不丢主题；[三色池](CONTEXT.md)管身份：褐红=站内主推，青绿=结构状态，钢蓝=链接与技术身份，中性即是灰 |
+| 阅读体验 | 目录外挂与玻璃抽屉、阅读进度、图片灯箱、KaTeX 公式、双主题代码高亮 |
+| 交互有自己的想法 | 鼓包 Dock 导航、打字机统计行、翻牌状态栏、View Transitions 软导航，全部尊重 prefers-reduced-motion |
 
 ## 📸 界面
 
@@ -97,25 +97,25 @@ featured: false                 # 可选
 
 ## 🎛️ 配置站点
 
-| 配置项 | 位置 |
-| --- | --- |
-| 站名、作者、简介、导航、Hero 文案与背景、页面文案与各页背景、当前状态、翻牌栏、分类图标 | 档案的 `site.ts` |
-| 链接目录（分组、整组色调、图标、卡片形态、首页展示、状态） | 档案的 `links.ts`(`featured`=大卡片，`home`=首页展示，最多 3 个） |
-| 主题变量（画布/表面/文字/边框/强调色/阴影） | `src/styles/global.css` 顶部 |
-| 站点 URL（影响 RSS / canonical) | `astro.config.mjs` 的 `site`，或部署时 `SITE_URL` 环境变量 |
+| 配置项                                                                                  | 位置                                                                   |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 站名、作者、简介、导航、Hero 文案与背景、页面文案与各页背景、当前状态、翻牌栏、分类图标 | 档案的`site.ts`                                                      |
+| 链接目录（分组、整组色调、图标、卡片形态、首页展示、状态）                              | 档案的`links.ts`(`featured`=大卡片，`home`=首页展示，最多 3 个） |
+| 主题变量（画布/表面/文字/边框/强调色/阴影）                                             | `src/styles/global.css` 顶部                                         |
+| 站点 URL（影响 RSS / canonical)                                                         | `astro.config.mjs` 的 `site`，或部署时 `SITE_URL` 环境变量       |
 
 主题由 `<html data-theme>` 驱动：首帧前的内联脚本读 `localStorage.theme`，没有就跟随系统；切换只写 `data-theme` 并持久化；软导航时 `astro:before-swap` 把主题复制到新文档。
 
 ## ⚡ 命令
 
-| 命令 | 作用 |
-| --- | --- |
-| `npm run dev` | 启动开发服务器（localhost:4321) |
-| `npm run build` | 类型检查 + 生产构建到 `dist/` |
-| `npm run preview` | 本地预览构建产物 |
-| `npm test` | 图片哨兵的单元测试 |
-| `npm run new-profile` | 生成个人档案骨架 |
-| `npm run astro ...` | 运行 Astro CLI（如 `astro add`、`astro check`) |
+| 命令                    | 作用                                              |
+| ----------------------- | ------------------------------------------------- |
+| `npm run dev`         | 启动开发服务器（localhost:4321)                   |
+| `npm run build`       | 类型检查 + 生产构建到`dist/`                    |
+| `npm run preview`     | 本地预览构建产物                                  |
+| `npm test`            | 图片哨兵的单元测试                                |
+| `npm run new-profile` | 生成个人档案骨架                                  |
+| `npm run astro ...`   | 运行 Astro CLI（如`astro add`、`astro check`) |
 
 ## 🚢 部署
 
