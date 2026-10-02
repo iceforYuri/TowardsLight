@@ -2,6 +2,7 @@
 import { ClientRouter } from 'astro:transitions';
 import FloatingCenteredHeader from '../components/FloatingCenteredHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
+import SearchOverlay from '../components/SearchOverlay.astro';
 import { site } from '../data/site';
 import { u } from '../utils/url';
 import 'katex/dist/katex.min.css';
@@ -95,5 +96,7 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
       <slot />
     </main>
     <SiteFooter />
+    {/* 搜索模态与导航平级:模糊才罩得住整页,事件也不经导航冒泡 */}
+    <SearchOverlay />
   </body>
 </html>
