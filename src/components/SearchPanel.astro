@@ -1,85 +1,165 @@
 ---
 /**
- * 搜索:桌面端是导航功能区的图标按钮 + 胶囊下方锚定面板;
+ * 搜索:桌面端是导航功能区的图标按钮,点击后打开全屏模态(液态玻璃):
+ * 半透明模糊背板盖住整页,期间页面不可交互;点背板或 Esc 退出。
  * 移动端的输入框在展开面板里(见 FloatingCenteredHeader),两处共用同一套逻辑。
  *
  * 数据:/search.json(首次打开时懒加载,模块级缓存,换页不重取)。
  * 匹配:Fuse.js(threshold 0.15 + ignoreLocation + 全量命中区间),
  * 排名:Fuse 相关度 × 长度归一 ÷ 命中计数加成,外加标题精确包含/标签精确命中/
  * 多字段命中三条规则加成。每篇文章最多占一行结果。
+ *
+ * 注意:触发按钮的圆形本体样式必须自带(与 ThemeToggle 同理)——
+ * 导航里的 .dock-item 样式是 Header 组件作用域,管不到本组件的 DOM。
  */
 import Icon from './Icon.astro';
 ---
 
 <button
   type="button"
-  class="dock-item search-trigger"
+  class="search-trigger"
   data-dock-item
   data-search-trigger
   data-tip="搜索"
   aria-label="搜索文章"
   aria-expanded="false"
-  aria-controls="search-panel"
+  aria-controls="search-modal"
 >
   <span class="dock-bubble" aria-hidden="true"></span>
   <Icon name="search" size={16} />
 </button>
 
-<div class="search-panel" id="search-panel" data-search-panel data-search-context hidden>
-  <div class="search-input-row">
-    <Icon name="search" size={15} />
-    <input
-      type="search"
-      placeholder="搜索标题、标签、正文…"
-      aria-label="搜索文章"
-      autocomplete="off"
-      data-search-input
-      role="combobox"
-      aria-expanded="false"
-      aria-controls="search-results"
-      aria-activedescendant=""
-    />
-    <kbd class="search-esc font-mono" aria-hidden="true">esc</kbd>
+<div class="search-overlay" data-search-overlay hidden>
+  <div class="search-backdrop" aria-hidden="true"></div>
+  <div
+    class="search-modal"
+    id="search-modal"
+    data-search-panel
+    data-search-context
+    role="dialog"
+    aria-modal="true"
+    aria-label="搜索文章"
+  >
+    <div class="search-input-row">
+      <Icon name="search" size={15} />
+      <input
+        type="search"
+        placeholder="搜索标题、标签、正文…"
+        aria-label="搜索文章"
+        autocomplete="off"
+        data-search-input
+        role="combobox"
+        aria-expanded="false"
+        aria-controls="search-results"
+        aria-activedescendant=""
+      />
+      <kbd class="search-esc font-mono" aria-hidden="true">esc</kbd>
+    </div>
+    <ul class="search-results" id="search-results" role="listbox" data-search-results></ul>
+    <div class="search-foot font-mono" data-search-foot></div>
   </div>
-  <ul class="search-results" id="search-results" role="listbox" data-search-results></ul>
-  <div class="search-foot font-mono" data-search-foot></div>
 </div>
 
 <style>
-  .search-panel {
+  /* 触发按钮:与 Dock 圆钮/ThemeToggle 同一规格(本体样式必须自带,见文件头注释) */
+  .search-trigger {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    margin-top: 0;
+    border-radius: 50%;
+    color: var(--color-muted);
+    box-shadow:
+      0 calc(var(--grow, 0) * 10px) calc(var(--grow, 0) * 24px)
+        rgba(20, 25, 20, calc(var(--grow, 0) * 0.2)),
+      inset 0 0 0 1px rgb(var(--dock-ring) / calc(var(--grow, 0) * 0.9));
+    transition:
+      width 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+      height 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.18s ease,
+      color 0.2s ease,
+      background-color 0.2s ease;
+  }
+
+  .search-trigger:hover {
+    color: var(--color-accent-text);
+  }
+
+  .search-trigger :global(svg) {
+    position: relative;
+    z-index: 1;
+    transform: scale(calc(1 + var(--grow, 0) * 0.45));
+    transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* ---- 全屏模态 ---- */
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: min(18vh, 160px);
+    pointer-events: auto; /* header 整体 pointer-events:none,模态自己恢复 */
+  }
+
+  .search-overlay[hidden] {
+    display: none;
+  }
+
+  .search-backdrop {
     position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
-    z-index: 20;
+    inset: 0;
+    background: color-mix(in oklab, var(--color-canvas) 58%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
+    -webkit-backdrop-filter: blur(10px) saturate(1.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .search-modal {
+    position: relative;
     display: flex;
     flex-direction: column;
-    width: min(520px, calc(100vw - 32px));
-    max-height: 60vh;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    width: min(560px, calc(100vw - 32px));
+    max-height: 62vh;
     border-radius: var(--radius-md);
-    box-shadow: var(--shadow-card);
+    border: 1px solid color-mix(in oklab, var(--color-border) 75%, transparent);
+    /* 液态玻璃:半透明表面 + 强模糊 + 轻微提饱和 */
+    background: color-mix(in oklab, var(--color-surface) 72%, transparent);
+    backdrop-filter: blur(24px) saturate(1.5);
+    -webkit-backdrop-filter: blur(24px) saturate(1.5);
+    box-shadow: 0 32px 90px rgba(20, 25, 20, 0.16);
     opacity: 0;
-    transform: translateY(-6px);
+    transform: translateY(-10px) scale(0.985);
     transition:
       opacity 0.2s ease,
-      transform 0.2s ease;
+      transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
-  .search-panel.is-open {
+  :global(html[data-theme='dark']) .search-modal {
+    background: color-mix(in oklab, var(--color-surface) 62%, transparent);
+    box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45);
+  }
+
+  .search-overlay.is-open .search-backdrop {
     opacity: 1;
-    transform: translateY(0);
   }
 
-  .search-panel[hidden] {
-    display: none;
+  .search-overlay.is-open .search-modal {
+    opacity: 1;
+    transform: none;
   }
 
   .search-input-row {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 14px 18px;
     color: var(--color-muted);
     border-bottom: 1px solid var(--color-border);
   }
@@ -92,7 +172,7 @@ import Icon from './Icon.astro';
     outline: none;
     color: var(--color-text);
     font-family: var(--font-ui);
-    font-size: 14.5px;
+    font-size: 15px;
   }
 
   .search-input-row input::placeholder {
@@ -114,7 +194,7 @@ import Icon from './Icon.astro';
     opacity: 0.8;
   }
 
-  /* 结果列表与底栏:桌面面板与移动端面板共用,且结果行是客户端渲染的
+  /* 结果列表与底栏:桌面模态与移动端面板共用,且结果行是客户端渲染的
      (没有组件作用域属性),全部走全局选择器 */
   :global(.search-results) {
     list-style: none;
@@ -190,7 +270,7 @@ import Icon from './Icon.astro';
   }
 
   @media (max-width: 768px) {
-    .search-panel {
+    .search-trigger {
       display: none;
     }
   }
@@ -271,10 +351,7 @@ import Icon from './Icon.astro';
         const lenPenalty = Math.max(0.7, Math.log(1 + r.item.body.length / 1000));
         let final = ((r.score ?? 0) * lenPenalty) / boost;
         if (r.item.title.toLowerCase().includes(q)) final *= 0.35;
-        if (
-          r.item.tags.some((t) => t.toLowerCase() === q) ||
-          r.item.category.toLowerCase() === q
-        )
+        if (r.item.tags.some((t) => t.toLowerCase() === q) || r.item.category.toLowerCase() === q)
           final *= 0.6;
         if (new Set(r.matches?.map((m) => m.key)).size >= 2) final *= 0.85;
         return { r, final };
@@ -451,27 +528,30 @@ import Icon from './Icon.astro';
     target?.click(); // 走 <a> 原生点击,由 ClientRouter 接管软导航
   }
 
-  // ---- 桌面端面板:开关、外部点击关闭 ----
+  // ---- 模态开关:打开时锁页面滚动,点背板/外部/Esc 关闭 ----
 
   function closePanel() {
-    const panel = document.querySelector<HTMLElement>('[data-search-panel]:not([hidden])');
+    const overlay = document.querySelector<HTMLElement>('[data-search-overlay]:not([hidden])');
     const trigger = document.querySelector<HTMLElement>('[data-search-trigger]');
-    if (!panel) return;
-    panel.classList.remove('is-open');
+    if (!overlay) return;
+    overlay.classList.remove('is-open');
     trigger?.setAttribute('aria-expanded', 'false');
-    setTimeout(() => (panel.hidden = true), 200);
+    document.body.style.overflow = '';
+    setTimeout(() => (overlay.hidden = true), 200);
   }
 
   function bindPanel(root: HTMLElement) {
+    const overlay = root.closest<HTMLElement>('[data-search-overlay]');
     const trigger = document.querySelector<HTMLButtonElement>('[data-search-trigger]');
     const input = root.querySelector<HTMLInputElement>('[data-search-input]');
-    if (!trigger || !input) return;
+    if (!overlay || !trigger || !input) return;
 
     trigger.addEventListener('click', async () => {
-      if (root.hidden) {
-        root.hidden = false;
-        requestAnimationFrame(() => root.classList.add('is-open'));
+      if (overlay.hidden) {
+        overlay.hidden = false;
+        requestAnimationFrame(() => overlay.classList.add('is-open'));
         trigger.setAttribute('aria-expanded', 'true');
+        document.body.style.overflow = 'hidden'; // 模态期间页面不可滚动
         input.focus();
         await ensureEngine(); // 预热索引,随后 input 事件或初次渲染接管
         if (!input.value.trim()) runSearch(ctxOf(root));
@@ -481,7 +561,7 @@ import Icon from './Icon.astro';
     });
   }
 
-  // ---- 上下文绑定(桌面面板 + 移动端面板各一份) ----
+  // ---- 上下文绑定(桌面模态 + 移动端面板各一份) ----
 
   const contexts = new WeakMap<HTMLElement, SearchContext>();
 
@@ -538,10 +618,10 @@ import Icon from './Icon.astro';
   function bindSearchGlobal() {
     if (searchGlobalBound) return;
     searchGlobalBound = true;
-    // 点面板与触发按钮之外的任意处关闭
+    // 点在模态与触发按钮之外的任意处(含背板)关闭
     document.addEventListener('click', (e) => {
       const t = e.target as HTMLElement;
-      if (t.closest('[data-search-panel]') || t.closest('[data-search-trigger]')) return;
+      if (t.closest('.search-modal') || t.closest('[data-search-trigger]')) return;
       closePanel();
     });
     document.addEventListener('keydown', (e) => {
