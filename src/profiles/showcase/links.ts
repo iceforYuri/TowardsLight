@@ -1,14 +1,26 @@
-/** 链接分组:id 供链接的 group 字段引用,label 为页面显示名;description/icon 供将来分组头部增强 */
+/** 链接分组的整色色调:不配=中性;配了整组浸染为该色。纪律:彩色分组不超过 3 个 */
+export type LinkGroupTone = 'accent' | 'contrast' | 'steel';
+
+export interface LinkGroupDef {
+  /** 供链接的 group 字段引用,构建期类型校验 */
+  id: string;
+  /** 页面显示名 */
+  label: string;
+  description: string;
+  tone?: LinkGroupTone;
+}
+
+/** 链接分组:id 供链接的 group 字段引用,label 为页面显示名;tone 给整组浸染色调 */
 export const linkGroups = [
-  { id: 'code', label: 'Code', description: '代码托管与开源项目' },
+  { id: 'code', label: 'Code', description: '代码托管与开源项目', tone: 'steel' },
   { id: 'build', label: 'Build', description: '构建本站与日常项目的工具链' },
   { id: 'write', label: 'Write', description: '写作平台与笔记工具' },
   { id: 'explore', label: 'Explore', description: '学习与查证的去处' },
-  { id: 'community', label: 'Community', description: '常逛的社区' },
+  { id: 'community', label: 'Community', description: '常逛的社区', tone: 'contrast' },
   { id: 'tools', label: 'Tools', description: '日常在用的软件' },
   { id: 'elsewhere', label: 'Elsewhere', description: '其他地方也能找到我' },
   { id: 'currently-using', label: 'Currently Using', description: '当前正在用的服务' },
-] as const;
+] as const satisfies readonly LinkGroupDef[];
 
 export type LinkGroupId = (typeof linkGroups)[number]['id'];
 

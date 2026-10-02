@@ -102,7 +102,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
     border-radius: 9px;
   }
 
-  /* 双色池:青(contrast)/ 褐红(accent),由 categoryMeta 固定分配 */
+  /* 三色池:褐红(accent)/ 青绿(contrast)/ 钢蓝(steel),由 categoryMeta 固定分配 */
   .card-icon.tone-contrast {
     background: var(--color-contrast-soft);
     color: var(--color-contrast);
@@ -111,6 +111,11 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
   .card-icon.tone-accent {
     background: var(--color-accent-soft);
     color: var(--color-accent-text);
+  }
+
+  .card-icon.tone-steel {
+    background: var(--color-steel-soft);
+    color: var(--color-steel);
   }
 
   .card-count {

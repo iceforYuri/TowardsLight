@@ -40,7 +40,7 @@ export const site = {
     tagline: '一名数字守望者的赛博自留地',
     intro:
       '于拾光中窥见昨日的恍惚，那犹豫与今日一致',
-    background: '/images/hero-bg.svg',
+    background: '/images/hero-bg-2.svg',
     /** 图上文字模式:auto=按处理后背景亮度自动;on-dark=浅字;on-light=深字(仅影响亮色主题,深色主题一律收暗配浅字) */
     textMode: 'auto' as 'auto' | 'on-dark' | 'on-light',
   },
@@ -91,10 +91,10 @@ export const site = {
     },
     博客搭建: {
       icon: 'layers',
-      tone: 'contrast',
+      tone: 'steel',
       description: '关于这个博客本身:内容模型、配置与主题系统',
     },
-  } as Record<string, { icon: string; tone: 'accent' | 'contrast'; description: string }>,
+  } as Record<string, { icon: string; tone: 'accent' | 'contrast' | 'steel'; description: string }>,
   /** 首页介绍区底部的翻牌栏:两套内容定时滚换 */
   flipRow: {
     interval: 3000,

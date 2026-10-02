@@ -23,7 +23,7 @@ const groups = linksByGroup();
       const featured = compact ? [] : links.filter((l) => l.featured);
       const normal = compact ? links : links.filter((l) => !l.featured);
       return (
-        <section class="link-group">
+        <section class="link-group" data-tone={'tone' in group ? group.tone : undefined}>
           <h2 class="group-title font-ui">
             <span class="group-marker" aria-hidden="true" />
             {group.label}
@@ -98,5 +98,72 @@ const groups = linksByGroup();
   .row-list :global(.tech-link-row + .tech-link-row) {
     border-top: 1px solid var(--color-border);
     border-radius: 0;
+  }
+
+  /* ── 分组整色:linkGroups[].tone 声明后,整个栏目浸染为该色系 ──
+     纪律:彩色分组不超过 3 个,全彩会滑向资源导航站 */
+  .link-group[data-tone] {
+    background: var(--gt-soft);
+    border: 1px solid color-mix(in oklab, var(--gt) 26%, transparent);
+    border-radius: 20px;
+    padding: 20px 20px 10px;
+  }
+  .link-group[data-tone='steel'] {
+    --gt: var(--color-steel);
+    --gt-soft: var(--color-steel-soft);
+  }
+  .link-group[data-tone='contrast'] {
+    --gt: var(--color-contrast);
+    --gt-soft: var(--color-contrast-soft);
+  }
+  .link-group[data-tone='accent'] {
+    --gt: var(--color-accent);
+    --gt-soft: var(--color-accent-soft);
+  }
+
+  .link-group[data-tone] .group-title {
+    color: var(--gt);
+  }
+  .link-group[data-tone] .group-marker {
+    background: var(--gt);
+  }
+  .link-group[data-tone] .group-count {
+    color: var(--gt);
+    opacity: 0.75;
+  }
+
+  /* 组内行/卡统一归入组色:图标徽章、hover、外链箭头、精选卡、分隔线 */
+  .link-group[data-tone] :global(.link-icon) {
+    background: color-mix(in oklab, var(--gt) 14%, var(--color-surface));
+    color: var(--gt);
+  }
+  .link-group[data-tone] :global(.tech-link-row:hover) {
+    background: color-mix(in oklab, var(--gt) 9%, transparent);
+  }
+  .link-group[data-tone] :global(.tech-link-row:hover .link-external) {
+    color: var(--gt);
+    opacity: 0.9;
+  }
+  .link-group[data-tone] .row-list :global(.tech-link-row + .tech-link-row) {
+    border-top-color: color-mix(in oklab, var(--gt) 18%, transparent);
+  }
+  .link-group[data-tone] :global(.tech-link-card) {
+    background: var(--color-surface);
+    border-color: color-mix(in oklab, var(--gt) 24%, var(--color-border));
+  }
+  .link-group[data-tone] :global(.tech-link-card:hover) {
+    border-color: var(--gt);
+  }
+  .link-group[data-tone] :global(.tech-link-card .card-icon) {
+    color: var(--gt);
+    border-color: color-mix(in oklab, var(--gt) 24%, var(--color-border));
+  }
+  .link-group[data-tone] :global(.tech-link-card:hover .card-external) {
+    color: var(--gt);
+  }
+
+  /* 深色主题:浸染底在炭面上偏薄,补一点表面明度差 */
+  :global(html[data-theme='dark']) .link-group[data-tone] {
+    background: color-mix(in oklab, var(--gt-soft) 70%, var(--color-surface));
   }
 </style>
