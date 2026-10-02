@@ -23,6 +23,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
         <a
           href={u(`/categories/${encodeURIComponent(name)}`)}
           class="category-card"
+          data-tone={meta.tone}
           style={`--enter-delay: ${i * 40}ms`}
         >
           <div class="card-head">
@@ -62,10 +63,18 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
   }
 
   .category-card:hover {
-    border-color: var(--color-accent);
+    /* hover 边框跟随分类色调(默认褐红;青绿/钢蓝见下) */
+    border-color: var(--ct, var(--color-accent));
     box-shadow: var(--shadow-raised);
     transform: translateY(-2px);
     color: var(--color-text);
+  }
+
+  .category-card[data-tone='contrast'] {
+    --ct: var(--color-contrast);
+  }
+  .category-card[data-tone='steel'] {
+    --ct: var(--color-steel);
   }
 
   /* 入场交错浮现:JS+动效允许时先隐藏，转场结束后由 .ready 触发 */
