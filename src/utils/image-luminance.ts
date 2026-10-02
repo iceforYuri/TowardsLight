@@ -9,9 +9,17 @@
  * 仅在构建/开发服务端运行,产物是内联的 data 属性与 CSS 变量,运行时零开销。
  */
 import path from 'node:path';
+import fs from 'node:fs';
 import sharp from 'sharp';
 
 export type ImageTextMode = 'on-dark' | 'on-light';
+
+/**
+ * 采样结果缓存(path + mtime → 亮度):dev 下同一进程内页面反复渲染时,
+ * 不为每张背景图重复解码原图——大图(如 8K JPEG)单次解码可达数百毫秒,
+ * 会阻塞 SSR 响应,表现为"点击后过一会才跳转"。文件变更(mtime 变化)自动失效。
+ */
+const lumCache = new Map<string, { mtimeMs: number; lum: number | null }>();
 
 interface Region {
   left: number;
@@ -39,31 +47,39 @@ export async function sampleImageLuminance(
     const file = src.startsWith('/')
       ? path.join(process.cwd(), 'public', src)
       : path.resolve(process.cwd(), src);
+    const { mtimeMs } = fs.statSync(file);
+    const key = `${file}:${zone}`;
+    const hit = lumCache.get(key);
+    if (hit && hit.mtimeMs === mtimeMs) return hit.lum;
     const img = sharp(file);
     const meta = await img.metadata();
     const w = meta.width ?? 0;
     const h = meta.height ?? 0;
-    if (!w || !h) return null;
-    // 先缩到 64×48 再在 JS 侧裁区域:避免 extract 强制全尺寸栅格化
-    // (SVG 大模糊滤镜下尤其贵);位图也能吃到 shrink-on-load
-    const { data } = await img
-      .resize(64, 48, { fit: 'fill' })
-      .removeAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    const x0 = Math.floor(64 * r.left);
-    const y0 = Math.floor(48 * r.top);
-    const rw = Math.max(1, Math.floor(64 * r.width));
-    const rh = Math.max(1, Math.floor(48 * r.height));
-    const lums: number[] = [];
-    for (let y = y0; y < y0 + rh; y++) {
-      for (let x = x0; x < x0 + rw; x++) {
-        const i = (y * 64 + x) * 3;
-        lums.push(0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]);
+    let lum: number | null = null;
+    if (w && h) {
+      // 先缩到 64×48 再在 JS 侧裁区域:避免 extract 强制全尺寸栅格化
+      // (SVG 大模糊滤镜下尤其贵);位图也能吃到 shrink-on-load
+      const { data } = await img
+        .resize(64, 48, { fit: 'fill' })
+        .removeAlpha()
+        .raw()
+        .toBuffer({ resolveWithObject: true });
+      const x0 = Math.floor(64 * r.left);
+      const y0 = Math.floor(48 * r.top);
+      const rw = Math.max(1, Math.floor(64 * r.width));
+      const rh = Math.max(1, Math.floor(48 * r.height));
+      const lums: number[] = [];
+      for (let y = y0; y < y0 + rh; y++) {
+        for (let x = x0; x < x0 + rw; x++) {
+          const i = (y * 64 + x) * 3;
+          lums.push(0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2]);
+        }
       }
+      lums.sort((a, b) => a - b);
+      lum = lums[Math.floor(lums.length / 2)];
     }
-    lums.sort((a, b) => a - b);
-    return lums[Math.floor(lums.length / 2)];
+    lumCache.set(key, { mtimeMs, lum });
+    return lum;
   } catch {
     return null;
   }
