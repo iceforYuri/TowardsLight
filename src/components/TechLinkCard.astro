@@ -37,7 +37,8 @@ const { link, tone } = Astro.props;
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background: var(--color-accent-soft);
+    /* 中性面:精选的身份由卡片形态承担,颜色只表示组色(data-tone) */
+    background: var(--color-surface-raised);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     color: var(--color-text);
@@ -70,7 +71,7 @@ const { link, tone } = Astro.props;
     border-radius: 10px;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    color: var(--color-accent-text);
+    color: var(--color-muted);
   }
 
   .card-external {
@@ -110,7 +111,7 @@ const { link, tone } = Astro.props;
     border-radius: 999px;
   }
 
-  /* 分组整色(首页精选卡按所在分组的 tone 着色;Links 页则由分组 section 级联,两者一致) */
+  /* 组色(首页按所在分组的 tone 传入;Links 页由分组 section 级联,两者一致) */
   .tech-link-card[data-tone='steel'] {
     --gt: var(--color-steel);
     --gt-soft: var(--color-steel-soft);
@@ -118,6 +119,10 @@ const { link, tone } = Astro.props;
   .tech-link-card[data-tone='contrast'] {
     --gt: var(--color-contrast);
     --gt-soft: var(--color-contrast-soft);
+  }
+  .tech-link-card[data-tone='accent'] {
+    --gt: var(--color-accent);
+    --gt-soft: var(--color-accent-soft);
   }
   .tech-link-card[data-tone] {
     background: var(--gt-soft);
@@ -130,12 +135,5 @@ const { link, tone } = Astro.props;
   }
   .tech-link-card[data-tone]:hover .card-external {
     color: var(--gt);
-  }
-
-  /* 移动端单列堆叠时收敛强调色面积(带分组色调的卡保留色调,它是身份而非强调) */
-  @media (max-width: 640px) {
-    .tech-link-card:not([data-tone]) {
-      background: var(--color-surface-raised);
-    }
   }
 </style>
