@@ -1,0 +1,556 @@
+---
+/**
+ * 搜索:桌面端是导航功能区的图标按钮 + 胶囊下方锚定面板;
+ * 移动端的输入框在展开面板里(见 FloatingCenteredHeader),两处共用同一套逻辑。
+ *
+ * 数据:/search.json(首次打开时懒加载,模块级缓存,换页不重取)。
+ * 匹配:Fuse.js(threshold 0.15 + ignoreLocation + 全量命中区间),
+ * 排名:Fuse 相关度 × 长度归一 ÷ 命中计数加成,外加标题精确包含/标签精确命中/
+ * 多字段命中三条规则加成。每篇文章最多占一行结果。
+ */
+import Icon from './Icon.astro';
+---
+
+<button
+  type="button"
+  class="dock-item search-trigger"
+  data-dock-item
+  data-search-trigger
+  data-tip="搜索"
+  aria-label="搜索文章"
+  aria-expanded="false"
+  aria-controls="search-panel"
+>
+  <span class="dock-bubble" aria-hidden="true"></span>
+  <Icon name="search" size={16} />
+</button>
+
+<div class="search-panel" id="search-panel" data-search-panel data-search-context hidden>
+  <div class="search-input-row">
+    <Icon name="search" size={15} />
+    <input
+      type="search"
+      placeholder="搜索标题、标签、正文…"
+      aria-label="搜索文章"
+      autocomplete="off"
+      data-search-input
+      role="combobox"
+      aria-expanded="false"
+      aria-controls="search-results"
+      aria-activedescendant=""
+    />
+    <kbd class="search-esc font-mono" aria-hidden="true">esc</kbd>
+  </div>
+  <ul class="search-results" id="search-results" role="listbox" data-search-results></ul>
+  <div class="search-foot font-mono" data-search-foot></div>
+</div>
+
+<style>
+  .search-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    width: min(520px, calc(100vw - 32px));
+    max-height: 60vh;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .search-panel.is-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .search-panel[hidden] {
+    display: none;
+  }
+
+  .search-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    color: var(--color-muted);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .search-input-row input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-text);
+    font-family: var(--font-ui);
+    font-size: 14.5px;
+  }
+
+  .search-input-row input::placeholder {
+    color: var(--color-muted);
+    opacity: 0.7;
+  }
+
+  /* 去掉 webkit 搜索框自带的清除钮,保持视觉干净 */
+  .search-input-row input::-webkit-search-cancel-button {
+    display: none;
+  }
+
+  .search-esc {
+    padding: 2px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    font-size: 10.5px;
+    color: var(--color-muted);
+    opacity: 0.8;
+  }
+
+  /* 结果列表与底栏:桌面面板与移动端面板共用,且结果行是客户端渲染的
+     (没有组件作用域属性),全部走全局选择器 */
+  :global(.search-results) {
+    list-style: none;
+    overflow-y: auto;
+    padding: 6px;
+  }
+
+  :global(.search-results:empty) {
+    display: none;
+  }
+
+  :global(.search-foot) {
+    padding: 8px 16px;
+    border-top: 1px solid var(--color-border);
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--color-muted);
+  }
+
+  :global(.search-foot:empty) {
+    display: none;
+  }
+
+  :global(.search-results .sr-item) {
+    display: block;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  :global(.search-results .sr-item:hover),
+  :global(.search-results .sr-item.active) {
+    background: var(--color-accent-soft);
+  }
+
+  :global(.search-results .sr-title) {
+    display: block;
+    font-size: 14.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--color-text);
+    overflow-wrap: anywhere;
+  }
+
+  :global(.search-results .sr-snippet) {
+    display: block;
+    margin-top: 2px;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--color-muted);
+    overflow-wrap: anywhere;
+  }
+
+  :global(.search-results .sr-meta) {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    letter-spacing: 0.03em;
+    color: var(--color-muted);
+    opacity: 0.85;
+  }
+
+  :global(.search-results mark) {
+    padding: 0 1px;
+    border-radius: 3px;
+    background: color-mix(in oklab, var(--color-accent) 16%, transparent);
+    color: var(--color-accent-text);
+  }
+
+  :global(html[data-theme='dark'] .search-results mark) {
+    background: color-mix(in oklab, var(--color-accent) 30%, transparent);
+    color: var(--color-text);
+  }
+
+  @media (max-width: 768px) {
+    .search-panel {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import type Fuse from 'fuse.js';
+  import type { FuseResult, FuseResultMatch } from 'fuse.js';
+
+  interface SearchDoc {
+    slug: string;
+    title: string;
+    description: string;
+    category: string;
+    tags: string[];
+    pubDate: string;
+    body: string;
+  }
+
+  const BASE = import.meta.env.BASE_URL.replace(/\/+$/, '');
+  const SENT_ENDS = new Set(['。', '!', '?', '！', '？', '；', ';', '\n']);
+  const SNIPPET_MAX = 80;
+
+  // 模块级缓存:换页(软导航)不重取索引
+  let docsPromise: Promise<SearchDoc[]> | null = null;
+  let fusePromise: Promise<{ fuse: Fuse<SearchDoc>; docs: SearchDoc[] }> | null = null;
+
+  function loadDocs(): Promise<SearchDoc[]> {
+    docsPromise ??= fetch(`${BASE}/search.json`).then((r) => r.json());
+    return docsPromise;
+  }
+
+  async function ensureEngine() {
+    fusePromise ??= Promise.all([import('fuse.js'), loadDocs()]).then(
+      ([{ default: Fuse }, docs]) => ({
+        docs,
+        fuse: new Fuse<SearchDoc>(docs, {
+          keys: [
+            { name: 'title', weight: 5 },
+            { name: 'tags', weight: 3 },
+            { name: 'category', weight: 3 },
+            { name: 'description', weight: 2 },
+            { name: 'body', weight: 1 },
+          ],
+          threshold: 0.15,
+          ignoreLocation: true,
+          includeMatches: true,
+          findAllMatches: true,
+        }),
+      }),
+    );
+    return fusePromise;
+  }
+
+  /** 命中计数:某字段被命中的区间数(模糊命中也计入) */
+  function fieldHits(result: FuseResult<SearchDoc>, key: string): number {
+    return (
+      result.matches
+        ?.filter((m) => m.key === key)
+        .reduce((n, m) => n + m.indices.length, 0) ?? 0
+    );
+  }
+
+  /**
+   * F+ 排名:Fuse 相关度之上叠可解释的确定性加成。
+   * - 标题/摘要命中次数线性奖励(封顶 4 次);正文命中次数取对数(防刷屏)
+   * - 正文长度归一:长文不天然占优
+   * - 标题精确包含 / 标签或分类精确等于 / 多字段命中,三条规则加成
+   * 分数越低越好(Fuse 约定),同分时新文章在前。
+   */
+  function rank(results: FuseResult<SearchDoc>[], query: string): FuseResult<SearchDoc>[] {
+    const q = query.toLowerCase();
+    return results
+      .map((r) => {
+        const boost =
+          (1 + 0.5 * Math.min(fieldHits(r, 'title'), 4) + 0.25 * Math.min(fieldHits(r, 'description'), 4)) *
+          (1 + 0.6 * Math.log(1 + fieldHits(r, 'body')));
+        const lenPenalty = Math.max(0.7, Math.log(1 + r.item.body.length / 1000));
+        let final = ((r.score ?? 0) * lenPenalty) / boost;
+        if (r.item.title.toLowerCase().includes(q)) final *= 0.35;
+        if (
+          r.item.tags.some((t) => t.toLowerCase() === q) ||
+          r.item.category.toLowerCase() === q
+        )
+          final *= 0.6;
+        if (new Set(r.matches?.map((m) => m.key)).size >= 2) final *= 0.85;
+        return { r, final };
+      })
+      .sort(
+        (a, b) => a.final - b.final || b.r.item.pubDate.localeCompare(a.r.item.pubDate),
+      )
+      .map((x) => x.r);
+  }
+
+  /** 含 [from,to) 命中的整句区间;句子超过 80 字才以命中点为中心截断 */
+  function sentenceRange(text: string, from: number, to: number): [number, number] {
+    let s = 0;
+    for (let i = from - 1; i >= 0; i--) {
+      if (SENT_ENDS.has(text[i])) {
+        s = i + 1;
+        break;
+      }
+    }
+    let e = text.length;
+    for (let i = to; i < text.length; i++) {
+      if (SENT_ENDS.has(text[i])) {
+        e = i + 1;
+        break;
+      }
+    }
+    if (e - s > SNIPPET_MAX) {
+      const center = Math.floor((from + to) / 2);
+      s = Math.max(s, center - 30);
+      e = Math.min(e, s + SNIPPET_MAX);
+    }
+    return [s, e];
+  }
+
+  function firstSentence(text: string): string {
+    for (let i = 0; i < text.length; i++) {
+      if (SENT_ENDS.has(text[i])) return text.slice(0, i + 1);
+    }
+    return text.length > SNIPPET_MAX ? `${text.slice(0, SNIPPET_MAX)}…` : text;
+  }
+
+  type Ranges = readonly (readonly [number, number])[];
+
+  /** 片段:优先正文中含首个命中的整句,其次摘要命中句,最后摘要首句 */
+  function pickSnippet(result: FuseResult<SearchDoc>): { text: string; ranges: [number, number][] } {
+    const fromField = (key: 'body' | 'description') => {
+      const text = result.item[key];
+      const match: FuseResultMatch | undefined = result.matches?.find(
+        (m) => m.key === key && m.indices.length > 0,
+      );
+      if (!match) return null;
+      const idx = [...match.indices].sort((a, b) => a[0] - b[0]);
+      const [s, e] = sentenceRange(text, idx[0][0], idx[0][1] + 1);
+      const prefix = s > 0 ? '…' : '';
+      const suffix = e < text.length ? '…' : '';
+      const ranges: [number, number][] = [];
+      for (const [a, b] of idx) {
+        const st = Math.max(a, s);
+        const en = Math.min(b + 1, e);
+        if (st < en) ranges.push([st - s + prefix.length, en - s + prefix.length]);
+      }
+      return { text: prefix + text.slice(s, e) + suffix, ranges };
+    };
+    return (
+      fromField('body') ??
+      fromField('description') ?? { text: firstSentence(result.item.description), ranges: [] }
+    );
+  }
+
+  /** 纯 DOM 拼接高亮:文本全部走 textContent,不接 HTML 字符串 */
+  function appendHighlighted(el: HTMLElement, text: string, ranges: [number, number][]) {
+    let pos = 0;
+    for (const [s, e] of [...ranges].sort((a, b) => a[0] - b[0])) {
+      if (s > pos) el.append(document.createTextNode(text.slice(pos, s)));
+      if (e > s) {
+        const mark = document.createElement('mark');
+        mark.textContent = text.slice(s, e);
+        el.append(mark);
+      }
+      pos = Math.max(pos, e);
+    }
+    if (pos < text.length) el.append(document.createTextNode(text.slice(pos)));
+  }
+
+  function buildRow(
+    doc: SearchDoc,
+    snippet: { text: string; ranges: [number, number][] },
+    titleRanges: Ranges | undefined,
+    id: string,
+  ): HTMLLIElement {
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    li.id = id;
+    const a = document.createElement('a');
+    a.className = 'sr-item';
+    a.href = `${BASE}/posts/${doc.slug}/`;
+
+    const title = document.createElement('span');
+    title.className = 'sr-title';
+    const tRanges: [number, number][] = (titleRanges ?? []).map(([s, e]) => [s, e + 1]);
+    appendHighlighted(title, doc.title, tRanges);
+
+    const snip = document.createElement('span');
+    snip.className = 'sr-snippet';
+    appendHighlighted(snip, snippet.text, snippet.ranges);
+
+    const meta = document.createElement('span');
+    meta.className = 'sr-meta';
+    meta.textContent = [doc.category, ...doc.tags.slice(0, 3), doc.pubDate].join(' · ');
+
+    a.append(title, snip, meta);
+    li.append(a);
+    return li;
+  }
+
+  interface SearchContext {
+    root: HTMLElement;
+    input: HTMLInputElement;
+    list: HTMLUListElement;
+    foot: HTMLElement | null;
+    active: number;
+  }
+
+  function renderRows(ctx: SearchContext, rows: HTMLLIElement[], footText: string) {
+    ctx.list.replaceChildren(...rows);
+    if (ctx.foot) ctx.foot.textContent = footText;
+    ctx.active = -1;
+    ctx.input.setAttribute('aria-activedescendant', '');
+    ctx.input.setAttribute('aria-expanded', rows.length > 0 ? 'true' : 'false');
+  }
+
+  async function runSearch(ctx: SearchContext) {
+    const query = ctx.input.value.trim();
+    const { fuse, docs } = await ensureEngine();
+    // 等待索引期间用户又改了输入,放弃这次渲染
+    if (query !== ctx.input.value.trim()) return;
+
+    if (!query) {
+      const recent = docs.slice(0, 5);
+      renderRows(
+        ctx,
+        recent.map((doc, i) =>
+          buildRow(doc, { text: firstSentence(doc.description), ranges: [] }, undefined, `sr-opt-${i}`),
+        ),
+        docs.length ? '最近的文章 · esc 退出' : '还没有文章',
+      );
+      return;
+    }
+
+    const ranked = rank(fuse.search(query), query).slice(0, 8);
+    renderRows(
+      ctx,
+      ranked.map((r, i) => {
+        const titleMatch = r.matches?.find((m) => m.key === 'title');
+        return buildRow(r.item, pickSnippet(r), titleMatch?.indices, `sr-opt-${i}`);
+      }),
+      ranked.length ? `${ranked.length} 条结果 · esc 退出` : `没有找到「${query}」的文章`,
+    );
+  }
+
+  function moveActive(ctx: SearchContext, dir: 1 | -1) {
+    const items = [...ctx.list.querySelectorAll<HTMLElement>('.sr-item')];
+    if (!items.length) return;
+    ctx.active = (ctx.active + dir + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle('active', i === ctx.active));
+    const li = items[ctx.active].closest('li');
+    if (li?.id) ctx.input.setAttribute('aria-activedescendant', li.id);
+    items[ctx.active].scrollIntoView({ block: 'nearest' });
+  }
+
+  function openCurrent(ctx: SearchContext) {
+    const items = ctx.list.querySelectorAll<HTMLAnchorElement>('.sr-item');
+    const target = items[ctx.active] ?? items[0];
+    target?.click(); // 走 <a> 原生点击,由 ClientRouter 接管软导航
+  }
+
+  // ---- 桌面端面板:开关、外部点击关闭 ----
+
+  function closePanel() {
+    const panel = document.querySelector<HTMLElement>('[data-search-panel]:not([hidden])');
+    const trigger = document.querySelector<HTMLElement>('[data-search-trigger]');
+    if (!panel) return;
+    panel.classList.remove('is-open');
+    trigger?.setAttribute('aria-expanded', 'false');
+    setTimeout(() => (panel.hidden = true), 200);
+  }
+
+  function bindPanel(root: HTMLElement) {
+    const trigger = document.querySelector<HTMLButtonElement>('[data-search-trigger]');
+    const input = root.querySelector<HTMLInputElement>('[data-search-input]');
+    if (!trigger || !input) return;
+
+    trigger.addEventListener('click', async () => {
+      if (root.hidden) {
+        root.hidden = false;
+        requestAnimationFrame(() => root.classList.add('is-open'));
+        trigger.setAttribute('aria-expanded', 'true');
+        input.focus();
+        await ensureEngine(); // 预热索引,随后 input 事件或初次渲染接管
+        if (!input.value.trim()) runSearch(ctxOf(root));
+      } else {
+        closePanel();
+      }
+    });
+  }
+
+  // ---- 上下文绑定(桌面面板 + 移动端面板各一份) ----
+
+  const contexts = new WeakMap<HTMLElement, SearchContext>();
+
+  function ctxOf(root: HTMLElement): SearchContext {
+    let ctx = contexts.get(root);
+    if (!ctx) {
+      ctx = {
+        root,
+        input: root.querySelector<HTMLInputElement>('[data-search-input]')!,
+        list: root.querySelector<HTMLUListElement>('[data-search-results]')!,
+        foot: root.querySelector<HTMLElement>('[data-search-foot]'),
+        active: -1,
+      };
+      contexts.set(root, ctx);
+    }
+    return ctx;
+  }
+
+  function initSearch() {
+    document.querySelectorAll<HTMLElement>('[data-search-context]').forEach((root) => {
+      if (root.dataset.bound) return;
+      root.dataset.bound = '1';
+      const ctx = ctxOf(root);
+
+      ctx.input.addEventListener('input', () => {
+        // 移动端:搜索时收起导航链接列表,只留结果
+        root.closest('.mobile-panel')?.classList.toggle('searching', !!ctx.input.value.trim());
+        runSearch(ctx);
+      });
+      ctx.input.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          moveActive(ctx, 1);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          moveActive(ctx, -1);
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          openCurrent(ctx);
+        } else if (e.key === 'Escape') {
+          if (root.hasAttribute('data-search-panel')) {
+            closePanel();
+          } else {
+            ctx.input.blur();
+          }
+        }
+      });
+
+      if (root.hasAttribute('data-search-panel')) bindPanel(root);
+    });
+  }
+
+  let searchGlobalBound = false;
+  function bindSearchGlobal() {
+    if (searchGlobalBound) return;
+    searchGlobalBound = true;
+    // 点面板与触发按钮之外的任意处关闭
+    document.addEventListener('click', (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest('[data-search-panel]') || t.closest('[data-search-trigger]')) return;
+      closePanel();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closePanel();
+    });
+    document.addEventListener('astro:before-swap', closePanel);
+  }
+
+  bindSearchGlobal();
+  document.addEventListener('astro:after-swap', initSearch);
+  document.addEventListener('astro:page-load', initSearch);
+</script>

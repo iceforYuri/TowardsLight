@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import ThemeToggle from './ThemeToggle.astro';
+import SearchPanel from './SearchPanel.astro';
 import { site } from '../data/site';
 import { u } from '../utils/url';
 
@@ -46,23 +47,27 @@ function isActive(href: string) {
     </div>
 
     <div class="nav-actions">
-      {/* 功能区小 Dock:图标圆钮，鼠标靠近按距离放大 */}
+      {/* 功能区小 Dock:图标圆钮，鼠标靠近按距离放大。
+          RSS 不占导航位(页脚与 links 页保留入口),搜索占据首位 */}
+      <SearchPanel />
       {
-        site.socialLinks.map((link) => (
-          <a
-            href={u(link.href)}
-            class="dock-item"
-            data-dock-item
-            data-tip={link.label}
-            aria-label={link.label}
-            {...(link.href.startsWith('http')
-              ? { target: '_blank', rel: 'noopener noreferrer' }
-              : {})}
-          >
-            <span class="dock-bubble" aria-hidden="true" />
-            <Icon name={link.icon} size={16} />
-          </a>
-        ))
+        site.socialLinks
+          .filter((link) => link.icon !== 'rss')
+          .map((link) => (
+            <a
+              href={u(link.href)}
+              class="dock-item"
+              data-dock-item
+              data-tip={link.label}
+              aria-label={link.label}
+              {...(link.href.startsWith('http')
+                ? { target: '_blank', rel: 'noopener noreferrer' }
+                : {})}
+            >
+              <span class="dock-bubble" aria-hidden="true" />
+              <Icon name={link.icon} size={16} />
+            </a>
+          ))
       }
       <ThemeToggle />
       <button
@@ -80,7 +85,22 @@ function isActive(href: string) {
   </nav>
 
   <div class="mobile-panel" id="mobile-nav-panel" data-mobile-panel hidden>
-    <ul>
+    {/* 移动端搜索:输入框置顶,输入后结果就地替换导航链接列表 */}
+    <div class="mobile-search" data-search-context>
+      <div class="mobile-search-bar">
+        <Icon name="search" size={15} />
+        <input
+          type="search"
+          placeholder="搜索文章…"
+          aria-label="搜索文章"
+          autocomplete="off"
+          data-search-input
+        />
+      </div>
+      <ul class="search-results" data-search-results></ul>
+      <div class="search-foot font-mono" data-search-foot></div>
+    </div>
+    <ul class="mobile-links">
       {
         site.navigation.map((item) => (
           <li>
@@ -96,6 +116,24 @@ function isActive(href: string) {
         ))
       }
     </ul>
+    {/* 功能区全部收进面板底部:主题切换 + 社交链接(含 RSS) */}
+    <div class="mobile-actions">
+      <ThemeToggle />
+      {
+        site.socialLinks.map((link) => (
+          <a
+            href={u(link.href)}
+            class="mobile-action-icon"
+            aria-label={link.label}
+            {...(link.href.startsWith('http')
+              ? { target: '_blank', rel: 'noopener noreferrer' }
+              : {})}
+          >
+            <Icon name={link.icon} size={16} />
+          </a>
+        ))
+      }
+    </div>
   </div>
 </header>
 
@@ -381,6 +419,11 @@ function isActive(href: string) {
       display: none;
     }
 
+    /* 移动端功能区全部收进展开面板,顶部只留站点标识与菜单钮 */
+    .nav-actions :global(.theme-toggle) {
+      display: none;
+    }
+
     .menu-button {
       display: inline-flex;
     }
@@ -435,6 +478,56 @@ function isActive(href: string) {
 
     .mobile-link :global(.mobile-link-arrow) {
       opacity: 0.4;
+    }
+
+    /* 面板内搜索:输入后(.searching)结果替换导航链接 */
+    .mobile-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-muted);
+    }
+
+    .mobile-search-bar input {
+      flex: 1;
+      min-width: 0;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--color-text);
+      font-size: 15px;
+    }
+
+    .mobile-panel.searching .mobile-links {
+      display: none;
+    }
+
+    .mobile-actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .mobile-action-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      color: var(--color-muted);
+    }
+
+    .mobile-action-icon:hover {
+      color: var(--color-accent-text);
+      background: var(--color-accent-soft);
     }
   }
 </style>
@@ -506,6 +599,8 @@ function isActive(href: string) {
 
   function initDock() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // 移动端无 Dock 动效:图标全部收进展开面板,胶囊保持朴素静态表面
+    if (window.matchMedia('(max-width: 768px)').matches) return;
     document.querySelectorAll<HTMLElement>('[data-dock-zone]').forEach((zone) => {
       // 导航持久化后只初始化一次
       if (zone.dataset.bound) return;
