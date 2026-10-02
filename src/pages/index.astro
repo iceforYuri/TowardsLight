@@ -14,7 +14,8 @@ import { linkGroups, techLinks } from '../data/links';
 
 const posts = await getAllPosts();
 const recentPosts = posts.slice(0, 5);
-const featuredLinks = techLinks.filter((l) => l.featured).slice(0, 3);
+// 首页精选链接:所有 featured,数量由勾选控制(策展纪律:建议 ≤ 4,多了首页会肿)
+const featuredLinks = techLinks.filter((l) => l.featured);
 // 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
 const groupTone = new Map(linkGroups.map((g) => [g.id, 'tone' in g ? g.tone : undefined]));
 
@@ -162,6 +163,12 @@ const statsSegments: StatSegment[] = firstPost
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 14px;
     margin-top: 16px;
+  }
+
+  /* 只有 1~2 张卡时限制最大宽度,避免单卡拉伸整行 */
+  .featured-links:has(> :first-child:last-child),
+  .featured-links:has(> :nth-child(2):last-child) {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 340px));
   }
 
   .home-contact {
