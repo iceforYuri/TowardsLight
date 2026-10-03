@@ -26,8 +26,11 @@ public/images
 # 个人站构建产物
 dist-personal/
 
-# 个人档案:嵌套独立私有仓库,模板库永不跟踪
+# 个人档案
 personal/
 
-# 本地 VS Code 写作工具(编辑器扩展,不进模板库)
+# 本地 VS Code 写作工具
 editor/
+
+# docs
+docs/specs/
