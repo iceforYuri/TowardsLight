@@ -15,7 +15,7 @@ const intro = stripEnd(hero.intro);
 
 {/*
   v2 规格(docs/specs/2026-10-03-home-wallpaper-hero.md):
-  - 壁纸层 fixed 铺满视口,永不滚动、永不随内容长高("桌布");
+  - 壁纸层铺满 hero、随内容滚动;hero 略高于一屏,图片按视口比例缩放不过度放大;
   - 身份组(.hero-group)sticky:上滚随文档下移,中心钳制在视口正中,钉住段发光;
   - hero 高度由首页锁底脚本给定(卡片顶缘恒等于一屏),min-height: 100svh 是无 JS 兜底。
 */}
@@ -75,12 +75,11 @@ const intro = stripEnd(hero.intro);
     --hero-fg-m: var(--color-muted);
   }
 
-  /* 固定壁纸层:桌布语义——永远完整铺满视口,不随内容滚动。
-     注意:hero 及其祖先不得携带 transform/filter/will-change(否则 fixed 失效) */
+  /* 壁纸层:铺满 hero(略高于一屏),随文档与内容一体滚动——
+     下滚阅读时背景与卡片同上移离场;S1(页顶)展示其顶部约一屏 */
   .hero-backdrop {
-    position: fixed;
+    position: absolute;
     inset: 0;
-    z-index: -1;
   }
 
   .hero-img {

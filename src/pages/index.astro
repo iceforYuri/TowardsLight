@@ -206,9 +206,10 @@ const statsSegments: StatSegment[] = firstPost
     margin-top: 0;
   }
 
-  /* 重叠量由统计行的负 margin 承载,卡片自身不再上拉 */
+  /* 重叠量由统计行的负 margin 承载;卡片上间距 24px = 统计行与卡片的呼吸距离
+     (锁底脚本会自动吸收:hero 高度相应减少,卡片顶仍恒等于一屏) */
   .home-card-wrap :global(.overlap-none) {
-    margin-top: 0;
+    margin-top: 24px;
   }
 
   .home-intro {
