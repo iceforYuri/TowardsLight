@@ -1,34 +1,24 @@
 ---
 import { site } from '../data/site';
 import { u, stageMediaName } from '../utils/url';
-import { imageTreatment, sampleImageLuminance } from '../utils/image-luminance';
+import { resolveImgMode } from '../utils/image-luminance';
 import CurrentStatus from './CurrentStatus.astro';
 
-type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
-
-interface Props {
-  /**
-   * 统计行分段:文本逐字打出，数字段(num)在光标经过时翻动计数。
-   * 构建时从内容集合算出;d 为小数位数(如 8.4 万字)。
-   */
-  statsSegments: StatSegment[];
-}
-
-const { statsSegments } = Astro.props;
 const hero = site.homeHero;
 // 构建期采样背景图亮度:决定图上文字模式(on-dark 浅字 / on-light 深字)与遮罩强度
-const imgLum = await sampleImageLuminance(hero.background, 'hero');
-const treatment = imageTreatment(imgLum);
-const manualMode = hero.textMode === 'on-dark' || hero.textMode === 'on-light' ? hero.textMode : null;
-const imgMode = manualMode ?? treatment?.mode ?? null;
-const imgScrim = treatment?.scrim ?? 0.35;
-const imgScrimDark = treatment?.scrimDark ?? 0.45;
+const { imgMode, imgScrim, imgScrimDark } = await resolveImgMode(hero.background, hero.textMode, 'hero');
 // 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const stripEnd = (s: string) => s.replace(/。\s*$/, '');
 const tagline = stripEnd(hero.tagline);
 const intro = stripEnd(hero.intro);
 ---
 
+{/*
+  v2 规格(docs/specs/2026-10-03-home-wallpaper-hero.md):
+  - 壁纸层 fixed 铺满视口,永不滚动、永不随内容长高("桌布");
+  - 身份组(.hero-group)sticky:上滚随文档下移,中心钳制在视口正中,钉住段发光;
+  - hero 高度由首页锁底脚本给定(卡片顶缘恒等于一屏),min-height: 100svh 是无 JS 兜底。
+*/}
 <section class="hero" data-img-mode={imgMode} style={imgMode ? `--img-scrim: ${imgScrim}; --img-scrim-dark: ${imgScrimDark}` : undefined}>
   {
     hero.background && (
@@ -50,34 +40,25 @@ const intro = stripEnd(hero.intro);
   }
 
   <div class="hero-content shell-container">
-    <div class="hero-status">
-      <CurrentStatus />
-    </div>
-    <h1 class="hero-title font-display" transition:name="page-title">{hero.greeting}</h1>
-    <div class="hero-body" transition:name="hero-body">
-      <p class="hero-tagline" data-typewriter data-caret="fade">
-        <span data-typewriter-text>{tagline}</span><span
-          class="type-caret"
-          data-typewriter-caret
-          aria-hidden="true">_</span>
-      </p>
-      <p class="hero-intro" data-typewriter>
-        <span data-typewriter-text>{intro}</span><span
-          class="type-caret"
-          data-typewriter-caret
-          aria-hidden="true">_</span>
-      </p>
-      <p class="hero-meta font-mono" data-typewriter>
-        <span data-typewriter-text>{
-          statsSegments.map((seg) =>
-            seg.t === 'num' ? (
-              <span class="type-num" data-count-to={seg.v} data-decimals={seg.d ?? 0}>{seg.d ? seg.v.toFixed(seg.d) : seg.v}</span>
-            ) : (
-              <>{seg.v}</>
-            ),
-          )
-        }</span><span class="type-caret" data-typewriter-caret aria-hidden="true">_</span>
-      </p>
+    <div class="hero-group">
+      <div class="hero-status">
+        <CurrentStatus />
+      </div>
+      <h1 class="hero-title font-display" transition:name="page-title">{hero.greeting}</h1>
+      <div class="hero-body" transition:name="hero-body">
+        <p class="hero-tagline" data-typewriter data-caret="fade">
+          <span data-typewriter-text>{tagline}</span><span
+            class="type-caret"
+            data-typewriter-caret
+            aria-hidden="true">_</span>
+        </p>
+        <p class="hero-intro" data-typewriter>
+          <span data-typewriter-text>{intro}</span><span
+            class="type-caret"
+            data-typewriter-caret
+            aria-hidden="true">_</span>
+        </p>
+      </div>
     </div>
   </div>
 </section>
@@ -86,21 +67,20 @@ const intro = stripEnd(hero.intro);
   .hero {
     position: relative;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 72svh;
-    padding-top: calc(var(--nav-height) + 72px);
-    padding-bottom: 112px;
-    overflow: hidden;
-    /* 文字色变量:默认取主题色,有背景图时由 data-img-mode 覆盖 */
+    flex-direction: column;
+    /* 无 JS 兜底:接近一屏;有 JS 时锁底脚本给定精确高度 */
+    min-height: 100svh;/* 文字色变量:默认取主题色,有背景图时由 data-img-mode 覆盖 */
     --hero-fg: var(--color-text);
     --hero-fg-2: var(--color-accent-text);
     --hero-fg-m: var(--color-muted);
   }
 
+  /* 固定壁纸层:桌布语义——永远完整铺满视口,不随内容滚动。
+     注意:hero 及其祖先不得携带 transform/filter/will-change(否则 fixed 失效) */
   .hero-backdrop {
-    position: absolute;
+    position: fixed;
     inset: 0;
+    z-index: -1;
   }
 
   .hero-img {
@@ -109,26 +89,20 @@ const intro = stripEnd(hero.intro);
     object-fit: cover;
   }
 
+  /* 顶部导航保护 + 文字区压暗;底部画布羽化已移交羽化幕布(.home-body) */
   .hero-scrim {
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      var(--color-overlay) 0%,
-      transparent 28%,
-      transparent 68%,
-      var(--color-canvas) 96%
-    );
+    background: linear-gradient(to bottom, var(--color-overlay) 0%, transparent 28%);
   }
 
-  /* 深色主题兜底:仅在采样失败(无 data-img-mode)时整幅再压一层 */
+  /* 深色主题兜底:仅在采样失败(无 data-img-mode)时上段再压一层 */
   :global(html[data-theme='dark']) .hero:not([data-img-mode]) .hero-scrim {
     background: linear-gradient(
       to bottom,
       var(--color-overlay) 0%,
       rgba(23, 25, 22, 0.42) 40%,
-      rgba(23, 25, 22, 0.55) 70%,
-      var(--color-canvas) 97%
+      rgba(23, 25, 22, 0.55) 70%
     );
   }
 
@@ -154,8 +128,7 @@ const intro = stripEnd(hero.intro);
       to bottom,
       rgba(18, 20, 17, calc(var(--img-scrim, 0.35) * 0.7)) 0%,
       rgba(18, 20, 17, var(--img-scrim, 0.35)) 42%,
-      rgba(18, 20, 17, calc(var(--img-scrim, 0.35) * 0.85)) 68%,
-      var(--color-canvas) 96%
+      rgba(18, 20, 17, calc(var(--img-scrim, 0.35) * 0.85)) 68%
     );
   }
 
@@ -164,8 +137,7 @@ const intro = stripEnd(hero.intro);
       to bottom,
       rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.55)) 0%,
       rgba(244, 245, 241, var(--img-scrim, 0.35)) 42%,
-      rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.8)) 68%,
-      var(--color-canvas) 96%
+      rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.8)) 68%
     );
   }
 
@@ -180,8 +152,7 @@ const intro = stripEnd(hero.intro);
   /* 图到位/隐藏时,文字色随底色平滑过渡 */
   .hero-title,
   .hero-tagline,
-  .hero-intro,
-  .hero-meta {
+  .hero-intro {
     transition: color 0.3s ease;
   }
 
@@ -190,17 +161,50 @@ const intro = stripEnd(hero.intro);
       to bottom,
       rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.7)) 0%,
       rgba(18, 20, 17, var(--img-scrim-dark, 0.45)) 42%,
-      rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.85)) 68%,
-      var(--color-canvas) 96%
+      rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.85)) 68%
     );
   }
 
+  /* 身份组的 sticky 容器:撑满 hero 高度。padding 上多下少:
+     让组的自然位置对准 S0 可见区(导航底~卡片顶)的光学中心 */
   .hero-content {
     position: relative;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     text-align: center;
+    padding: calc(var(--nav-height) + 56px) 0 0;
+  }
+
+  /* 上滚编排:bottom 钳制使组中心不超过视口正中(50svh);
+     下滚阅读时自然位置在钳制线之上,自由离场。--gh 由 JS 测量写入 */
+  .hero-group {
+    position: sticky;
+    bottom: calc(50svh - var(--gh, 260px) / 2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: --glow 0.25s ease-out;
+  }
+
+  /* 发光:钉住段内 --glow 0→1(全局注册的可过渡属性,见 global.css);
+     标题提亮并向主题色靠拢,泛起主题色微光晕;tagline/intro 半量 */
+  .hero-title {
+    font-size: clamp(44px, 8vw, 76px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    color: color-mix(in oklab, var(--hero-fg), var(--hero-fg-2) calc(var(--glow, 0) * 28%));
+    text-shadow: 0 0 calc(var(--glow, 0) * 26px)
+      color-mix(in oklab, var(--hero-fg-2), transparent calc((1 - var(--glow, 0)) * 100%));
+  }
+
+  .hero-tagline,
+  .hero-intro {
+    text-shadow: 0 0 calc(var(--glow, 0) * 14px)
+      color-mix(in oklab, var(--hero-fg-2), transparent calc((1 - var(--glow, 0)) * 100%));
   }
 
   .hero-body {
@@ -211,14 +215,6 @@ const intro = stripEnd(hero.intro);
 
   .hero-status {
     margin-bottom: 28px;
-  }
-
-  .hero-title {
-    font-size: clamp(44px, 8vw, 76px);
-    font-weight: 700;
-    line-height: 1.15;
-    letter-spacing: 0.02em;
-    color: var(--hero-fg);
   }
 
   .hero-tagline {
@@ -238,59 +234,21 @@ const intro = stripEnd(hero.intro);
     color: var(--hero-fg-m);
   }
 
-  .hero-meta {
-    margin-top: 30px;
-    font-size: 12.5px;
-    letter-spacing: 0.03em;
-    line-height: 1.8;
-    text-align: center;
-    color: var(--hero-fg-m);
-  }
-
-  .type-num {
+  /* 光标基础样式在 global.css(统计行在 hero 外也用);hero 内只定颜色 */
+  .hero .type-caret {
     color: var(--hero-fg-2);
   }
 
-  /* 下划线光标:零宽度占位(字形画出但不占布局),
-     出现/消失/淡出都不会顶动文字;动画常驻，多光标闪烁同步 */
-  .type-caret {
-    display: inline-block;
-    width: 0;
-    overflow: visible;
-    visibility: hidden;
-    transform: translateX(1px);
-    font-family: var(--font-mono);
-    color: var(--hero-fg-2);
-    animation: caret-blink 0.85s steps(1) infinite;
-  }
-
-  [data-typewriter][data-typing='true'] .type-caret,
-  [data-typewriter][data-done='true'] .type-caret {
-    visibility: visible;
-  }
-
-  /* 标题行的光标只是打字指示，打完即淡出;句子行的光标代替句号常驻 */
-  [data-typewriter][data-caret='fade'][data-done='true'] .type-caret {
-    animation: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-
-  @keyframes caret-blink {
-    0%,
-    49% {
-      opacity: 1;
-    }
-    50%,
-    100% {
-      opacity: 0;
-    }
-  }
-
+  /* 移动端(≤640px):锁底与进入偏移由首页脚本停用,hero 退回自然流——
+     完整壁纸入场(高度不足一屏,让卡片顶缘在视口底探头作为内容提示),
+     身份组近似居中;sticky/发光编排不受影响 */
   @media (max-width: 640px) {
     .hero {
-      min-height: auto;
-      padding-bottom: 100px;
+      min-height: calc(100svh - 56px);
+    }
+
+    .hero-content {
+      padding-top: calc(var(--nav-height) + 24px);
     }
   }
 </style>
@@ -322,7 +280,7 @@ const intro = stripEnd(hero.intro);
   async function runHeroSequence(signal: AbortSignal) {
     const taglineEl = document.querySelector<HTMLElement>('.hero-tagline[data-typewriter]');
     const introEl = document.querySelector<HTMLElement>('.hero-intro[data-typewriter]');
-    const statsEl = document.querySelector<HTMLElement>('.hero-meta[data-typewriter]');
+    const statsEl = document.querySelector<HTMLElement>('.hero-stats[data-typewriter]');
     if (!taglineEl && !introEl && !statsEl) return;
 
     // 多行同时打印，各自按自己的速度走完。
@@ -346,4 +304,57 @@ const intro = stripEnd(hero.intro);
 
   document.addEventListener('astro:page-load', initHeroTyping);
   document.addEventListener('astro:before-swap', () => ctrl?.abort());
+
+  /**
+   * 身份组发光编排(v2 规格):
+   * 上滚时组随文档下移,中心触及视口正中后被 sticky 钳住;
+   * 钳住段内发光进度 --glow 从 0 升到 1。
+   * 钳制生效点 stickStart = 组自然文档中心 − 视口半高;
+   * 组高写入 --gh 供 sticky 的 bottom 钳制线使用。
+   * 减少动态偏好:整套不启用(--glow 恒 0,无阴影,sticky 位置行为保留)。
+   */
+  let stickStart = 0;
+  let glowRaf = 0;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function measureGlow() {
+    const hero = document.querySelector<HTMLElement>('.hero');
+    const group = document.querySelector<HTMLElement>('.hero-group');
+    if (!hero || !group) return;
+    const gh = group.offsetHeight;
+    hero.style.setProperty('--gh', `${Math.round(gh)}px`);
+    // offsetTop 沿定位祖先累加到文档顶;sticky 不影响 offsetTop(恒为自然位置)
+    let docTop = 0;
+    let el: HTMLElement | null = group;
+    while (el) {
+      docTop += el.offsetTop;
+      el = el.offsetParent as HTMLElement | null;
+    }
+    stickStart = Math.max(1, docTop + gh / 2 - window.innerHeight / 2);
+  }
+
+  function updateGlow() {
+    glowRaf = 0;
+    const hero = document.querySelector<HTMLElement>('.hero');
+    if (!hero) return;
+    const p = Math.min(1, Math.max(0, (stickStart - window.scrollY) / stickStart));
+    hero.style.setProperty('--glow', p.toFixed(3));
+  }
+
+  function onGlowScroll() {
+    if (!glowRaf) glowRaf = requestAnimationFrame(updateGlow);
+  }
+
+  if (!reduceMotion.matches) {
+    window.addEventListener('scroll', onGlowScroll, { passive: true });
+    window.addEventListener('resize', () => measureGlow());
+    document.addEventListener('astro:page-load', () => {
+      measureGlow();
+      updateGlow();
+    });
+    // 锁底脚本会重排身份组(自适应 padding),锁完必须重测
+    document.addEventListener('hero:locked', () => measureGlow());
+    // 字体落盘后组高/位置可能变化,重测(锁底脚本同样监听,同帧内先后无碍)
+    document.fonts?.ready.then(() => requestAnimationFrame(measureGlow));
+  }
 </script>

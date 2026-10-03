@@ -11,6 +11,7 @@ import { getAllPosts, formatDate, countWords, collectTags } from '../utils/posts
 import { u } from '../utils/url';
 import { site } from '../data/site';
 import { linkGroups, techLinks } from '../data/links';
+import { resolveImgMode } from '../utils/image-luminance';
 
 const posts = await getAllPosts();
 const recentPosts = posts.slice(0, 5);
@@ -18,6 +19,8 @@ const recentPosts = posts.slice(0, 5);
 const homeLinks = techLinks.filter((l) => l.home).slice(0, 3);
 // 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
 const groupTone = new Map(linkGroups.map((g) => [g.id, 'tone' in g ? g.tone : undefined]));
+// 统计行挂在 .home-flow 上,与 hero 共用同一图上文字模式(采样有缓存,重复调用廉价)
+const { imgMode } = await resolveImgMode(site.homeHero.background, site.homeHero.textMode, 'hero');
 
 // Hero 统计行:全部由内容集合在构建时算出;数字段经过打字光标时翻动计数
 type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
@@ -52,68 +55,160 @@ const statsSegments: StatSegment[] = firstPost
   : [{ t: 'text', v: '还没有文章，敬请期待' }];
 ---
 
+{/*
+  v2 规格(docs/specs/2026-10-03-home-wallpaper-hero.md):
+  .home-flow > hero(固定壁纸) + 统计行(三态纯文字) + .home-body(羽化幕布) > 主卡片
+*/}
 <BaseLayout>
-  <CenteredHero statsSegments={statsSegments} />
+  <div class="home-flow" data-img-mode={imgMode}>
+    <CenteredHero />
 
-  <div class="shell-container home-card-wrap">
-    <FloatingMainCard overlap="hero">
-      {/* 个人介绍 */}
-      <section class="home-intro">
-        <img
-          decoding="async"
-          src={u(site.avatar)}
-          alt={`${site.author} 的头像`}
-          class="intro-avatar"
-          width="64"
-          height="64"
-          style={`object-position: ${site.avatarPosition};`}
-          onerror="this.style.display='none'"
-        />
-        <div class="intro-body">
-          <p class="intro-name font-display">{site.author}</p>
-          <p class="intro-bio">{site.bio}</p>
-          <FlipRow />
-        </div>
-      </section>
+    {/* 统计行:无背景纯文字,负 margin 骑入 hero 底缘重叠区(界锚=主卡片顶部);
+        上滚出视口底时被 sticky 收在底缘,读卡片时滚出视口消失。
+        打字机由 CenteredHero 的脚本统一驱动(.hero-stats 选择器) */}
+    <p class="hero-stats font-mono" data-typewriter>
+      <span data-typewriter-text>{
+        statsSegments.map((seg) =>
+          seg.t === 'num' ? (
+            <span class="type-num" data-count-to={seg.v} data-decimals={seg.d ?? 0}>{seg.d ? seg.v.toFixed(seg.d) : seg.v}</span>
+          ) : (
+            <>{seg.v}</>
+          ),
+        )
+      }</span><span class="type-caret" data-typewriter-caret aria-hidden="true">_</span>
+    </p>
 
-      <hr class="home-divider" />
+    {/* 羽化幕布:透明→画布色渐变(顶部 200px 羽化段)接续纯画布色,
+        锚定卡片顶、随卡片滚动;上滚到顶时整幅离场,壁纸完整无羽化 */}
+    <div class="home-body">
+      <div class="shell-container home-card-wrap">
+        <FloatingMainCard overlap="none">
+        {/* 个人介绍 */}
+        <section class="home-intro">
+          <img
+            decoding="async"
+            src={u(site.avatar)}
+            alt={`${site.author} 的头像`}
+            class="intro-avatar"
+            width="64"
+            height="64"
+            style={`object-position: ${site.avatarPosition};`}
+            onerror="this.style.display='none'"
+          />
+          <div class="intro-body">
+            <p class="intro-name font-display">{site.author}</p>
+            <p class="intro-bio">{site.bio}</p>
+            <FlipRow />
+          </div>
+        </section>
 
-      {/* 近期文章 */}
-      <section>
-        <SectionHeader title="近期文章" count={posts.length} href={u('/archive')} linkText="归档" />
-        <PostList posts={recentPosts} />
-      </section>
+        <hr class="home-divider" />
 
-      <hr class="home-divider" />
+        {/* 近期文章 */}
+        <section>
+          <SectionHeader title="近期文章" count={posts.length} href={u('/archive')} linkText="归档" />
+          <PostList posts={recentPosts} />
+        </section>
 
-      {/* 精选技术链接 */}
-      <section>
-        <SectionHeader title="常用去处" href={u('/links')} linkText="完整目录" />
-        <div class="featured-links">
-          {homeLinks.map((link) => <TechLinkCard link={link} tone={groupTone.get(link.group)} />)}
-        </div>
-      </section>
+        <hr class="home-divider" />
 
-      <hr class="home-divider" />
+        {/* 精选技术链接 */}
+        <section>
+          <SectionHeader title="常用去处" href={u('/links')} linkText="完整目录" />
+          <div class="featured-links">
+            {homeLinks.map((link) => <TechLinkCard link={link} tone={groupTone.get(link.group)} />)}
+          </div>
+        </section>
 
-      {/* 联系与订阅 */}
-      <section class="home-contact">
-        <p class="contact-text">
-          文章通过 <a href={u('/rss.xml')}>RSS</a> 发布更新，也欢迎邮件交流:
-          <a href={`mailto:${site.email}`}>{site.email}</a>
-        </p>
-        <a href={u('/archive')} class="contact-cta font-ui">
-          浏览全部文章 <Icon name="arrow-right" size={15} />
-        </a>
-      </section>
-    </FloatingMainCard>
+        <hr class="home-divider" />
+
+        {/* 联系与订阅 */}
+        <section class="home-contact">
+          <p class="contact-text">
+            文章通过 <a href={u('/rss.xml')}>RSS</a> 发布更新，也欢迎邮件交流:
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
+          <a href={u('/archive')} class="contact-cta font-ui">
+            浏览全部文章 <Icon name="arrow-right" size={15} />
+          </a>
+        </section>
+      </FloatingMainCard>
+      </div>
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  .home-card-wrap {
+  .home-flow {
+    position: relative;
+  }
+
+  /* 统计行:三态纯文字。负 margin 骑入卡片对 hero 的重叠区(重叠量与
+     FloatingMainCard overlap-hero 同式);天然位置在视口底之下时被
+     sticky 收在底缘;天然位置滚出视口上缘时正常离场。
+     它始终压在壁纸上,壁纸揭示后文字色切换为图上模式 */
+  .hero-stats {
+    position: sticky;
+    bottom: 12px;
+    z-index: 11; /* 压过幕布与卡片 */
+    display: block;
+    width: fit-content;
+    max-width: 88%;
+    margin: calc(-1 * clamp(48px, 6vw, 96px)) auto 0;
+    font-size: 12.5px;
+    letter-spacing: 0.03em;
+    line-height: 1.8;
+    text-align: center;
+    color: var(--color-muted);
+    transition: color 0.3s ease;
+  }
+
+  .hero-stats .type-num,
+  .hero-stats .type-caret {
+    color: var(--color-accent-text);
+  }
+
+  /* 壁纸揭示后(:has .is-loaded),统计行切换到图上文字色(与 hero 同体系) */
+  .home-flow[data-img-mode='on-dark']:has(.hero-backdrop.is-loaded) .hero-stats {
+    color: rgba(242, 243, 236, 0.74);
+  }
+
+  .home-flow[data-img-mode='on-dark']:has(.hero-backdrop.is-loaded) .hero-stats :is(.type-num, .type-caret) {
+    color: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
+  }
+
+  .home-flow[data-img-mode='on-light']:has(.hero-backdrop.is-loaded) .hero-stats {
+    color: rgba(27, 29, 26, 0.74);
+  }
+
+  .home-flow[data-img-mode='on-light']:has(.hero-backdrop.is-loaded) .hero-stats :is(.type-num, .type-caret) {
+    color: color-mix(in oklab, var(--color-accent-text) 78%, #1b1d1a);
+  }
+
+  :global(html[data-theme='dark']) .home-flow[data-img-mode]:has(.hero-backdrop.is-loaded) .hero-stats {
+    color: rgba(242, 243, 236, 0.74);
+  }
+
+  :global(html[data-theme='dark']) .home-flow[data-img-mode]:has(.hero-backdrop.is-loaded) .hero-stats :is(.type-num, .type-caret) {
+    color: color-mix(in oklab, var(--color-accent) 50%, #ffffff);
+  }
+
+  /* 羽化幕布:全宽,背景渐变先羽化(透明→画布)后纯色;页脚方向由 padding 承担间距,
+     footer 的 margin-top 在首页归零,保证画布色不间断盖到页脚 */
+  .home-body {
     position: relative;
     z-index: 10;
+    background: linear-gradient(to bottom, transparent, var(--color-canvas) 200px);
+    padding-bottom: 96px;
+  }
+
+  :global(body:has(.home-flow) .site-footer) {
+    margin-top: 0;
+  }
+
+  /* 重叠量由统计行的负 margin 承载,卡片自身不再上拉 */
+  .home-card-wrap :global(.overlap-none) {
+    margin-top: 0;
   }
 
   .home-intro {
@@ -210,5 +305,99 @@ const statsSegments: StatSegment[] = firstPost
       flex-direction: column;
       gap: 16px;
     }
+
+    /* 移动端卡片重叠量为 28px */
+    .hero-stats {
+      margin-top: -28px;
+    }
   }
 </style>
+
+<script>
+  /**
+   * 横线锁底 + 进入偏移(v2 规格):
+   * - 锁底:调整 hero 高度,使卡片顶缘文档位置恒等于视口高——
+   *   由此页顶(scrollY=0)即全屏壁纸态停止位,构造保证无 overshoot;
+   * - 身份组对齐:按实测 L/重叠量/统计行高反推 hero-content 上padding,
+   *   使组在 S0 可见区(视口顶~卡片顶)光学中心(偏上 20px)——
+   *   不同档案的简介高度不同,固定 padding 无法兼顾;
+   * - 进入偏移 L = 卡片顶缘 → 首条横线底缘的距离,进入时瞬时滚过 L,
+   *   横线恰好压在视口底缘;
+   * - 内容(翻牌/换行/字体)或视口变化时重锁;锁底不可达(内容超高)时自然流;
+   * - 移动端(≤640px):停用锁底与偏移,完整壁纸入场(hero 不足一屏,卡片探头);
+   * - reload / 浏览器返回:交给滚动恢复,不干预。
+   */
+  function entryOffset(): number {
+    const card = document.querySelector<HTMLElement>('.home-card-wrap .main-card');
+    const divider = document.querySelector<HTMLElement>('.home-card-wrap .home-divider');
+    if (!card || !divider) return 0;
+    return Math.max(
+      0,
+      Math.round(divider.getBoundingClientRect().bottom - card.getBoundingClientRect().top),
+    );
+  }
+
+  function lockHeroDivider(): boolean {
+    const hero = document.querySelector<HTMLElement>('.hero');
+    const content = document.querySelector<HTMLElement>('.hero-content');
+    const card = document.querySelector<HTMLElement>('.home-card-wrap .main-card');
+    const stats = document.querySelector<HTMLElement>('.hero-stats');
+    if (!hero || !content || !card || !stats) return false;
+    hero.style.minHeight = '';
+    content.style.paddingTop = '';
+    // 移动端放不下完整编排:自然流(完整壁纸入场)
+    if (window.matchMedia('(max-width: 640px)').matches) return false;
+    const cardTopDoc = card.getBoundingClientRect().top + window.scrollY;
+    const delta = window.innerHeight - cardTopDoc;
+    // 卡片顶已在一屏之下:锁底不可达,自然流
+    if (delta <= 0) return false;
+    hero.style.minHeight = `${Math.round(hero.offsetHeight + delta)}px`;
+    // 身份组对准 S0 可见区光学中心:padTop = L − 重叠量 + 统计行高 − 偏上量 40
+    const statsH = stats.offsetHeight;
+    const overlap = -parseFloat(getComputedStyle(stats).marginTop) || 0;
+    content.style.paddingTop = `${Math.max(88, Math.round(entryOffset() - overlap + statsH - 40))}px`;
+    // 身份组位置已变,通知发光编排重测钳制点
+    document.dispatchEvent(new CustomEvent('hero:locked'));
+    return true;
+  }
+
+  function scrollToEntry() {
+    if (lockHeroDivider()) {
+      window.scrollTo({ top: entryOffset(), behavior: 'instant' });
+    }
+  }
+
+  let lockRaf = 0;
+  function scheduleLock() {
+    cancelAnimationFrame(lockRaf);
+    lockRaf = requestAnimationFrame(() => lockHeroDivider());
+  }
+
+  let observedIntro: Element | null = null;
+  const introObserver = new ResizeObserver(scheduleLock);
+
+  function initHeroLock() {
+    lockHeroDivider();
+    const intro = document.querySelector('.home-intro');
+    if (intro && intro !== observedIntro) {
+      observedIntro = intro;
+      introObserver.observe(intro);
+    }
+  }
+
+  initHeroLock();
+  // 硬加载且为全新进入(非浏览器返回):先锁底再偏移(此时整页已解析,不会被钳制);
+  // 软导航来到首页时脚本首次执行,navDir 由转场标记,返回则不偏移
+  const navType = (performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined)?.type;
+  if (navType === 'navigate' && document.documentElement.dataset.navDir !== 'back') {
+    scrollToEntry();
+  }
+  document.addEventListener('astro:after-swap', () => {
+    initHeroLock();
+    if (document.documentElement.dataset.navDir === 'back') return;
+    scrollToEntry();
+  });
+  document.addEventListener('astro:page-load', scheduleLock);
+  window.addEventListener('resize', scheduleLock);
+  document.fonts?.ready.then(scheduleLock);
+</script>

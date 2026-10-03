@@ -96,6 +96,31 @@ export interface ImageTreatment {
   scrimDark: number;
 }
 
+/** 采样 + 模式解析的合体结果(hero/stage 组件与页面级元素共用,如首页统计行) */
+export interface ImgModeResult {
+  imgMode: ImageTextMode | null;
+  imgScrim: number;
+  imgScrimDark: number;
+}
+
+/**
+ * 背景图 + 手工指定模式 → 图上文字模式与遮罩强度。
+ * 手工模式('on-dark'/'on-light')优先;否则按采样亮度推导;采样失败 imgMode 为 null。
+ */
+export async function resolveImgMode(
+  background: string | undefined,
+  textMode: string | undefined,
+  zone: 'hero' | 'stage' = 'hero',
+): Promise<ImgModeResult> {
+  const treatment = imageTreatment(await sampleImageLuminance(background, zone));
+  const manual = textMode === 'on-dark' || textMode === 'on-light' ? textMode : null;
+  return {
+    imgMode: manual ?? treatment?.mode ?? null,
+    imgScrim: treatment?.scrim ?? 0.35,
+    imgScrimDark: treatment?.scrimDark ?? 0.45,
+  };
+}
+
 /**
  * 图片中位亮度 → 两个主题各自的遮罩处理。
  * 文字色按"处理后"的背景亮度决定;采样失败返回 null,组件回退主题默认遮罩。

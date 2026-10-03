@@ -41,6 +41,10 @@ const year = new Date().getFullYear();
     margin-top: 96px;
     padding-block: 40px 48px;
     border-top: 1px solid var(--color-border);
+    /* 显式画布底:首页固定壁纸层(z:-1)全局存在,页脚必须自带底色;
+       其他页与 body 底色同色,视觉无变化 */
+    background: var(--color-canvas);
+    transition: background-color 0.35s ease;
   }
 
   .footer-inner {
