@@ -255,7 +255,8 @@ const statsSegments: StatSegment[] = firstPost
     width: fit-content;
     max-width: 88%;
     margin: calc(-1 * clamp(48px, 6vw, 96px)) auto 0;
-    font-size: 12.5px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     letter-spacing: 0.03em;
     line-height: 1.8;
     text-align: center;
@@ -343,7 +344,7 @@ const statsSegments: StatSegment[] = firstPost
   }
 
   .intro-bio {
-    font-size: 15px;
+    font-size: var(--text-lg);
     line-height: 1.8;
     color: var(--color-muted);
   }
@@ -376,7 +377,7 @@ const statsSegments: StatSegment[] = firstPost
   }
 
   .contact-text {
-    font-size: 14.5px;
+    font-size: var(--text-lg);
     color: var(--color-muted);
   }
 
@@ -385,7 +386,7 @@ const statsSegments: StatSegment[] = firstPost
     align-items: center;
     gap: 7px;
     padding: 10px 20px;
-    font-size: 14px;
+    font-size: var(--text-md);
     font-weight: 500;
     color: var(--color-surface);
     background: var(--color-text);

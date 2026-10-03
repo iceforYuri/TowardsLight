@@ -111,10 +111,10 @@ const intro = stripEnd(hero.intro);
   /* 发光:钉住段内 --glow 0→1(全局注册的可过渡属性,见 global.css);
      标题提亮并向主题色靠拢,泛起主题色微光晕;tagline/intro 半量 */
   .hero-title {
-    font-size: clamp(44px, 8vw, 76px);
-    font-weight: 700;
+    font-size: clamp(48px, 9vw, 92px);
+    font-weight: 900;
     line-height: 1.15;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
     color: color-mix(in oklab, var(--hero-fg), var(--hero-fg-2) calc(var(--glow, 0) * 28%));
     text-shadow: 0 0 calc(var(--glow, 0) * 26px)
       color-mix(in oklab, var(--hero-fg-2), transparent calc((1 - var(--glow, 0)) * 100%));

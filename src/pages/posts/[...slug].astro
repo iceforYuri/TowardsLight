@@ -337,7 +337,8 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 12.5px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     letter-spacing: 0.05em;
     color: var(--color-contrast);
     padding: 4px 13px;
@@ -350,8 +351,8 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
   }
 
   .article-title {
-    font-size: clamp(26px, 4.2vw, 38px);
-    font-weight: 700;
+    font-size: clamp(30px, 5vw, 44px);
+    font-weight: 900;
     line-height: 1.4;
     color: var(--astg-fg, var(--color-text));
     overflow-wrap: anywhere;
@@ -361,7 +362,7 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
   .article-desc {
     margin: 16px auto 0;
     max-width: 620px;
-    font-size: 15px;
+    font-size: var(--text-lg);
     line-height: 1.8;
     color: var(--astg-fg-m, var(--color-muted));
   }
@@ -372,7 +373,8 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
     justify-content: center;
     gap: 8px 20px;
     margin-top: 20px;
-    font-size: 12.5px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     color: var(--astg-fg-m, var(--color-muted));
   }
 
@@ -398,7 +400,8 @@ const coverTreatment = imageTreatment(await sampleImageLuminance(coverFsPath, 'h
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 4px 12px;
-    font-size: 12px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     color: var(--color-muted);
     background: var(--color-surface-raised);
     border: 1px solid var(--color-border);

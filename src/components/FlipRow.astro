@@ -114,7 +114,8 @@ const { panels, interval } = site.flipRow;
 
   .panel-label {
     flex-shrink: 0;
-    font-size: 11px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     letter-spacing: 0.1em;
     color: var(--color-muted);
   }
@@ -134,7 +135,8 @@ const { panels, interval } = site.flipRow;
     gap: 6px;
     padding: 5px 12px;
     font-family: var(--font-ui);
-    font-size: 12.5px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     color: var(--color-text);
     background: var(--color-surface-raised);
     border: 1px solid var(--color-border);

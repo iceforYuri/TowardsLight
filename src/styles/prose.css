@@ -172,7 +172,7 @@
   border: 1px solid var(--color-border);
   background: var(--color-surface-raised);
   overflow-x: auto;
-  font-size: 13.5px;
+  font-size: var(--text-sm);
   line-height: 1.7;
 }
 
@@ -190,7 +190,8 @@
   top: 0.75em;
   right: 1.1em;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-label);
   letter-spacing: 0.08em;
   color: var(--color-muted);
   opacity: 0.65;

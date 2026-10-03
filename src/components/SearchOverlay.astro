@@ -144,7 +144,8 @@ import Icon from './Icon.astro';
     padding: 3px 8px;
     border: 1px solid var(--color-border);
     border-radius: 5px;
-    font-size: 11px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     color: var(--color-muted);
     opacity: 0.8;
   }
@@ -164,7 +165,8 @@ import Icon from './Icon.astro';
   :global(.search-foot) {
     padding: 10px 24px;
     border-top: 1px solid var(--color-border);
-    font-size: 12px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     letter-spacing: 0.03em;
     color: var(--color-muted);
   }
@@ -196,7 +198,8 @@ import Icon from './Icon.astro';
   :global(.search-results .sr-snippet) {
     display: block;
     margin-top: 3px;
-    font-size: 14px;
+    font-size: var(--text-md);
+    font-weight: var(--weight-label);
     line-height: 1.65;
     color: var(--color-muted);
     overflow-wrap: anywhere;
@@ -206,7 +209,8 @@ import Icon from './Icon.astro';
     display: block;
     margin-top: 5px;
     font-family: var(--font-mono);
-    font-size: 12px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     letter-spacing: 0.03em;
     color: var(--color-muted);
     opacity: 0.85;

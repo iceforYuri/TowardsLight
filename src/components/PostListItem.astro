@@ -72,7 +72,8 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
   .post-date {
     flex-shrink: 0;
     width: 86px;
-    font-size: 13px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-label);
     color: var(--color-muted);
     padding-top: 3px;
   }
@@ -85,7 +86,7 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
   .post-title {
     font-family: var(--font-display);
     font-size: 19px;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.5;
     color: var(--color-text);
     /* 超长标题:最多两行，优雅截断 */
@@ -115,7 +116,7 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
 
   .post-desc {
     margin-top: 4px;
-    font-size: 14.5px;
+    font-size: var(--text-lg);
     line-height: 1.7;
     color: var(--color-muted);
     display: -webkit-box;
@@ -130,7 +131,8 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
     align-items: center;
     gap: 6px 14px;
     margin-top: 8px;
-    font-size: 12px;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
   }
 
   /* 分类与标签入口:浮在拉伸链接之上 */

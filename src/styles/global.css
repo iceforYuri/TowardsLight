@@ -10,6 +10,15 @@
   --font-ui: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
 
+  /* 字号阶梯:中文小字下限 12px(11px 笔画无法完整排布,全站禁用) */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 15px;
+
+  /* 辅助小字统一字重:400 在 ≤14px 中文上笔画过细 */
+  --weight-label: 500;
+
   /* 尺寸 */
   --shell-max: 1120px;
   --prose-max: 720px;
@@ -104,8 +113,7 @@ body {
   line-height: 1.8;
   color: var(--color-text);
   background-color: var(--color-canvas);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* 不设 font-smoothing:antialiased 在 macOS 会削细小字笔画,Windows 本就无效 */
   /* clip 而非 hidden:hidden 会让 body 变成滚动容器,sticky 全站失效 */
   overflow-x: clip;
   transition: background-color 0.35s ease, color 0.35s ease;
@@ -485,7 +493,7 @@ html[data-typewriter='on'] [data-typewriter][data-done] [data-typewriter-text] {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   font-family: var(--font-ui);
-  font-size: 14px;
+  font-size: var(--text-md);
 }
 
 .skip-link:focus {

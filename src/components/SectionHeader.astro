@@ -32,13 +32,14 @@ const { title, count, href, linkText = '查看全部' } = Astro.props;
     display: flex;
     align-items: baseline;
     gap: 10px;
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: 700;
     color: var(--color-text);
   }
 
   .section-count {
-    font-size: 12px;
-    font-weight: 400;
+    font-size: var(--text-xs);
+    font-weight: var(--weight-label);
     color: var(--color-muted);
     padding: 2px 8px;
     background: var(--color-surface-raised);
@@ -48,7 +49,8 @@ const { title, count, href, linkText = '查看全部' } = Astro.props;
 
   .section-link {
     font-family: var(--font-ui);
-    font-size: 13.5px;
+    font-size: var(--text-md);
+    font-weight: var(--weight-label);
     color: var(--color-muted);
     white-space: nowrap;
   }
