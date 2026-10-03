@@ -346,18 +346,29 @@ const statsSegments: StatSegment[] = firstPost
     if (!hero || !content || !card || !stats) return false;
     hero.style.minHeight = '';
     content.style.paddingTop = '';
+    // 壁纸冻结行程:L 写入 --journey(壁纸层脚本读取);未锁底时归零=不冻结
+    const setJourney = (v: number) =>
+      document.documentElement.style.setProperty('--journey', `${Math.round(v)}px`);
     // 移动端放不下完整编排:自然流(完整壁纸入场)
-    if (window.matchMedia('(max-width: 640px)').matches) return false;
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      setJourney(0);
+      return false;
+    }
     const cardTopDoc = card.getBoundingClientRect().top + window.scrollY;
     const delta = window.innerHeight - cardTopDoc;
     // 卡片顶已在一屏之下:锁底不可达,自然流
-    if (delta <= 0) return false;
+    if (delta <= 0) {
+      setJourney(0);
+      return false;
+    }
     hero.style.minHeight = `${Math.round(hero.offsetHeight + delta)}px`;
     // 身份组对准 S0 可见区光学中心:padTop = L − 重叠量 + 统计行高 − 偏上量 40
+    const L = entryOffset();
     const statsH = stats.offsetHeight;
     const overlap = -parseFloat(getComputedStyle(stats).marginTop) || 0;
-    content.style.paddingTop = `${Math.max(88, Math.round(entryOffset() - overlap + statsH - 40))}px`;
-    // 身份组位置已变,通知发光编排重测钳制点
+    content.style.paddingTop = `${Math.max(88, Math.round(L - overlap + statsH - 40))}px`;
+    setJourney(L);
+    // 身份组位置与行程已变,通知壁纸冻结/发光编排重测
     document.dispatchEvent(new CustomEvent('hero:locked'));
     return true;
   }

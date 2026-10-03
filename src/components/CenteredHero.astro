@@ -75,11 +75,15 @@ const intro = stripEnd(hero.intro);
     --hero-fg-m: var(--color-muted);
   }
 
-  /* 壁纸层:铺满 hero(略高于一屏),随文档与内容一体滚动——
-     下滚阅读时背景与卡片同上移离场;S1(页顶)展示其顶部约一屏 */
+  /* 壁纸层:恰好一屏高(100svh),图片永按视口比例缩放。
+     冻结:简介线之上的行程内由脚本补偿位移、钉住视口(满屏不动);
+     简介线之下(阅读区)补偿停在 L,随文档一体滚动 */
   .hero-backdrop {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100svh;
   }
 
   .hero-img {
@@ -305,15 +309,17 @@ const intro = stripEnd(hero.intro);
   document.addEventListener('astro:before-swap', () => ctrl?.abort());
 
   /**
-   * 身份组发光编排(v2 规格):
-   * 上滚时组随文档下移,中心触及视口正中后被 sticky 钳住;
-   * 钳住段内发光进度 --glow 从 0 升到 1。
-   * 钳制生效点 stickStart = 组自然文档中心 − 视口半高;
-   * 组高写入 --gh 供 sticky 的 bottom 钳制线使用。
-   * 减少动态偏好:整套不启用(--glow 恒 0,无阴影,sticky 位置行为保留)。
+   * 身份组发光 + 壁纸冻结(v2 规格):
+   * - 发光:上滚时组随文档下移,中心触及视口正中后被 sticky 钳住;
+   *   钳住段内 --glow 从 0 升到 1。钳制生效点 stickStart = 组自然文档中心 − 视口半高;
+   *   组高写入 --gh 供 sticky 的 bottom 钳制线使用。
+   * - 冻结:壁纸层恰好一屏高,行程内(scrollY ∈ [0, L])补偿位移钉住视口,
+   *   行程外停在 L 随文档滚动;L 从 --journey 读取(锁底脚本写入,未锁底为 0=不冻结)。
+   * 两者共用同一 rAF 滚动回调。减少动态偏好:无发光,冻结保留(纯位置行为)。
    */
   let stickStart = 0;
-  let glowRaf = 0;
+  let journey = 0;
+  let scrollRaf = 0;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   function measureGlow() {
@@ -332,28 +338,49 @@ const intro = stripEnd(hero.intro);
     stickStart = Math.max(1, docTop + gh / 2 - window.innerHeight / 2);
   }
 
+  function measureJourney() {
+    journey =
+      parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--journey')) || 0;
+  }
+
+  function updateFreeze() {
+    const backdrop = document.querySelector<HTMLElement>('.hero-backdrop');
+    if (!backdrop) return;
+    const y = Math.max(0, Math.min(window.scrollY, journey));
+    backdrop.style.transform = y > 0 ? `translateY(${y}px)` : '';
+  }
+
   function updateGlow() {
-    glowRaf = 0;
     const hero = document.querySelector<HTMLElement>('.hero');
     if (!hero) return;
     const p = Math.min(1, Math.max(0, (stickStart - window.scrollY) / stickStart));
     hero.style.setProperty('--glow', p.toFixed(3));
   }
 
-  function onGlowScroll() {
-    if (!glowRaf) glowRaf = requestAnimationFrame(updateGlow);
+  function onScrollFrame() {
+    if (scrollRaf) return;
+    scrollRaf = requestAnimationFrame(() => {
+      scrollRaf = 0;
+      updateFreeze();
+      if (!reduceMotion.matches) updateGlow();
+    });
   }
 
-  if (!reduceMotion.matches) {
-    window.addEventListener('scroll', onGlowScroll, { passive: true });
-    window.addEventListener('resize', () => measureGlow());
-    document.addEventListener('astro:page-load', () => {
-      measureGlow();
-      updateGlow();
-    });
-    // 锁底脚本会重排身份组(自适应 padding),锁完必须重测
-    document.addEventListener('hero:locked', () => measureGlow());
-    // 字体落盘后组高/位置可能变化,重测(锁底脚本同样监听,同帧内先后无碍)
-    document.fonts?.ready.then(() => requestAnimationFrame(measureGlow));
+  function measureAll() {
+    measureJourney();
+    updateFreeze();
+    if (reduceMotion.matches) return;
+    measureGlow();
+    updateGlow();
   }
+
+  window.addEventListener('scroll', onScrollFrame, { passive: true });
+  window.addEventListener('resize', () => measureAll());
+  // 锁底脚本会重排身份组并写入 --journey,锁完必须重测
+  document.addEventListener('hero:locked', () => measureAll());
+  document.addEventListener('astro:page-load', () => measureAll());
+  // 字体落盘后组高/位置可能变化,重测(锁底脚本同样监听,同帧内先后无碍)
+  document.fonts?.ready.then(() => requestAnimationFrame(measureAll));
+  // 顶层立即执行一次:覆盖硬加载时锁底脚本尚未运行前的首帧
+  measureAll();
 </script>
