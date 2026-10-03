@@ -8,7 +8,7 @@ import FlipRow from '../components/FlipRow.astro';
 import TechLinkCard from '../components/TechLinkCard.astro';
 import Icon from '../components/Icon.astro';
 import { getAllPosts, formatDate, countWords, collectTags } from '../utils/posts';
-import { u } from '../utils/url';
+import { u, stageMediaName } from '../utils/url';
 import { site } from '../data/site';
 import { linkGroups, techLinks } from '../data/links';
 import { resolveImgMode } from '../utils/image-luminance';
@@ -19,8 +19,9 @@ const recentPosts = posts.slice(0, 5);
 const homeLinks = techLinks.filter((l) => l.home).slice(0, 3);
 // 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
 const groupTone = new Map(linkGroups.map((g) => [g.id, 'tone' in g ? g.tone : undefined]));
-// 统计行挂在 .home-flow 上,与 hero 共用同一图上文字模式(采样有缓存,重复调用廉价)
-const { imgMode } = await resolveImgMode(site.homeHero.background, site.homeHero.textMode, 'hero');
+// 统计行与身份组共用同一图上文字模式;壁纸层也挂在 .home-flow(采样有缓存,重复调用廉价)
+const hero = site.homeHero;
+const { imgMode, imgScrim, imgScrimDark } = await resolveImgMode(hero.background, hero.textMode, 'hero');
 
 // Hero 统计行:全部由内容集合在构建时算出;数字段经过打字光标时翻动计数
 type StatSegment = { t: 'text'; v: string } | { t: 'num'; v: number; d?: number };
@@ -57,10 +58,39 @@ const statsSegments: StatSegment[] = firstPost
 
 {/*
   v2 规格(docs/specs/2026-10-03-home-wallpaper-hero.md):
-  .home-flow > hero(固定壁纸) + 统计行(三态纯文字) + .home-body(羽化幕布) > 主卡片
+  .home-flow > 壁纸层(sticky 冻结) + hero(身份组) + 统计行(三态纯文字)
+           + .home-body(羽化幕布) > 主卡片
 */}
 <BaseLayout>
-  <div class="home-flow" data-img-mode={imgMode}>
+  <div
+    class="home-flow"
+    data-img-mode={imgMode}
+    style={imgMode ? `--img-scrim: ${imgScrim}; --img-scrim-dark: ${imgScrimDark}` : undefined}
+  >
+    {/* 壁纸层:在 .home-flow 直属——sticky 冻结需要"轨道+一屏"的容器,
+        hero 不够高。轨道高度 = 100svh + L(锁底脚本写入),负 margin 抵消占位;
+        壁纸层 sticky top:0:行程内被轨道钳在视口(冻结),行程外停在轨道末随文档滚动 */}
+    {
+      hero.background && (
+        <div class="wallpaper-track">
+          <div class="hero-backdrop img-reveal" aria-hidden="true" transition:name={stageMediaName(hero.background)}>
+            {/* 转场图层序:背景组始终压在卡片之下(转场名按图区分,见 utils/url) */}
+            <style is:global set:html={`::view-transition-group(${stageMediaName(hero.background)}) { z-index: 1; }`} />
+            <img
+              src={u(hero.background)}
+              alt=""
+              class="hero-img"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+              onerror="this.closest('.hero-backdrop').remove()"
+            />
+            <div class="hero-scrim" />
+          </div>
+        </div>
+      )
+    }
+
     <CenteredHero />
 
     {/* 统计行:无背景纯文字,负 margin 骑入 hero 底缘重叠区(界锚=主卡片顶部);
@@ -141,6 +171,76 @@ const statsSegments: StatSegment[] = firstPost
 <style>
   .home-flow {
     position: relative;
+    /* 阻隔壁纸层 margin 与外部的折叠(margin collapse),保证其自然位置精确 */
+    display: flow-root;
+  }
+
+  /* 壁纸轨道:高度 = 100svh + L(锁底脚本写入),负 margin 抵消文档流占位。
+     L=0(未锁底/移动端)时轨道=一屏,壁纸层无钳制空间,自动等价纯随动 */
+  .wallpaper-track {
+    height: 100svh;
+    margin-bottom: calc(-1 * 100svh);
+    pointer-events: none;
+  }
+
+  /* 壁纸层:恰好一屏高(图片永按视口比例缩放)。sticky top 冻结:
+     行程内(scrollY<L)被轨道钳在视口顶 → 满屏不动;
+     行程外(scrollY≥L)停在轨道末,随文档一体上移。
+     纯 CSS 合成器行为,无 JS 逐帧补偿(JS 补偿在合成器滚动下晚一帧,会剧烈抖动) */
+  .hero-backdrop {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+  }
+
+  .hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* 顶部导航保护 + 文字区压暗;底部画布羽化已移交羽化幕布(.home-body) */
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, var(--color-overlay) 0%, transparent 28%);
+  }
+
+  /* 深色主题兜底:仅在采样失败(无 data-img-mode)时上段再压一层 */
+  :global(html[data-theme='dark']) .home-flow:not([data-img-mode]) .hero-scrim {
+    background: linear-gradient(
+      to bottom,
+      var(--color-overlay) 0%,
+      rgba(23, 25, 22, 0.42) 40%,
+      rgba(23, 25, 22, 0.55) 70%
+    );
+  }
+
+  .home-flow[data-img-mode='on-dark'] .hero-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(18, 20, 17, calc(var(--img-scrim, 0.35) * 0.7)) 0%,
+      rgba(18, 20, 17, var(--img-scrim, 0.35)) 42%,
+      rgba(18, 20, 17, calc(var(--img-scrim, 0.35) * 0.85)) 68%
+    );
+  }
+
+  .home-flow[data-img-mode='on-light'] .hero-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.55)) 0%,
+      rgba(244, 245, 241, var(--img-scrim, 0.35)) 42%,
+      rgba(244, 245, 241, calc(var(--img-scrim, 0.35) * 0.8)) 68%
+    );
+  }
+
+  :global(html[data-theme='dark']) .home-flow[data-img-mode] .hero-scrim {
+    background: linear-gradient(
+      to bottom,
+      rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.7)) 0%,
+      rgba(18, 20, 17, var(--img-scrim-dark, 0.45)) 42%,
+      rgba(18, 20, 17, calc(var(--img-scrim-dark, 0.45) * 0.85)) 68%
+    );
   }
 
   /* 统计行:三态纯文字。负 margin 骑入卡片对 hero 的重叠区(重叠量与
@@ -318,14 +418,17 @@ const statsSegments: StatSegment[] = firstPost
   /**
    * 横线锁底 + 进入偏移(v2 规格):
    * - 锁底:调整 hero 高度,使卡片顶缘文档位置恒等于视口高——
-   *   由此页顶(scrollY=0)即全屏壁纸态停止位,构造保证无 overshoot;
+   *   由此页顶(scrollY=0)即满屏壁纸态停止位,构造保证无 overshoot;
+   * - 壁纸冻结:壁纸层 sticky bottom,其自然位置经 margin 放在 [L, L+100svh]——
+   *   行程内被钳到满屏(冻结),行程外随文档滚动;L=0 时自然位置 [0,100svh],
+   *   自动等价纯随动;
    * - 身份组对齐:按实测 L/重叠量/统计行高反推 hero-content 上padding,
    *   使组在 S0 可见区(视口顶~卡片顶)光学中心(偏上 20px)——
    *   不同档案的简介高度不同,固定 padding 无法兼顾;
-   * - 进入偏移 L = 卡片顶缘 → 首条横线底缘的距离,进入时瞬时滚过 L,
-   *   横线恰好压在视口底缘;
+   * - 进入偏移 L = 卡片顶缘 → 简介线底缘的距离,进入时瞬时滚过 L,
+   *   简介线恰好压在视口底缘;
    * - 内容(翻牌/换行/字体)或视口变化时重锁;锁底不可达(内容超高)时自然流;
-   * - 移动端(≤640px):停用锁底与偏移,完整壁纸入场(hero 不足一屏,卡片探头);
+   * - 移动端(≤640px):停用锁底与进入偏移,自然流(满屏壁纸入场);
    * - reload / 浏览器返回:交给滚动恢复,不干预。
    */
   function entryOffset(): number {
@@ -346,10 +449,15 @@ const statsSegments: StatSegment[] = firstPost
     if (!hero || !content || !card || !stats) return false;
     hero.style.minHeight = '';
     content.style.paddingTop = '';
-    // 壁纸冻结行程:L 写入 --journey(壁纸层脚本读取);未锁底时归零=不冻结
-    const setJourney = (v: number) =>
-      document.documentElement.style.setProperty('--journey', `${Math.round(v)}px`);
-    // 移动端放不下完整编排:自然流(完整壁纸入场)
+    // 壁纸冻结行程:轨道高度 = 100svh + L(负 margin 抵消占位);
+    // 未锁底时 L=0,壁纸层无钳制空间(不冻结,纯随动)
+    const track = document.querySelector<HTMLElement>('.wallpaper-track');
+    const setJourney = (v: number) => {
+      if (!track) return;
+      track.style.height = `calc(100svh + ${Math.round(v)}px)`;
+      track.style.marginBottom = `calc(-100svh - ${Math.round(v)}px)`;
+    };
+    // 移动端放不下完整编排:自然流(满屏壁纸入场)
     if (window.matchMedia('(max-width: 640px)').matches) {
       setJourney(0);
       return false;
@@ -368,7 +476,7 @@ const statsSegments: StatSegment[] = firstPost
     const overlap = -parseFloat(getComputedStyle(stats).marginTop) || 0;
     content.style.paddingTop = `${Math.max(88, Math.round(L - overlap + statsH - 40))}px`;
     setJourney(L);
-    // 身份组位置与行程已变,通知壁纸冻结/发光编排重测
+    // 身份组位置已变,通知发光编排重测钳制点
     document.dispatchEvent(new CustomEvent('hero:locked'));
     return true;
   }
