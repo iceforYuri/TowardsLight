@@ -15,7 +15,8 @@
     "new-profile": "node scripts/new-profile.mjs",
     "test": "node scripts/test-image-guard.mjs",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "frontmatter:check": "node scripts/check-frontmatter.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
