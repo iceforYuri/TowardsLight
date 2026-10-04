@@ -47,9 +47,9 @@ export default defineConfig({
   },
   prefetch: {
     prefetchAll: true,
-    // hover 预取在触屏上不存在、快速点击也赶不上,点击等于冷请求;
-    // 静态小站页面体积小,视口预取后点击几乎零等待
-    defaultStrategy: 'viewport',
+    // 目标读者的链路(国内→Vercel)文档拉取可能秒级, hover/viewport 都太晚;
+    // 页面全是几 KB 的静态 HTML,加载完成即全量预取,点击几乎全部命中缓存
+    defaultStrategy: 'load',
   },
   markdown: {
     // 公式:remark-math 解析 $..$/$$..$$,rehype-katex 构建期渲染为 HTML(零客户端 JS)
