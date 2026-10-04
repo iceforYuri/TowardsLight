@@ -1,20 +1,36 @@
 /**
- * mermaid 图/代码切换:工具栏按钮切换 figure 的 data-view。
- * 图与代码在构建期已渲染/保留,切换纯显隐,零重算。
+ * mermaid 图/代码切换:工具排单一图标钮切换 data-view(图标随状态换面),
+ * 复制键直接拷贝图源。视图构建期已就绪,切换纯显隐,零重算。
  */
 export function initMermaidFigures(): void {
   document
     .querySelectorAll<HTMLElement>('.mermaid-figure:not([data-mmd-bound])')
     .forEach((fig) => {
       fig.dataset.mmdBound = '1';
-      fig.querySelectorAll<HTMLButtonElement>('[data-mermaid-view]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const view = btn.dataset.mermaidView ?? 'diagram';
-          fig.dataset.view = view;
-          fig.querySelectorAll('[data-mermaid-view]').forEach((b) =>
-            b.setAttribute('aria-pressed', String(b === btn)),
-          );
-        });
+
+      const toggle = fig.querySelector<HTMLButtonElement>('.mmd-toggle');
+      toggle?.addEventListener('click', () => {
+        const toCode = fig.dataset.view !== 'code';
+        fig.dataset.view = toCode ? 'code' : 'diagram';
+        toggle.setAttribute('aria-pressed', String(toCode));
+        toggle.setAttribute('aria-label', toCode ? '切换到图' : '切换到代码');
+      });
+
+      const copyBtn = fig.querySelector<HTMLButtonElement>('.mmd-copy');
+      copyBtn?.addEventListener('click', async () => {
+        const src = fig.querySelector('.mermaid-source code')?.textContent ?? '';
+        if (!src) return;
+        try {
+          await navigator.clipboard.writeText(src);
+          copyBtn.classList.add('copied');
+          copyBtn.setAttribute('aria-label', '已复制');
+          window.setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            copyBtn.setAttribute('aria-label', '复制图源');
+          }, 1200);
+        } catch {
+          copyBtn.title = '复制失败,请手动选择';
+        }
       });
     });
 }

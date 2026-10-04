@@ -238,7 +238,9 @@
   border-color: var(--color-contrast);
 }
 
-/* ── mermaid 图(构建期渲染,手绘风):图/代码切换 ── */
+/* ── mermaid 图(构建期渲染,手绘风)──
+   一条工具排收在图右上角:徽章 + 图/代码切换(图标) + 复制;
+   代码视图的 pre 去掉自身边框与徽章,避免卡中卡 */
 .prose .mermaid-figure {
   position: relative;
   margin: 1.6em 0;
@@ -247,37 +249,80 @@
   border-radius: var(--radius-md);
   background: var(--color-surface-raised);
 }
-.prose .mermaid-toolbar {
+.prose .mermaid-chrome {
   position: absolute;
   top: 0.55em;
   right: 0.65em;
-  display: flex;
-  gap: 2px;
   z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.prose .mermaid-toolbar button {
+.prose .mermaid-badge {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  padding: 3px 9px;
+  font-weight: var(--weight-label);
+  letter-spacing: 0.08em;
+  color: var(--color-muted);
+  opacity: 0.65;
+  padding-right: 2px;
+}
+.prose .mmd-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
   border: 1px solid var(--color-border);
+  border-radius: 6px;
   background: var(--color-surface);
   color: var(--color-muted);
   cursor: pointer;
-  transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  transition: color 0.18s ease, border-color 0.18s ease;
 }
-.prose .mermaid-toolbar button:first-child {
-  border-radius: 6px 0 0 6px;
-}
-.prose .mermaid-toolbar button:last-child {
-  border-radius: 0 6px 6px 0;
-}
-.prose .mermaid-toolbar button[aria-pressed='true'] {
+.prose .mmd-btn:hover {
   color: var(--color-text);
-  background: var(--color-surface);
   border-color: var(--color-muted);
 }
+.prose .mmd-btn .mmd-ic {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.prose .mmd-btn .mmd-ic svg {
+  width: 13px;
+  height: 13px;
+}
+/* 切换钮:当前视图决定显示哪个图标(图视图显示「去看代码」,代码视图显示「回去看图」) */
+.prose .mermaid-figure[data-view='diagram'] .mmd-toggle .ic-img,
+.prose .mermaid-figure[data-view='code'] .mmd-toggle .ic-code {
+  opacity: 0;
+  transform: rotate(-40deg) scale(0.6);
+}
+/* 复制钮:check 只在 copied 时出现 */
+.prose .mmd-copy .ic-check {
+  opacity: 0;
+  transform: scale(0.6);
+}
+.prose .mmd-copy.copied {
+  color: var(--color-contrast);
+  border-color: var(--color-contrast);
+}
+.prose .mmd-copy.copied .ic-check {
+  opacity: 1;
+  transform: scale(1);
+}
+.prose .mmd-copy.copied .ic-copy {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
 .prose .mermaid-canvas {
-  padding: 1.6em 1.3em 1.2em;
+  padding: 2.6em 1.3em 1.2em; /* 顶部让出工具排 */
   display: flex;
   justify-content: center;
   overflow-x: auto;
@@ -296,21 +341,36 @@ html[data-theme='dark'] .prose .mermaid-svg-light {
 html[data-theme='dark'] .prose .mermaid-svg-dark {
   display: block;
 }
-/* 代码视图:复用代码块样式,去掉卡中卡感 */
+/* 代码视图:pre 去掉自身边框/底色/徽章/复制键(工具排已收编) */
 .prose .mermaid-figure .mermaid-source {
   display: none;
-  margin: 0;
+  margin: 2.2em 0 0; /* 让出工具排 */
   border: 0;
+  border-radius: 0;
   background: transparent;
+}
+.prose .mermaid-figure .mermaid-source::before {
+  content: none;
 }
 .prose .mermaid-figure[data-view='code'] .mermaid-canvas {
   display: none;
 }
 .prose .mermaid-figure[data-view='code'] .mermaid-source {
   display: block;
-  /* 让出工具栏高度,别让「图/代码」按钮压住徽章和复制键 */
-  margin-top: 2.2em;
-  border-top: 1px solid var(--color-border);
+}
+
+/* 切换动效:进入的视图轻微浮入 */
+@media (prefers-reduced-motion: no-preference) {
+  .prose .mermaid-figure[data-view='diagram'] .mermaid-canvas,
+  .prose .mermaid-figure[data-view='code'] .mermaid-source {
+    animation: mmd-view-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+@keyframes mmd-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 @media (hover: none) {
   .prose .code-copy-btn {

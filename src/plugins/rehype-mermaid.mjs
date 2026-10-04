@@ -80,7 +80,8 @@ export function rehypeMermaid() {
       const dual = await renderDual(source);
       if (!dual) continue; // 兜底:原样保留
 
-      // 源码视图:保持 astro-code 结构,徽章与复制按钮自动生效(hast 属性驼峰式)
+      // 源码视图:保持 astro-code 结构(hast 属性驼峰式);dataCopyBound 让
+      // code-copy 跳过它——复制键收进 figure 的工具排,不在 pre 里重复注入
       node.properties = node.properties || {};
       const existingCls = node.properties.className;
       const clsArr = Array.isArray(existingCls)
@@ -90,6 +91,30 @@ export function rehypeMermaid() {
           : [];
       node.properties.className = [...new Set([...clsArr, 'astro-code', 'mermaid-source'])];
       node.properties.dataLanguage = 'mermaid';
+      node.properties.dataCopyBound = '1';
+
+      const svgIcon = (paths) => ({
+        type: 'raw',
+        value: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`,
+      });
+      const ICON_IMG =
+        '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>';
+      const ICON_CODE = '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>';
+      const ICON_COPY =
+        '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>';
+      const ICON_CHECK = '<path d="M20 6 9 17l-5-5"/>';
+
+      const iconBtn = (cls, label, icons) => ({
+        type: 'element',
+        tagName: 'button',
+        properties: { type: 'button', className: ['mmd-btn', cls], ariaLabel: label, title: label },
+        children: icons.map((i) => ({
+          type: 'element',
+          tagName: 'span',
+          properties: { className: ['mmd-ic', i[1]], ariaHidden: 'true' },
+          children: [svgIcon(i[0])],
+        })),
+      });
 
       parent.children[index] = {
         type: 'element',
@@ -99,20 +124,22 @@ export function rehypeMermaid() {
           {
             type: 'element',
             tagName: 'div',
-            properties: { className: ['mermaid-toolbar'] },
+            properties: { className: ['mermaid-chrome'] },
             children: [
               {
                 type: 'element',
-                tagName: 'button',
-                properties: { type: 'button', dataMermaidView: 'diagram', ariaPressed: 'true' },
-                children: [{ type: 'text', value: '图' }],
+                tagName: 'span',
+                properties: { className: ['mermaid-badge'] },
+                children: [{ type: 'text', value: 'mermaid' }],
               },
-              {
-                type: 'element',
-                tagName: 'button',
-                properties: { type: 'button', dataMermaidView: 'code', ariaPressed: 'false' },
-                children: [{ type: 'text', value: '代码' }],
-              },
+              iconBtn('mmd-toggle', '切换图/代码', [
+                [ICON_CODE, 'ic-code'],
+                [ICON_IMG, 'ic-img'],
+              ]),
+              iconBtn('mmd-copy', '复制图源', [
+                [ICON_COPY, 'ic-copy'],
+                [ICON_CHECK, 'ic-check'],
+              ]),
             ],
           },
           {
