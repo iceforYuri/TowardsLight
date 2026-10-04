@@ -47,7 +47,9 @@ export default defineConfig({
   },
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: 'hover',
+    // hover 预取在触屏上不存在、快速点击也赶不上,点击等于冷请求;
+    // 静态小站页面体积小,视口预取后点击几乎零等待
+    defaultStrategy: 'viewport',
   },
   markdown: {
     // 公式:remark-math 解析 $..$/$$..$$,rehype-katex 构建期渲染为 HTML(零客户端 JS)
