@@ -102,7 +102,9 @@ fnord publish --draft=false --tags=a,b,c
 
 ## Mermaid 图(手绘风,构建期渲染)
 
-`mermaid` 代码块会在构建时渲染成 SVG,明暗主题各一份;右上角可以在「图 / 代码」之间切换,代码视图照样有复制按钮。flowchart、state、class、ER 图支持手绘风。
+`mermaid` 代码块会在构建时渲染成 SVG,明暗主题各一份;右上角可以在「图 / 代码」之间切换,代码视图照样有复制按钮。
+
+流程图(flowchart)是手绘风的主力:
 
 ```mermaid
 graph LR
@@ -111,4 +113,43 @@ graph LR
   C --> B
   B -- 否 --> D[发布]
   D --> E[读者]
+```
+
+状态图(stateDiagram-v2)同样支持手绘:
+
+```mermaid
+stateDiagram-v2
+  [*] --> 草稿
+  草稿 --> 校对: 写完了
+  校对 --> 草稿: 不满意
+  校对 --> 已发布: draft: false
+  已发布 --> [*]
+```
+
+类图(classDiagram)也行:
+
+```mermaid
+classDiagram
+  class Post {
+    +string title
+    +string category
+    +string[] tags
+    +boolean draft
+  }
+  class Profile {
+    +site.ts
+    +links.ts
+    +posts/
+  }
+  Profile "1" --> "*" Post
+```
+
+时序图(sequenceDiagram)暂时不支持手绘风,会回退为经典样式(功能不受影响):
+
+```mermaid
+sequenceDiagram
+  读者->>博客: 打开文章页
+  博客->>内容集合: 按 slug 取文章
+  内容集合-->>博客: 渲染好的正文
+  博客-->>读者: 页面 + 目录 + 进度条
 ```
