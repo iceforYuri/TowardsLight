@@ -4,13 +4,14 @@
    ============================================ */
 
 :root {
-  /* 字体系统 */
   /* 字体系统:TL 别名为自托管字体(scripts/fetch-fonts.mjs),族名独特,
-     本机装有 Noto 可变字体也不会被劫持到 Thin 实例;回退链刻意不含 Noto 原名 */
+     不受本机安装的同名 Noto 字体干扰;回退链刻意不含 Noto 原名 */
   --font-display: 'TL Display', 'TL Serif', 'Songti SC', 'SimSun', serif;
   --font-body: 'TL Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
   --font-ui: 'TL UI', 'TL Sans', 'PingFang SC', system-ui, sans-serif;
-  --font-mono: 'TL Mono', 'SF Mono', ui-monospace, 'Cascadia Code', Consolas, monospace;
+  /* mono 栈末尾垫 TL Sans/雅黑:拉丁等宽字体不含中文字形,中文落入
+     generic monospace 会被 Windows 映射成 NSimSun(点阵细体) */
+  --font-mono: 'TL Mono', 'SF Mono', ui-monospace, 'Cascadia Code', Consolas, 'TL Sans', 'Microsoft YaHei', monospace;
 
   /* 字号阶梯:中文小字下限 12px(11px 笔画无法完整排布,全站禁用) */
   --text-xs: 12px;
