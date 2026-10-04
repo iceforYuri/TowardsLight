@@ -424,7 +424,7 @@ const statsSegments: StatSegment[] = firstPost
    *   行程内被钳到满屏(冻结),行程外随文档滚动;L=0 时自然位置 [0,100svh],
    *   自动等价纯随动;
    * - 身份组对齐:按实测 L/重叠量/统计行高反推 hero-content 上padding,
-   *   使组在 S0 可见区(视口顶~卡片顶)光学中心(偏上 20px)——
+   *   使组在 S0 可见区(视口顶~卡片顶)光学中心偏下 20px(贴向卡片、留出壁纸呼吸)——
    *   不同档案的简介高度不同,固定 padding 无法兼顾;
    * - 进入偏移 L = 卡片顶缘 → 简介线底缘的距离,进入时瞬时滚过 L,
    *   简介线恰好压在视口底缘;
@@ -471,11 +471,12 @@ const statsSegments: StatSegment[] = firstPost
       return false;
     }
     hero.style.minHeight = `${Math.round(hero.offsetHeight + delta)}px`;
-    // 身份组对准 S0 可见区光学中心:padTop = L − 重叠量 + 统计行高 − 偏上量 40
+    // 身份组对准 S0 可见区光学中心偏下:padTop = L − 重叠量 + 统计行高 + 偏下量 20
+    // (下限 88 保证不与导航相碰;仍须低于 sticky 钳制线,否则进入态就误触发钉住/发光)
     const L = entryOffset();
     const statsH = stats.offsetHeight;
     const overlap = -parseFloat(getComputedStyle(stats).marginTop) || 0;
-    content.style.paddingTop = `${Math.max(88, Math.round(L - overlap + statsH - 40))}px`;
+    content.style.paddingTop = `${Math.max(88, Math.round(L - overlap + statsH + 20))}px`;
     setJourney(L);
     // 身份组位置已变,通知发光编排重测钳制点
     document.dispatchEvent(new CustomEvent('hero:locked'));
