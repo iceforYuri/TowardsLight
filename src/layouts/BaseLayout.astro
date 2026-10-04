@@ -119,6 +119,27 @@ const ogImage = rawImage
           if (value) to.dataset[key] = value;
         }
       });
+
+      // 点击即反馈:导航已被接受,但新文档未到 → 120ms 后亮顶部进度条
+      // (挂在 documentElement 上,熬过 body 整体交换;快导航在阈值内完成,永不闪现)
+      let navTimer: ReturnType<typeof setTimeout> | undefined;
+      document.addEventListener('astro:before-preparation', () => {
+        clearTimeout(navTimer);
+        navTimer = setTimeout(() => {
+          if (document.getElementById('nav-progress')) return;
+          const bar = document.createElement('div');
+          bar.id = 'nav-progress';
+          document.documentElement.appendChild(bar);
+        }, 120);
+      });
+      document.addEventListener('astro:page-load', () => {
+        clearTimeout(navTimer);
+        const bar = document.getElementById('nav-progress');
+        if (bar) {
+          bar.classList.add('is-done');
+          bar.addEventListener('animationend', () => bar.remove(), { once: true });
+        }
+      });
     </script>
   </head>
   <body>

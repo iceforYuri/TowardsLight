@@ -484,6 +484,53 @@ html[data-typewriter='on'] [data-typewriter][data-done] [data-typewriter-text] {
   initial-value: 0;
 }
 
+/* ============ 导航进度条:点击即反馈(BaseLayout 内联脚本驱动) ============ */
+/* 慢导航 120ms 后出现,停在 85% 等文档;到位后冲满并淡出。减少动态偏好下不显示 */
+#nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 100%;
+  height: 2px;
+  background: var(--color-accent);
+  transform-origin: left;
+  animation: nav-progress-run 1.4s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+}
+
+#nav-progress.is-done {
+  animation:
+    nav-progress-finish 0.18s ease-out forwards,
+    nav-progress-fade 0.25s ease 0.18s forwards;
+}
+
+@keyframes nav-progress-run {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(0.85);
+  }
+}
+
+@keyframes nav-progress-finish {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes nav-progress-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #nav-progress {
+    display: none;
+  }
+}
+
 /* ============ 通用工具 ============ */
 
 .skip-link {
