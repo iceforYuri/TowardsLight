@@ -99,3 +99,16 @@ fnord publish --draft=false --tags=a,b,c
 ## 实现说明
 
 语言徽章来自一个 5 行的 Shiki transformer,把 fence 语言写到 `<pre data-language>` 上,样式由 CSS `attr()` 生成,不引入任何运行时。
+
+## Mermaid 图(手绘风,构建期渲染)
+
+`mermaid` 代码块会在构建时渲染成 SVG,明暗主题各一份;右上角可以在「图 / 代码」之间切换,代码视图照样有复制按钮。flowchart、state、class、ER 图支持手绘风。
+
+```mermaid
+graph LR
+  A[写文章] --> B{草稿?}
+  B -- 是 --> C[继续改]
+  C --> B
+  B -- 否 --> D[发布]
+  D --> E[读者]
+```

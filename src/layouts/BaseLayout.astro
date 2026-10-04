@@ -94,9 +94,11 @@ const ogImage = rawImage
     <script>
       import { initImgReveal } from '../scripts/img-reveal';
       import { initCodeCopy } from '../scripts/code-copy';
+      import { initMermaidFigures } from '../scripts/mermaid-figure';
       document.addEventListener('astro:page-load', () => {
         initImgReveal();
         initCodeCopy();
+        initMermaidFigures();
       });
 
       // 记录导航方向与是否涉及首页(首页的标题用淡入淡出,不做滚换)

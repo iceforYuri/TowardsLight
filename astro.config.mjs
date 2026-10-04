@@ -4,6 +4,7 @@ import sitemap from '@astrojs/sitemap';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { rehypeImageDecoding } from './src/plugins/rehype-image-decoding.mjs';
+import { rehypeMermaid } from './src/plugins/rehype-mermaid.mjs';
 import { rehypeImageFigcaption } from './src/plugins/rehype-image-figcaption.mjs';
 import { remarkImageGuard, viteImageGuard } from './src/plugins/image-guard.mjs';
 
@@ -52,7 +53,7 @@ export default defineConfig({
     // 公式:remark-math 解析 $..$/$$..$$,rehype-katex 构建期渲染为 HTML(零客户端 JS)
     // remark-image-guard 放在最前:缺席的正文图片换成占位图,避免一张图拖垮全站
     remarkPlugins: [remarkImageGuard, remarkMath],
-    rehypePlugins: [rehypeKatex, rehypeImageDecoding, rehypeImageFigcaption],
+    rehypePlugins: [rehypeKatex, rehypeImageDecoding, rehypeImageFigcaption, rehypeMermaid],
     shikiConfig: {
       transformers: [langBadge],
       themes: {

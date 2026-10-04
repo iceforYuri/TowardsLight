@@ -13,9 +13,14 @@ export interface LinkGroupDef {
 /** 链接分组:id 供链接的 group 字段引用,label 为页面显示名;tone 给整组浸染色调 */
 export const linkGroups = [
   { id: 'code', label: 'Code', description: '代码托管与开源项目', tone: 'steel' },
-  { id: 'build', label: 'Build', description: '构建本站与日常项目的工具链' },
-  { id: 'write', label: 'Write', description: '写作平台与笔记工具' },
-  { id: 'explore', label: 'Explore', description: '学习与查证的去处' },
+  { id: 'build', label: 'Build', description: '构建本站与日常项目的工具链',
+      tone: 'accent'
+},
+  { id: 'write', label: 'Write', description: '写作平台与笔记工具',
+      tone: 'contrast'
+},
+  { id: 'explore', label: 'Explore', description: '学习与查证的去处'
+},
   { id: 'community', label: 'Community', description: '常逛的社区', tone: 'contrast' },
   { id: 'tools', label: 'Tools', description: '日常在用的软件' },
   { id: 'elsewhere', label: 'Elsewhere', description: '其他地方也能找到我' },
