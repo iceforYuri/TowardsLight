@@ -14,6 +14,15 @@ import { linkGroups, techLinks } from '../data/links';
 import { resolveImgMode } from '../utils/image-luminance';
 
 const posts = await getAllPosts();
+
+// 首页结构化数据(WebSite)
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: site.siteName,
+  description: site.bio,
+  inLanguage: 'zh-CN',
+};
 const recentPosts = posts.slice(0, 5);
 // 首页「常用去处」:读独立的 home 字段(featured 只管 Links 页卡片形态),最多 3 个
 const homeLinks = techLinks.filter((l) => l.home).slice(0, 3);
@@ -61,7 +70,7 @@ const statsSegments: StatSegment[] = firstPost
   .home-flow > 壁纸层(sticky 冻结) + hero(身份组) + 统计行(三态纯文字)
            + .home-body(羽化幕布) > 主卡片
 */}
-<BaseLayout>
+<BaseLayout jsonLd={jsonLd}>
   <div
     class="home-flow"
     data-img-mode={imgMode}

@@ -34,3 +34,5 @@ editor/
 
 # docs
 docs/specs/
+# 临时验证脚本与截图(本地)
+.tmp-*

@@ -11,10 +11,26 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /** 分享卡片图(绝对或站内路径);缺省用 Hero 背景(仅限位图,SVG 分享平台不认) */
+  image?: string;
+  /** 页面类型:文章页传 'article' */
+  type?: 'website' | 'article';
+  /** 结构化数据(schema.org),序列化后内联 */
+  jsonLd?: Record<string, unknown>;
 }
 
-const { title, description = site.bio } = Astro.props;
+const { title, description = site.bio, image, type = 'website', jsonLd } = Astro.props;
 const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · ${site.shortBio}`;
+
+// canonical/OG 一律绝对地址;Astro.url 已含 base
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).href;
+const heroBg = site.homeHero?.background;
+const defaultImage =
+  heroBg && /\.(png|jpe?g|webp|avif)$/i.test(heroBg) ? heroBg : undefined;
+const rawImage = image ?? defaultImage;
+const ogImage = rawImage
+  ? new URL(rawImage, Astro.site ?? Astro.url.origin).href
+  : undefined;
 ---
 
 <!doctype html>
@@ -24,6 +40,20 @@ const pageTitle = title ? `${title} · ${site.siteName}` : `${site.siteName} · 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- 发现与分享:canonical 归权,OG/Twitter 供分享卡片 -->
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:site_name" content={site.siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalUrl} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
     <link rel="icon" type="image/svg+xml" href={u('/favicon.svg')} />
     <link rel="alternate" type="application/rss+xml" title={site.siteName} href={u('/rss.xml')} />
 

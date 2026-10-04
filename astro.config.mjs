@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { rehypeImageDecoding } from './src/plugins/rehype-image-decoding.mjs';
@@ -30,6 +31,7 @@ try {
 export default defineConfig({
   site: process.env.SITE_URL ?? profileSiteUrl,
   base: process.env.SITE_BASE ?? '/',
+  integrations: [sitemap()],
   vite: {
     // 内容图片解析兜底(先于 astro 内部插件):缓存残留的失效引用喂占位图,不抛 ImageNotFound
     plugins: [viteImageGuard()],
