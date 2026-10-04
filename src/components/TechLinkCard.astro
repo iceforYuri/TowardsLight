@@ -98,7 +98,8 @@ const { link, tone } = Astro.props;
     font-size: var(--text-sm);
     font-weight: var(--weight-label);
     line-height: 1.65;
-    color: var(--color-muted);
+    /* 组色浸染底上 muted 对比度不足,向正文色混入 15% 兜底 */
+    color: color-mix(in oklab, var(--color-muted) 85%, var(--color-text));
     flex: 1;
   }
 
@@ -108,7 +109,8 @@ const { link, tone } = Astro.props;
     font-size: var(--text-sm);
     font-weight: var(--weight-label);
     letter-spacing: 0.04em;
-    color: var(--color-contrast);
+    /* 组色浸染底上 contrast 对比度不足,向正文色混入 25% 兜底 */
+    color: color-mix(in oklab, var(--color-contrast) 75%, var(--color-text));
     background: var(--color-contrast-soft);
     padding: 2px 9px;
     border-radius: 999px;

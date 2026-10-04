@@ -226,7 +226,6 @@ for (const h of toc) {
     font-weight: var(--weight-label);
     letter-spacing: 0.06em;
     color: var(--color-muted);
-    opacity: 0.8;
   }
 
   .toc-percent:empty {
@@ -250,7 +249,8 @@ for (const h of toc) {
   .toc-desktop .lv-0 a:not(.is-current),
   .toc-desktop .lv-1 a:not(.is-current),
   .toc-desktop .lv-2 a:not(.is-current) {
-    color: var(--color-accent);
+    /* accent 直接上字对比度不足(4.16),用文字级 accent-text */
+    color: var(--color-accent-text);
   }
 
   .toc-desktop .lv-1 a {
@@ -261,7 +261,7 @@ for (const h of toc) {
     font-size: var(--text-xs);
   }
 
-  /* lv-3~5 字号触底 12px 下限,层级只靠色与透明度递进 */
+  /* lv-3~5 字号触底 12px 下限,层级只靠色递进(opacity 会击穿对比度) */
   .toc-desktop .lv-3 a:not(.is-current) {
     font-size: var(--text-xs);
     color: var(--color-contrast);
@@ -269,14 +269,12 @@ for (const h of toc) {
 
   .toc-desktop .lv-4 a:not(.is-current) {
     font-size: var(--text-xs);
-    color: var(--color-contrast);
-    opacity: 0.8;
+    color: color-mix(in oklab, var(--color-contrast) 80%, var(--color-muted));
   }
 
   .toc-desktop .lv-5 a:not(.is-current) {
     font-size: var(--text-xs);
-    color: var(--color-contrast);
-    opacity: 0.6;
+    color: color-mix(in oklab, var(--color-contrast) 65%, var(--color-muted));
   }
 
   .toc-mobile {
@@ -341,7 +339,7 @@ for (const h of toc) {
   .toc-panel .lv-0 a,
   .toc-panel .lv-1 a,
   .toc-panel .lv-2 a {
-    color: var(--color-accent);
+    color: var(--color-accent-text);
   }
 
   .toc-panel .lv-1 a {
@@ -359,14 +357,12 @@ for (const h of toc) {
 
   .toc-panel .lv-4 a {
     font-size: var(--text-xs);
-    color: var(--color-contrast);
-    opacity: 0.8;
+    color: color-mix(in oklab, var(--color-contrast) 80%, var(--color-muted));
   }
 
   .toc-panel .lv-5 a {
     font-size: var(--text-xs);
-    color: var(--color-contrast);
-    opacity: 0.6;
+    color: color-mix(in oklab, var(--color-contrast) 65%, var(--color-muted));
   }
 </style>
 

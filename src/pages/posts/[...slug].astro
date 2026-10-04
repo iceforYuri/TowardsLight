@@ -11,6 +11,7 @@ import Icon from '../../components/Icon.astro';
 import { getAllPosts, formatDate, readingTime } from '../../utils/posts';
 import { site } from '../../data/site';
 import { u, stageMediaName } from '../../utils/url';
+import { optImage } from '../../utils/opt-image';
 import { imageTreatment, sampleImageLuminance } from '../../utils/image-luminance';
 import '../../styles/prose.css';
 
@@ -44,7 +45,7 @@ const postAssets = import.meta.glob<string>(
 let coverSrc: string | undefined;
 if (cover) {
   if (cover.startsWith('/')) {
-    coverSrc = u(cover);
+    coverSrc = u(optImage(cover));
   } else if (/^https?:/.test(cover)) {
     coverSrc = cover;
   } else {

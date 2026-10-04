@@ -5,6 +5,7 @@
  */
 import Icon from './Icon.astro';
 import { u, stageMediaName } from '../utils/url';
+import { optImage } from '../utils/opt-image';
 import { imageTreatment, sampleImageLuminance } from '../utils/image-luminance';
 
 interface Props {
@@ -36,7 +37,7 @@ const metaSegments = meta
       <div class="stage-backdrop img-reveal" aria-hidden="true" transition:name={stageMediaName(image)}>
         <style is:global set:html={`::view-transition-group(${stageMediaName(image)}) { z-index: 1; }`} />
         <img
-          src={u(image)}
+          src={u(optImage(image))}
           alt=""
           class="stage-img"
           loading="eager"

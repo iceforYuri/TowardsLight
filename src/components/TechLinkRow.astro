@@ -84,9 +84,10 @@ const { link } = Astro.props;
 
   .link-status {
     font-size: var(--text-sm);
-    font-weight: 400;
+    font-weight: var(--weight-label);
     letter-spacing: 0.04em;
-    color: var(--color-contrast);
+    /* 浸染底上对比度兜底,与 TechLinkCard 同规则 */
+    color: color-mix(in oklab, var(--color-contrast) 75%, var(--color-text));
     background: var(--color-contrast-soft);
     padding: 1px 7px;
     border-radius: 999px;
@@ -95,7 +96,7 @@ const { link } = Astro.props;
   .link-desc {
     font-size: var(--text-sm);
     font-weight: var(--weight-label);
-    color: var(--color-muted);
+    color: color-mix(in oklab, var(--color-muted) 85%, var(--color-text));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

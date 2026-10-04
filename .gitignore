@@ -36,3 +36,6 @@ editor/
 docs/specs/
 # 临时验证脚本与截图(本地)
 .tmp-*
+
+# 图片优化清单(scripts/optimize-images.mjs 每次构建前重新生成)
+src/generated/

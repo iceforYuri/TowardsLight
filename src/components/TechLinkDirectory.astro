@@ -78,10 +78,9 @@ const groups = linksByGroup();
 
   .group-count {
     font-size: var(--text-xs);
-    font-weight: 400;
+    font-weight: var(--weight-label);
     letter-spacing: 0;
     color: var(--color-muted);
-    opacity: 0.7;
   }
 
   .featured-grid {
@@ -118,14 +117,14 @@ const groups = linksByGroup();
   }
 
   .link-group[data-tone] .group-title {
-    color: var(--gt);
+    /* 组色直接上字对比度不足(accent 4.16),混入正文色兜底 */
+    color: color-mix(in oklab, var(--gt) 82%, var(--color-text));
   }
   .link-group[data-tone] .group-marker {
     background: var(--gt);
   }
   .link-group[data-tone] .group-count {
-    color: var(--gt);
-    opacity: 0.75;
+    color: color-mix(in oklab, var(--gt) 82%, var(--color-text));
   }
 
   /* 行:图标徽章与 hover 归入组色 */
