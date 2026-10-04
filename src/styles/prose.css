@@ -337,6 +337,20 @@ html[data-theme='dark'] .prose img:hover {
   }
 }
 
+/* 图片说明:浅灰斜体、接近正文大小,与正文拉开气质但不抢戏 */
+.prose figure {
+  margin: 2em 0;
+}
+
+.prose figcaption {
+  margin-top: 10px;
+  text-align: center;
+  font-size: var(--text-lg);
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
 /* 公式(KaTeX 构建期渲染,见 astro.config) */
 .prose .katex {
   font-size: 1.05em;
