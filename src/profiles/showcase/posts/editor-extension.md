@@ -8,7 +8,7 @@ draft: false
 ---
 博客搭好之后，日常操作其实就剩三类：写文章、改配置、看效果。这三件事本来都要离开编辑器——开终端起 dev server、找到 site.ts 翻字段、去浏览器刷新。为了把这条链路收回编辑器，我写了一个本地 VS Code 扩展（不发布，vsix 直装），这篇文章是它的使用说明。
 
-![1790776907274](image/editor-extension/1790776907274.png)
+![扩展侧边栏总览:文章、站点配置、预览三个视图区](image/editor-extension/1790776907274.png)
 
 ## 安装
 
@@ -26,7 +26,7 @@ code --install-extension towards-light-editor-0.6.1.vsix
 
 模板和内容在这个博客里本来就是两回事——模板是 Astro 工程，档案是 site.ts + links.ts + posts/ 的内容包。两个位置都是**自动识别、可手动覆盖**：模板认 `package.json` + 档案切换钩子，档案认 `site.ts` + `links.ts` + `posts/` 三件套，工作区往下两层内自动扫描。
 
-![1790776950792](image/editor-extension/1790776950792.png)
+![预览区三行:模板目录、档案目录、启动预览](image/editor-extension/1790776950792.png)
 
 点「启动预览」，扩展在模板目录里起 `npm run dev`，把档案目录通过环境变量传进去。起好的 server 会列在预览区，带端口和档案名，点击在浏览器打开，行内按钮停止。几个值得知道的细节:
 
@@ -34,7 +34,7 @@ code --install-extension towards-light-editor-0.6.1.vsix
 - **Reload Window 不会攒僵尸进程**——扩展激活时按上次记下的 PID 把孤儿 server 收掉（这个之前引发过 EMFILE);
 - 你在自己终端里手动起的 dev server 它不动。
 
-![1790777170213](image/editor-extension/1790777170213.png)
+![预览 server 列表:端口、档案名与行内停止按钮](image/editor-extension/1790777170213.png)
 
 ## 文章区
 
@@ -50,7 +50,7 @@ code --install-extension towards-light-editor-0.6.1.vsix
 
 最常用的表单：站点名、作者、签名、头像、当前状态、Hero、默认主题、各页背景与文案。长表单带**左侧目录**,scrollspy 高亮当前分区。
 
-![1790776963067](image/editor-extension/1790776963067.png)
+![站点信息表单:左侧目录 + scrollspy 高亮当前分区](image/editor-extension/1790776963067.png)
 
 图片字段（头像、各页背景）输入框旁有**实时缩略图**，也能从电脑选图自动归档。两个不显眼的机制：
 
@@ -61,19 +61,19 @@ code --install-extension towards-light-editor-0.6.1.vsix
 
 新建和编辑合一：顶部下拉切换「新建 / 已有分类」。编辑模式回填图标、色调、描述，底部胶囊实时预览。**分类名是文章引用的 key**——有文章引用的分类不能改名也不能删除，下拉里直接标注引用篇数；无引用的分类才开放这两个操作。
 
-![1790777059443](image/editor-extension/1790777059443.png)
+![分类管理:新建/编辑下拉切换,底部胶囊实时预览](image/editor-extension/1790777059443.png)
 
 ### 管理链接
 
 链接不是表单，是一个**有序列表**：按分组分段，每行一个链接，还原了博客里链接行的样子（图标、名称、描述、域名、状态徽章）。
 
-![1790777065906](image/editor-extension/1790777065906.png)
+![链接管理:按分组分段的有序列表,行内还原链接样式](image/editor-extension/1790777065906.png)
 
 - 点 ✎ 行内展开编辑器，同一时刻只展开一个；URL 是 key，不可改，要换地址就删了重建；
 - 组内排序用行尾的 ↑↓；**分组排序直接拖分组头**，拖到目标分段上半/下半决定插前插后；
 - 删除是两段式（✕ → 确认删除），空分组才能删。
 
-![1790777127030](image/editor-extension/1790777127030.png)
+![链接编辑器:行内展开,组内 ↑↓ 排序,分组拖拽排序](image/editor-extension/1790777127030.png)
 
 ## 为什么值得做
 

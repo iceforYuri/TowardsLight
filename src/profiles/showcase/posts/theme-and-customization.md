@@ -41,7 +41,7 @@ draft: false
 ## 微调时该动哪里
 
 - **换强调色**:改两个主题块里的 `--color-accent` 系列,注意检查 accent-soft 的透明度在两种底色上都成立;
-- **换字体**:改 `--font-display / --font-body / --font-ui / --font-mono`,并在 `BaseLayout.astro` 里同步更新字体加载链接;
+- **换字体**:改 `--font-display / --font-body / --font-ui / --font-mono` 的栈,并同步 `scripts/fetch-fonts.mjs` 里的字体清单后跑 `npm run fonts`(自托管,TL 别名族名防止本地同名字体劫持,回退链刻意不含 Noto 原名);
 - **调字号**:小字一律引用字号阶梯 `--text-xs / --text-sm / --text-md / --text-lg`(12px 是中文小字下限,不要再写散值),辅助小字字重用 `--weight-label`;纯中文标签/分类/状态类小字从 `--text-sm` 起步,`--text-xs` 只留给拉丁/数字;
 - **调阴影**:导航和卡片用不同的阴影变量,深色主题下阴影更重,两套都要调;
 - **不要动**组件内部——组件里不应该出现任何颜色字面量,如果出现了,那是组件的 bug。

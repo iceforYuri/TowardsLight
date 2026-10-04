@@ -16,7 +16,8 @@
     "test": "node scripts/test-image-guard.mjs",
     "preview": "astro preview",
     "astro": "astro",
-    "frontmatter:check": "node scripts/check-frontmatter.mjs"
+    "frontmatter:check": "node scripts/check-frontmatter.mjs",
+    "fonts": "node scripts/fetch-fonts.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
