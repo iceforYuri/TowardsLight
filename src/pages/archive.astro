@@ -13,6 +13,7 @@ const byYear = [...groupPostsByYear(posts).entries()];
 <BaseLayout title="Archive" description={`${site.siteName} 的文章归档`}>
   <PageVisualStage
     title={site.pages.archive.title}
+    titleEn={site.pages.archive.titleEn}
     description={site.pages.archive.description}
     image={site.pageBackdrops.archive || undefined}
     meta={`共 ${posts.length} 篇 · ${byYear.length} 个年份`}

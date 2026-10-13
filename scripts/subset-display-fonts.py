@@ -28,6 +28,11 @@ FONTS = [
     ),
 ]
 
+# 标题中英翻滚的英文层(蔡云汉行书,只承载英文标题,纯拉丁子集即可)
+FONTS_LATIN = [
+    ("fonts-src/cyh-en/蔡云汉简体行书书法字体.ttf", "public/fonts/custom/cyh-en.woff2"),
+]
+
 ASCII = "".join(chr(c) for c in range(0x20, 0x7F))
 CJK_PUNCT = "。、，；：？！“”‘’（）《》〈〉【】—…·～「」『』％‰℃—―•◦→←↑↓±×÷≈≠≤≥①②③④⑤"
 
@@ -51,13 +56,13 @@ def collect_chars() -> str:
 def main() -> None:
     chars = collect_chars()
     print(f"字符集 {len(chars)} 字")
-    for src, dst in FONTS:
+    for src, dst, *latin in [*FONTS, *[(*t, True) for t in FONTS_LATIN]]:
         out = ROOT / dst
         out.parent.mkdir(parents=True, exist_ok=True)
         subset.main(
             [
                 str(ROOT / src),
-                f"--text={chars}",
+                f"--text={ASCII if latin else chars}",
                 "--flavor=woff2",
                 f"--output-file={out}",
                 "--layout-features=*",

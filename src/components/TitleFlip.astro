@@ -1,0 +1,73 @@
+---
+/**
+ * 标题中英翻滚:中文层与英文层(蔡云汉行书)在同一格内每 5s 上下滚换,
+ * 节奏比简介翻牌(FlipRow)慢。英文层字号按"油墨高度"运行时实测校准,
+ * 与中文层视觉等高(两款艺术体字身比例不同,固定比例不可靠)。
+ * 减少动态偏好 / 无 en:静态中文,不翻。
+ */
+interface Props {
+  zh: string;
+  en?: string;
+}
+
+const { zh, en } = Astro.props;
+---
+
+{
+  en ? (
+    <span class="title-flip" data-title-flip aria-label={`${zh} / ${en}`}>
+      <span class="tf-layer tf-zh" aria-hidden="true">
+        {zh}
+      </span>
+      <span class="tf-layer tf-en" aria-hidden="true" data-tf-en>
+        {en}
+      </span>
+    </span>
+  ) : (
+    zh
+  )
+}
+
+<style>
+  .title-flip {
+    display: inline-grid;
+    overflow: hidden;
+    vertical-align: bottom;
+  }
+
+  /* 两层同格叠放,容器恒取较大者——滚换时宽度/高度不跳 */
+  .tf-layer {
+    grid-area: 1 / 1;
+    transition:
+      transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
+      opacity 0.5s ease;
+  }
+
+  .tf-en {
+    font-family: var(--font-flip-en);
+    /* 英文层字距:行书拉丁连笔,不加宽 */
+    letter-spacing: 0;
+    transform: translateY(105%);
+    opacity: 0;
+  }
+
+  .title-flip.show-en .tf-zh {
+    transform: translateY(-105%);
+    opacity: 0;
+  }
+
+  .title-flip.show-en .tf-en {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tf-en {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import '../scripts/title-flip';
+</script>

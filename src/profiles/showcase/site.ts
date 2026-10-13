@@ -37,6 +37,7 @@ export const site = {
   ],
   homeHero: {
     greeting: '拾光集',
+    titleEn: 'TowardsLight',
     tagline: '一名数字守望者的赛博自留地',
     intro:
       '于拾光中窥见昨日的恍惚，那犹豫与今日一致',
@@ -53,10 +54,10 @@ export const site = {
 
   /** 各内容页文案:标题 + 描述;详情页标题为插值模板,留在代码里 */
   pages: {
-    archive: { title: '归档', description: '写过的所有文章，按年份排列。' },
-    tags: { title: '标签', description: '文章按主题打的标签，比分类更细一些。' },
-    categories: { title: '分类', description: '文章的大致归属，每个分类是一种长期关心的事。' },
-    links: { title: '链接', description: '我常用的工具、常去的社区、认可的平台。不是导航站，是个人选择。' },
+    archive: { title: '归档', titleEn: 'Archive', description: '写过的所有文章，按年份排列。' },
+    tags: { title: '标签', titleEn: 'Tags', description: '文章按主题打的标签，比分类更细一些。' },
+    categories: { title: '分类', titleEn: 'Categories', description: '文章的大致归属，每个分类是一种长期关心的事。' },
+    links: { title: '链接', titleEn: 'Links', description: '我常用的工具、常去的社区、认可的平台。不是导航站，是个人选择。' },
     notFound: {
       title: '这一页不存在',
       description: '链接可能已经过期，或者地址打错了。文章都还在，从下面回去就能找到。',

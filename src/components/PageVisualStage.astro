@@ -4,18 +4,20 @@
  * 无图片时退化为纯色主题背景
  */
 import Icon from './Icon.astro';
+import TitleFlip from './TitleFlip.astro';
 import { u, stageMediaName } from '../utils/url';
 import { optImage } from '../utils/opt-image';
 import { imageTreatment, sampleImageLuminance } from '../utils/image-luminance';
 
 interface Props {
   title: string;
+  titleEn?: string;
   description?: string;
   image?: string;
   meta?: string;
 }
 
-const { title, description, image, meta } = Astro.props;
+const { title, titleEn, description, image, meta } = Astro.props;
 // 构建期采样背景图底部(文字所在区)亮度:决定图上文字模式与遮罩强度
 const imgLum = await sampleImageLuminance(image, 'stage');
 const treatment = imageTreatment(imgLum);
@@ -50,7 +52,9 @@ const metaSegments = meta
   }
   <div class="stage-content shell-container">
     <div class="stage-intro" data-stage-intro>
-      <h1 class="stage-title font-display" transition:name="page-title">{title}</h1>
+      <h1 class="stage-title" transition:name="page-title">
+        <TitleFlip zh={title} en={titleEn} />
+      </h1>
       <div class="stage-extra">
         <div class="stage-extra-inner">
           {typedDesc && (

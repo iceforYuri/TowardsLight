@@ -1,6 +1,7 @@
 ---
 import { site } from '../data/site';
 import CurrentStatus from './CurrentStatus.astro';
+import TitleFlip from './TitleFlip.astro';
 
 const hero = site.homeHero;
 // 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
@@ -22,7 +23,9 @@ const intro = stripEnd(hero.intro);
       <div class="hero-status">
         <CurrentStatus />
       </div>
-      <h1 class="hero-title font-display" transition:name="page-title">{hero.greeting}</h1>
+      <h1 class="hero-title" transition:name="page-title">
+        <TitleFlip zh={hero.greeting} en={hero.titleEn} />
+      </h1>
       <div class="hero-body" transition:name="hero-body">
         <p class="hero-tagline" data-typewriter data-caret="fade">
           <span data-typewriter-text>{tagline}</span><span

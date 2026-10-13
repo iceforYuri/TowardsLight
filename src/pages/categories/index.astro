@@ -13,6 +13,7 @@ const categories = [...collectCategories(posts).entries()];
 <BaseLayout title="Categories" description={`${site.siteName} 的文章分类`}>
   <PageVisualStage
     title={site.pages.categories.title}
+    titleEn={site.pages.categories.titleEn}
     description={site.pages.categories.description}
     image={site.pageBackdrops.categories || undefined}
     meta={`共 ${categories.length} 个分类`}

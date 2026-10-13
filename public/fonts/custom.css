@@ -19,3 +19,12 @@
   font-display: swap;
   src: url(./custom/wo-yu-jian-ni.woff2) format('woff2');
 }
+
+/* 蔡云汉行书(纯拉丁子集):标题中英翻滚的英文层 */
+@font-face {
+  font-family: 'TL CYH';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./custom/cyh-en.woff2) format('woff2');
+}

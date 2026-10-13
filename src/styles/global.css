@@ -16,6 +16,8 @@
   /* 展示艺术体(public/fonts/custom.css,子集化生成):品牌=首页 hero,stage=章节页大字 */
   --font-brand: 'TL Baige', 'TL Serif', 'Songti SC', serif;
   --font-stage: 'TL WYJ', 'TL Serif', 'Songti SC', serif;
+  /* 标题中英翻滚的英文层(蔡云汉行书拉丁子集) */
+  --font-flip-en: 'TL CYH', 'TL Display', serif;
 
   /* 字号阶梯:中文小字下限 12px(11px 笔画无法完整排布,全站禁用) */
   --text-xs: 12px;
