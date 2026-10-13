@@ -29,35 +29,41 @@ const { zh, en } = Astro.props;
 }
 
 <style>
+  /* 滚筒式翻滚:层绕水平轴原地滚入滚出(rotateX + 透视),
+     不做整行位移——占用空间就是标题自身一格 */
   .title-flip {
     display: inline-grid;
-    overflow: hidden;
     vertical-align: bottom;
+    perspective: 480px;
   }
 
   /* 两层同格叠放,容器恒取较大者——滚换时宽度/高度不跳 */
   .tf-layer {
     grid-area: 1 / 1;
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
     transition:
       transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
-      opacity 0.5s ease;
+      opacity 0.45s ease;
   }
 
   .tf-en {
     font-family: var(--font-flip-en);
     /* 英文层字距:行书拉丁连笔,不加宽 */
     letter-spacing: 0;
-    transform: translateY(105%);
+    /* 候场:贴在滚筒下缘背后 */
+    transform: rotateX(-88deg);
     opacity: 0;
   }
 
+  /* 向上滚:中文层向上缘滚出视野,英文层自下缘滚入 */
   .title-flip.show-en .tf-zh {
-    transform: translateY(-105%);
+    transform: rotateX(88deg);
     opacity: 0;
   }
 
   .title-flip.show-en .tf-en {
-    transform: translateY(0);
+    transform: rotateX(0);
     opacity: 1;
   }
 
