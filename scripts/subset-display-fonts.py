@@ -21,16 +21,16 @@ from fontTools import subset
 ROOT = Path(__file__).resolve().parent.parent
 
 FONTS = [
-    ("fonts-src/baige/字魂白鸽天行体(商用需授权).ttf", "public/fonts/custom/baige-tianxing.woff2"),
+    ("fonts-src/baige-tianxing.ttf", "public/fonts/custom/baige-tianxing.woff2"),
     (
-        "fonts-src/wyjnhjcq/WoYuJianNiHeJuChunQiu/WoYuJianNiHeJuChunQiu/WoYuJianNiHeJuChunQiu-2.ttf",
+        "fonts-src/wo-yu-jian-ni.ttf",
         "public/fonts/custom/wo-yu-jian-ni.woff2",
     ),
 ]
 
 # 标题中英翻滚的英文层(蔡云汉行书,只承载英文标题,纯拉丁子集即可)
 FONTS_LATIN = [
-    ("fonts-src/cyh-en/蔡云汉简体行书书法字体.ttf", "public/fonts/custom/cyh-en.woff2"),
+    ("fonts-src/caiyunhan-xingshu.ttf", "public/fonts/custom/cyh-en.woff2"),
 ]
 
 ASCII = "".join(chr(c) for c in range(0x20, 0x7F))
