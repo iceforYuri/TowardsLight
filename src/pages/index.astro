@@ -28,7 +28,9 @@ const recentPosts = posts.slice(0, 5);
 // 首页「常用去处」:读独立的 home 字段(featured 只管 Links 页卡片形态),最多 3 个
 const homeLinks = techLinks.filter((l) => l.home).slice(0, 3);
 // 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
-const groupTone = new Map(linkGroups.map((g) => [g.id, 'tone' in g ? g.tone : undefined]));
+const groupTone = new Map<string, string | undefined>(
+  linkGroups.map((g) => [g.id, (g as { tone?: string }).tone]),
+);
 // 统计行与身份组共用同一图上文字模式;壁纸层也挂在 .home-flow(采样有缓存,重复调用廉价)
 const hero = site.homeHero;
 const { imgMode, imgScrim, imgScrimDark } = await resolveImgMode(hero.background, hero.textMode, 'hero');
