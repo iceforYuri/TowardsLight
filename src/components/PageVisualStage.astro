@@ -24,6 +24,8 @@ const treatment = imageTreatment(imgLum);
 const imgMode = treatment?.mode ?? null;
 // 打字机文本:去掉行尾句号，由闪烁的下划线光标接替终止符
 const typedDesc = description?.replace(/。\s*$/, '');
+// 纯英文副标题走蔡云汉行书(见 .desc-latin)
+const descLatin = !!typedDesc && !/[^\x00-\x7F]/.test(typedDesc);
 /** meta 行拆段:数字包成计数段,打字光标经过时翻滚 */
 const metaSegments = meta
   ? meta
@@ -58,7 +60,7 @@ const metaSegments = meta
       <div class="stage-extra">
         <div class="stage-extra-inner">
           {typedDesc && (
-            <p class="stage-desc" data-typewriter>
+            <p class:list={['stage-desc', { 'desc-latin': descLatin }]} data-typewriter>
               <span data-typewriter-text>{typedDesc}</span><span
                 class="type-caret"
                 data-typewriter-caret
@@ -249,8 +251,16 @@ const metaSegments = meta
   .stage-desc {
     margin: 12px auto 0;
     max-width: 560px;
-    font-size: 15.5px;
+    /* 副标题用我欲见你何惧春秋;艺术体字身小,字号补偿到视觉同高 */
+    font-family: var(--font-stage);
+    font-size: 17px;
     color: var(--stage-fg-m);
+  }
+
+  /* 纯英文副标题:换蔡云汉行书(拉丁连笔) */
+  .stage-desc.desc-latin {
+    font-family: var(--font-flip-en);
+    letter-spacing: 0.02em;
   }
 
   /* 下划线光标:零宽度占位(不占布局，不顶动文字),打完代替句号常亮闪烁 */

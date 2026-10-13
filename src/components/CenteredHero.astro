@@ -8,6 +8,8 @@ const hero = site.homeHero;
 const stripEnd = (s: string) => s.replace(/。\s*$/, '');
 const tagline = stripEnd(hero.tagline);
 const intro = stripEnd(hero.intro);
+// 纯英文副标题走蔡云汉行书
+const introLatin = !/[^\x00-\x7F]/.test(intro);
 ---
 
 {/*
@@ -33,7 +35,7 @@ const intro = stripEnd(hero.intro);
             data-typewriter-caret
             aria-hidden="true">_</span>
         </p>
-        <p class="hero-intro" data-typewriter>
+        <p class:list={['hero-intro', { 'intro-latin': introLatin }]} data-typewriter>
           <span data-typewriter-text>{intro}</span><span
             class="type-caret"
             data-typewriter-caret
@@ -153,9 +155,17 @@ const intro = stripEnd(hero.intro);
   .hero-intro {
     margin-top: 22px;
     max-width: 520px;
-    font-size: 15.5px;
+    /* 副标题用我欲见你何惧春秋;艺术体字身小,字号补偿到视觉同高 */
+    font-family: var(--font-stage);
+    font-size: 17px;
     line-height: 1.9;
     color: var(--hero-fg-m);
+  }
+
+  /* 纯英文副标题:换蔡云汉行书(拉丁连笔) */
+  .hero-intro.intro-latin {
+    font-family: var(--font-flip-en);
+    letter-spacing: 0.02em;
   }
 
   /* 光标基础样式在 global.css(统计行在 hero 外也用);hero 内只定颜色 */
