@@ -39,3 +39,8 @@ docs/specs/
 
 # 图片优化清单(scripts/optimize-images.mjs 每次构建前重新生成)
 src/generated/
+
+# 字体源文件:安装器与压缩包不进库(TTF 保留,供 fonts:display 重新子集化)
+fonts-src/**/*.exe
+fonts-src/**/*.zip
+fonts-src/**/*.rar

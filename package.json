@@ -17,7 +17,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "frontmatter:check": "node scripts/check-frontmatter.mjs",
-    "fonts": "node scripts/fetch-fonts.mjs"
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "fonts:display": "python scripts/subset-display-fonts.py"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",

@@ -111,8 +111,10 @@ const intro = stripEnd(hero.intro);
   /* 发光:钉住段内 --glow 0→1(全局注册的可过渡属性,见 global.css);
      标题提亮并向主题色靠拢,泛起主题色微光晕;tagline/intro 半量 */
   .hero-title {
+    font-family: var(--font-brand);
     font-size: clamp(48px, 9vw, 92px);
-    font-weight: 700;
+    /* 艺术体单字重:写死 400,防浏览器合成加粗毁字形 */
+    font-weight: 400;
     line-height: 1.15;
     letter-spacing: 0.04em;
     color: color-mix(in oklab, var(--hero-fg), var(--hero-fg-2) calc(var(--glow, 0) * 28%));
@@ -138,9 +140,9 @@ const intro = stripEnd(hero.intro);
 
   .hero-tagline {
     margin-top: 18px;
-    font-family: var(--font-display);
+    font-family: var(--font-brand);
     font-size: clamp(17px, 2.4vw, 21px);
-    font-weight: 600;
+    font-weight: 400;
     color: var(--hero-fg-2);
     letter-spacing: 0.06em;
   }

@@ -13,6 +13,10 @@
      generic monospace 会被 Windows 映射成 NSimSun(点阵细体) */
   --font-mono: 'TL Mono', 'SF Mono', ui-monospace, 'Cascadia Code', Consolas, 'TL Sans', 'Microsoft YaHei', monospace;
 
+  /* 展示艺术体(public/fonts/custom.css,子集化生成):品牌=首页 hero,stage=章节页大字 */
+  --font-brand: 'TL Baige', 'TL Serif', 'Songti SC', serif;
+  --font-stage: 'TL WYJ', 'TL Serif', 'Songti SC', serif;
+
   /* 字号阶梯:中文小字下限 12px(11px 笔画无法完整排布,全站禁用) */
   --text-xs: 12px;
   --text-sm: 13px;

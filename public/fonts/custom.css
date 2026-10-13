@@ -1,0 +1,21 @@
+/* 展示艺术体(scripts/subset-display-fonts.py 按站点用馆子集化生成,勿手改):
+   文案变更后重跑 npm run fonts:display 重新子集化。
+   单字重艺术体,声明 400——用 700 会被浏览器合成加粗毁掉字形 */
+
+/* 白鸽天行体:首页 hero(站名 + tagline) */
+@font-face {
+  font-family: 'TL Baige';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./custom/baige-tianxing.woff2) format('woff2');
+}
+
+/* 我欲见你何惧春秋:章节页大字(归档/标签/分类/链接等 stage 标题) */
+@font-face {
+  font-family: 'TL WYJ';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(./custom/wo-yu-jian-ni.woff2) format('woff2');
+}

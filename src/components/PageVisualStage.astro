@@ -216,8 +216,10 @@ const metaSegments = meta
   }
 
   .stage-title {
+    font-family: var(--font-stage);
     font-size: clamp(38px, 5.6vw, 56px);
-    font-weight: 700;
+    /* 艺术体单字重:写死 400,防浏览器合成加粗毁字形 */
+    font-weight: 400;
     color: var(--stage-fg);
     overflow-wrap: anywhere;
     transition:
