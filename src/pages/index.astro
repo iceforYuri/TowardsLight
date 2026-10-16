@@ -25,9 +25,11 @@ const jsonLd = {
   description: site.bio,
   inLanguage: 'zh-CN',
 };
-// 精选文章:首页独立策展区块,最多 3 篇(按日期倒序);精选不再重复出现在近期列表
+// 精选文章:首页独立策展区块,最多 3 篇(按日期倒序);
+// 近期列表只排除"实际展出"的精选——超出上限的精选按日期自然回落,不会在首页消失
 const featuredPosts = posts.filter((p) => p.data.featured).slice(0, 3);
-const recentPosts = posts.filter((p) => !p.data.featured).slice(0, 5);
+const featuredIds = new Set(featuredPosts.map((p) => p.id));
+const recentPosts = posts.filter((p) => !featuredIds.has(p.id)).slice(0, 5);
 // 首页「常用去处」:读独立的 home 字段(featured 只管 Links 页卡片形态),最多 3 个
 const homeLinks = techLinks.filter((l) => l.home).slice(0, 3);
 // 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
