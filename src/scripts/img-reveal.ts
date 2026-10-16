@@ -1,8 +1,11 @@
 /**
  * 图片揭示调度:
- * - 已就绪(缓存)的图:decode 后立即亮,赶上转场快照,无缝
- * - 未加载完的图:load + decode + 转场播完(vt.finished)后才淡入——
- *   位图 ready 淡入才是真的,且不会在快照覆盖下空播
+ * - 转场中(软导航):无过渡直奔最终态(见 revealInstant)——0.6s 淡入会被
+ *   定格在 opacity≈0 拍进新页快照,图像比同帧元素(如羽化幕布)晚一整拍;
+ *   缓存图首帧即有像素,在途图字节到达后直接呈现(快照撤下时已在场),
+ *   平滑统一交给转场自身的交叉淡化
+ * - 硬加载:decode 后 0.6s 淡入,避免生硬的瞬间弹出;图未就绪则等
+ *   load + decode + 转场播完(vt.finished),位图 ready 淡入才是真的
  */
 
 type VT = { finished: Promise<unknown> };
@@ -25,7 +28,17 @@ if (typeof document !== 'undefined' && document.startViewTransition) {
 }
 
 /**
- * 揭示 = 位图可绘制(decode)+ 转场播完。两者都满足才开始淡入:
+ * 转场中的同步揭示:直奔最终态。强制重排提交样式,供新页快照捕获。
+ */
+function revealInstant(el: HTMLElement) {
+  el.style.transition = 'none';
+  el.classList.add('is-loaded');
+  void el.offsetWidth;
+  el.style.transition = '';
+}
+
+/**
+ * 硬加载路径的揭示 = 位图可绘制(decode)+ 转场播完:
  * - decode:等位图解码/光栅化完成,淡入开始时图层 ready,避免"透明度在走、画面还没图"的空淡入
  * - vt.finished:避免淡入在转场快照覆盖下空播(闪入)
  * 小图 decode 几乎瞬时,等效于"快图立即淡入";大图自动变成"好了再淡"。
@@ -52,6 +65,12 @@ export function initImgReveal() {
     .querySelectorAll<HTMLElement>('.img-reveal:not([data-reveal-bound])')
     .forEach((el) => {
       el.dataset.revealBound = '1';
+      // 转场中:直奔最终态进快照(不依赖新建 img 的 complete——内存缓存图
+      // 的首帧渲染本就带像素,而 complete/load 事件时机赶不上快照捕获)
+      if (activeTransition) {
+        revealInstant(el);
+        return;
+      }
       // 容器级:揭示对象是整个背景容器(图+遮罩一起淡入),触发源是其中的 img
       const img = el instanceof HTMLImageElement ? el : el.querySelector('img');
       if (!img) {
@@ -59,7 +78,7 @@ export function initImgReveal() {
         return;
       }
       if (img.complete && img.naturalWidth > 0) {
-        reveal(el, img, false); // 已就绪:立即亮(赶上转场快照)
+        reveal(el, img, false); // 已就绪:decode 后即淡入
       } else {
         img.addEventListener('load', () => reveal(el, img, true), { once: true });
       }

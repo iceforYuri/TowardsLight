@@ -274,6 +274,11 @@ html[data-search-open]::view-transition {
   z-index: 2;
 }
 
+/* 羽化幕布:压在壁纸(1)之上、主卡片(3)之下,与壁纸同走默认交叉淡化 */
+::view-transition-group(home-feather) {
+  z-index: 2;
+}
+
 ::view-transition-group(main-card) {
   z-index: 3;
 }
