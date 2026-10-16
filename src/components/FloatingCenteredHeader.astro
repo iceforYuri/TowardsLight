@@ -14,7 +14,7 @@ function isActive(href: string) {
 }
 ---
 
-<header class="site-header" transition:name="site-header" transition:animate="none">
+<header class="site-header" transition:persist="site-header">
   <nav class="nav-pill" aria-label="主导航" data-dock-zone>
     {/* 液体皮肤:整条下轮廓(含圆头)是一条以鼠标为中心的光滑包络，
         单路径单描边，鼓包自然流入圆头，无接缝无截断面 */}
@@ -40,6 +40,7 @@ function isActive(href: string) {
           >
             <span class="dock-bubble" aria-hidden="true" />
             <Icon name={item.icon} size={17} />
+            <span class="dock-tooltip" aria-hidden="true">{item.label}</span>
           </a>
         ))
       }
@@ -61,6 +62,7 @@ function isActive(href: string) {
       >
         <span class="dock-bubble" aria-hidden="true" />
         <Icon name="search" size={16} />
+        <span class="dock-tooltip" aria-hidden="true">搜索</span>
       </button>
       {
         site.socialLinks
@@ -78,6 +80,7 @@ function isActive(href: string) {
             >
               <span class="dock-bubble" aria-hidden="true" />
               <Icon name={link.icon} size={16} />
+              <span class="dock-tooltip" aria-hidden="true">{link.label}</span>
             </a>
           ))
       }
@@ -157,6 +160,7 @@ function isActive(href: string) {
     align-items: center;
     padding-top: 18px;
     pointer-events: none;
+    view-transition-name: none;
   }
 
   .nav-pill {
@@ -339,9 +343,9 @@ function isActive(href: string) {
     background: var(--color-accent);
   }
 
-  /* Dock tooltip:导航在顶部，提示向下弹出 */
-  .nav-pill :global([data-dock-item])::after {
-    content: attr(data-tip);
+  /* 真实节点让转场遮罩也能复用提示气泡的实时轮廓。 */
+  .nav-pill :global(.dock-tooltip) {
+    display: block;
     position: absolute;
     top: calc(100% + 12px);
     left: 50%;
@@ -364,16 +368,10 @@ function isActive(href: string) {
       transform 0.18s ease;
   }
 
-  .nav-pill :global([data-dock-item]):hover::after {
+  .nav-pill :global([data-dock-item]:hover) > :global(.dock-tooltip),
+  .nav-pill :global([data-dock-item]:focus-visible) > :global(.dock-tooltip) {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
-  }
-
-  /* 转场期间恢复悬停态时禁用过渡，让快照直接捕获最终状态 */
-  .nav-pill.no-anim .dock-item,
-  .nav-pill.no-anim :global(.theme-toggle),
-  .nav-pill.no-anim :global(.dock-bubble) {
-    transition: none !important;
   }
 
   .menu-button {
@@ -453,6 +451,10 @@ function isActive(href: string) {
       transition:
         opacity 0.22s ease,
         transform 0.22s ease;
+    }
+
+    .mobile-panel[hidden] {
+      display: none;
     }
 
     .mobile-panel.is-open {
@@ -539,6 +541,34 @@ function isActive(href: string) {
 </style>
 
 <script>
+  import { initNavTransition } from '../scripts/nav-transition';
+
+  let menuTimer: ReturnType<typeof setTimeout> | undefined;
+
+  function closeMenu(immediate = false) {
+    const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
+    const panel = document.querySelector<HTMLElement>('[data-mobile-panel]');
+    if (!button || !panel) return;
+    clearTimeout(menuTimer);
+    button.setAttribute('aria-expanded', 'false');
+    button.setAttribute('aria-label', '打开导航菜单');
+    panel.classList.remove('is-open');
+    if (immediate) panel.hidden = true;
+    else menuTimer = setTimeout(() => (panel.hidden = true), 220);
+  }
+
+  function syncNavState() {
+    const pathname = location.pathname.replace(/\/+$/, '') || '/';
+    const home = import.meta.env.BASE_URL.replace(/\/+$/, '') || '/';
+    document.querySelectorAll<HTMLAnchorElement>('.dock-nav-item, .mobile-link').forEach((link) => {
+      const href = new URL(link.href).pathname.replace(/\/+$/, '') || '/';
+      const active = href === home ? pathname === href : pathname.startsWith(href);
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
   function initHeader() {
     const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
     const panel = document.querySelector<HTMLElement>('[data-mobile-panel]');
@@ -547,14 +577,15 @@ function isActive(href: string) {
 
     button.addEventListener('click', () => {
       const open = button.getAttribute('aria-expanded') === 'true';
-      button.setAttribute('aria-expanded', String(!open));
-      button.setAttribute('aria-label', open ? '打开导航菜单' : '关闭导航菜单');
-      if (open) {
-        panel.classList.remove('is-open');
-        setTimeout(() => (panel.hidden = true), 220);
-      } else {
+      clearTimeout(menuTimer);
+      if (open) closeMenu();
+      else {
+        button.setAttribute('aria-expanded', 'true');
+        button.setAttribute('aria-label', '关闭导航菜单');
         panel.hidden = false;
-        requestAnimationFrame(() => panel.classList.add('is-open'));
+        requestAnimationFrame(() => {
+          if (!panel.hidden && button.getAttribute('aria-expanded') === 'true') panel.classList.add('is-open');
+        });
       }
     });
   }
@@ -564,6 +595,9 @@ function isActive(href: string) {
   function bindHeaderGlobal() {
     if (headerGlobalBound) return;
     headerGlobalBound = true;
+    document.addEventListener('astro:before-swap', () => closeMenu(true));
+    const header = document.querySelector<HTMLElement>('.site-header');
+    if (header) initNavTransition(header);
 
     document.addEventListener('keydown', (e) => {
       const button = document.querySelector<HTMLButtonElement>('[data-menu-button]');
@@ -592,23 +626,9 @@ function isActive(href: string) {
   // 胶囊皮肤是 SVG 路径，下边缘在鼠标位置局部下垂，把鼓出的按钮裹住。
   // --grow 同时驱动泡泡光影与投影，--mx/--my 让高光跟随鼠标。
 
-  // 常驻记录鼠标位置:换页后新导航初始化时，若鼠标仍悬停在胶囊上，
-  // 用最后已知位置合成一次激活，避免"闪现缩回"
-  let lastMouse: { x: number; y: number } | null = null;
-  document.addEventListener(
-    'mousemove',
-    (e) => {
-      lastMouse = { x: e.clientX, y: e.clientY };
-    },
-    { passive: true },
-  );
-
   function initDock() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    // 移动端无 Dock 动效:图标全部收进展开面板,胶囊保持朴素静态表面
-    if (window.matchMedia('(max-width: 768px)').matches) return;
     document.querySelectorAll<HTMLElement>('[data-dock-zone]').forEach((zone) => {
-      // 导航持久化后只初始化一次
+      // 真正保留同一个导航节点，动画和监听只初始化一次。
       if (zone.dataset.bound) return;
       zone.dataset.bound = '1';
       const items = [...zone.querySelectorAll<HTMLElement>('[data-dock-item]')];
@@ -616,7 +636,8 @@ function isActive(href: string) {
 
       const RADIUS = 100; // 影响半径:目标 + 两侧邻居，余弦钟形衰减
       const MAX_GROW = 19; // 最大增量 38→57(1.5x),鼓包恰好裹住珠子
-      const bases = new Map(items.map((el) => [el, el.offsetWidth]));
+      const bases = new Map(items.map((el) => [el, el.offsetWidth || 38]));
+      const motion = window.matchMedia('(min-width: 769px) and (prefers-reduced-motion: no-preference)');
 
       // ---- 液体皮肤:连续曲线 ----
       // 整条下轮廓(含两个圆头)由一条以鼠标为中心的光滑包络一次生成:
@@ -630,6 +651,7 @@ function isActive(href: string) {
       let curCx = 0;
       let curDepth = 0;
       let rafId = 0;
+      let pointerInDock = false;
 
       function buildSkin(W: number, cx: number, depth: number) {
         const w = 78 + depth * 1.4; // 波形半径:随深度略增，包住两侧邻居
@@ -678,31 +700,36 @@ function isActive(href: string) {
         if (!rafId) rafId = requestAnimationFrame(frame);
       }
 
-      if (path) {
-        // 初始画一次平面皮肤，再接管胶囊的表面
-        path.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
-        zone.classList.add('has-skin');
-        const onResize = () => {
-          if (targetDepth === 0) {
-            path.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
-          }
-        };
-        window.addEventListener('resize', onResize);
-        // 导航 DOM 每次换页都会重建，清理旧实例上的 window 监听
-        document.addEventListener(
-          'astro:before-swap',
-          () => window.removeEventListener('resize', onResize),
-          { once: true },
-        );
+      function resetDock() {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+        targetDepth = curDepth = 0;
+        pointerInDock = false;
+        for (const el of items) {
+          el.style.width = '';
+          el.style.height = '';
+          el.style.setProperty('--grow', '0');
+        }
+        zone.classList.toggle('has-skin', motion.matches);
+        path?.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
       }
+      resetDock();
+      motion.addEventListener('change', resetDock);
+      // 节点已持久化；尺寸监听也要跨导航保留。
+      window.addEventListener('resize', () => {
+        if (motion.matches && targetDepth === 0) {
+          path?.setAttribute('d', buildSkin(zone.offsetWidth, zone.offsetWidth / 2, 0));
+        }
+      });
 
       zone.addEventListener('mousemove', (e) => {
         // 搜索模态开着时 dock 停摆(模态已在 body 级,此为双保险)
-        if (document.documentElement.dataset.searchOpen) return;
+        if (!motion.matches || document.documentElement.dataset.searchOpen) return;
         updateAt(e.clientX, e.clientY);
       });
 
       function updateAt(clientX: number, clientY: number) {
+        pointerInDock = true;
         let maxGrow = 0;
         for (const el of items) {
           const rect = el.getBoundingClientRect();
@@ -725,44 +752,45 @@ function isActive(href: string) {
         kick();
       }
 
-      // 换页初始化时鼠标仍在胶囊上:无动画直接恢复到悬停状态。
-      // 在 astro:after-swap(新页快照捕获前)运行，新旧快照里的导航完全一致。
-      if (lastMouse) {
-        const zr = zone.getBoundingClientRect();
-        const inside =
-          lastMouse.x >= zr.left &&
-          lastMouse.x <= zr.right &&
-          lastMouse.y >= zr.top &&
-          lastMouse.y <= zr.bottom;
-        if (inside) {
-          zone.classList.add('no-anim');
-          updateAt(lastMouse.x, lastMouse.y);
-          curCx = targetCx;
-          curDepth = targetDepth;
-          path?.setAttribute('d', buildSkin(zone.offsetWidth, curCx, curDepth));
-          void zone.offsetWidth; // 强制同步布局，让快照捕获到最终状态
-          zone.classList.remove('no-anim');
-        }
+      function containsPointer(clientX: number, clientY: number) {
+        const contains = (el: HTMLElement) => {
+          const rect = el.getBoundingClientRect();
+          return clientX >= rect.left && clientX < rect.right && clientY >= rect.top && clientY < rect.bottom;
+        };
+        // 放大的按钮会伸出固定高度的胶囊，也属于真实可交互区域。
+        return contains(zone) || items.some(contains);
       }
 
-      zone.addEventListener('mouseleave', () => {
+      function releaseDock() {
+        pointerInDock = false;
         for (const el of items) {
           el.style.width = '';
           el.style.height = '';
           el.style.setProperty('--grow', '0');
         }
         targetDepth = 0;
-        kick();
+        if (motion.matches) kick();
+      }
+
+      zone.addEventListener('mouseleave', (e) => {
+        // 转场捕获/节点搬移可能把命中临时交给 HTML，即使鼠标根本没移动。
+        // 仅据真实位置收回动效；不重放放大动画，也不改变原生点击判定。
+        if (!containsPointer(e.clientX, e.clientY)) releaseDock();
+      });
+      document.addEventListener('mousemove', (e) => {
+        // 临时 mouseleave 被忽略后，鼠标若真的移出，仍要立即收回。
+        if (pointerInDock && !containsPointer(e.clientX, e.clientY)) releaseDock();
       });
     });
   }
-  // after-swap:换页时在新页快照捕获前完成初始化与悬停态恢复
-  // page-load:首次加载与兜底
+  // 保留导航节点后，换页只同步当前页语义，不重建或重放 Dock。
   document.addEventListener('astro:after-swap', () => {
+    syncNavState();
     initHeader();
     initDock();
   });
   document.addEventListener('astro:page-load', () => {
+    syncNavState();
     initHeader();
     initDock();
   });

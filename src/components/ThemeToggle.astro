@@ -14,9 +14,14 @@ import Icon from './Icon.astro';
   <span class="dock-bubble" aria-hidden="true" />
   <span class="icon-sun"><Icon name="sun" size={17} /></span>
   <span class="icon-moon"><Icon name="moon" size={17} /></span>
+  <span class="dock-tooltip" aria-hidden="true">切换主题</span>
 </button>
 
 <style>
+  .dock-tooltip {
+    display: none;
+  }
+
   .theme-toggle {
     position: relative;
     display: inline-flex;
