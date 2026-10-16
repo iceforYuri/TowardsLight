@@ -148,6 +148,100 @@
   text-align: left;
 }
 
+/* ---- 提示块(GitHub Alerts,rehype-alerts 输出) ----
+   五色语义:note=steel / tip=contrast / important=accent / warning=dedicated / caution=danger;
+   图标、左边框与小标题着色,底色用 color-mix 取 7% 淡染,正文保持默认文字色 */
+.prose .alert {
+  --alert-c: var(--color-steel);
+  margin-inline: 0;
+  padding: 0.85em 1.15em;
+  border: 1px solid color-mix(in srgb, var(--alert-c) 24%, transparent);
+  border-left: 3px solid var(--alert-c);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--alert-c) 7%, transparent);
+}
+
+.prose .alert-note {
+  --alert-c: var(--color-steel);
+}
+
+.prose .alert-tip {
+  --alert-c: var(--color-contrast);
+}
+
+.prose .alert-important {
+  --alert-c: var(--color-accent);
+}
+
+.prose .alert-warning {
+  --alert-c: var(--color-warning);
+}
+
+.prose .alert-caution {
+  --alert-c: var(--color-danger);
+}
+
+.prose .alert > * + * {
+  margin-top: 0.7em;
+}
+
+/* 标题行:类型图标 + 等宽英文小标(自定义标题也落在这行) */
+.prose .alert-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  color: var(--alert-c);
+}
+
+.prose .alert-title .alert-icon {
+  flex-shrink: 0;
+}
+
+/* 折叠形态:summary 整行可点,chevron 随开合转向 */
+.prose details.alert {
+  padding: 0;
+}
+
+.prose details.alert summary.alert-title {
+  padding: 0.85em 1.15em;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+
+.prose details.alert summary::-webkit-details-marker {
+  display: none;
+}
+
+.prose details.alert summary:focus-visible {
+  outline: 2px solid var(--alert-c);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.prose details.alert .alert-chevron {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.prose details.alert[open] .alert-chevron {
+  transform: rotate(-180deg);
+}
+
+.prose details.alert .alert-body {
+  padding: 0 1.15em 0.95em;
+}
+
+.prose details.alert .alert-body > * + * {
+  margin-top: 0.7em;
+}
+
 .prose hr {
   border: none;
   border-top: 1px solid var(--color-border);

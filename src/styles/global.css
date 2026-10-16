@@ -63,6 +63,8 @@ html[data-theme='light'] {
   --color-steel-soft: rgba(52, 114, 161, 0.12);
   /* 标签热度冷端:靛蓝。与褐红 accent 构成 OKLCH 色相路线的两端 */
   --color-cold: #5b62b0;
+  /* 提示块 warning 专用:暗金。note/tip/important/caution 分别复用 steel/contrast/accent/danger */
+  --color-warning: #94701c;
   --color-danger: #b44436;
   --color-overlay: rgba(244, 245, 241, 0.72);
 
@@ -87,6 +89,7 @@ html[data-theme='dark'] {
   --color-steel-soft: rgba(9, 86, 140, 0.32);
   /* 标签热度冷端:浅靛蓝(深色背景上提高明度) */
   --color-cold: #9aa6e3;
+  --color-warning: #d9b968;
   --color-danger: #e07a6a;
   --color-overlay: rgba(23, 25, 22, 0.68);
 
