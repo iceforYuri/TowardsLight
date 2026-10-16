@@ -55,33 +55,37 @@ for (const h of toc) {
 {
   toc.length > 0 && variant === 'desktop' && (
     <nav class="toc-desktop" aria-label="文章目录">
-      <p class="toc-heading font-mono">CONTENTS</p>
-      <ul>
-        {groups.map((g) => (
-          <>
-            <li class={`lv-${g.head.lv}`}>
-              <a href={`#${g.head.h.slug}`} data-toc-link={g.head.h.slug} title={g.head.h.text}>
-                {g.head.h.text}
-              </a>
-            </li>
-            {g.subs.length > 0 && (
-              <li class="toc-subs" data-family={g.head.h.slug} inert aria-hidden="true">
-                <div class="toc-subs-inner">
-                  <ul>
-                    {g.subs.map((s) => (
-                      <li class={`lv-${s.lv}`}>
-                        <a href={`#${s.h.slug}`} data-toc-link={s.h.slug} title={s.h.text}>
-                          {s.h.text}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+      {/* 只有「CONTENTS 标题 + 目录列表」是滚动区;
+          百分比钉在底部、进度轨道锚定可视高度,都不随列表滚动 */}
+      <div class="toc-scroll">
+        <p class="toc-heading font-mono">CONTENTS</p>
+        <ul>
+          {groups.map((g) => (
+            <>
+              <li class={`lv-${g.head.lv}`}>
+                <a href={`#${g.head.h.slug}`} data-toc-link={g.head.h.slug} title={g.head.h.text}>
+                  {g.head.h.text}
+                </a>
               </li>
-            )}
-          </>
-        ))}
-      </ul>
+              {g.subs.length > 0 && (
+                <li class="toc-subs" data-family={g.head.h.slug} inert aria-hidden="true">
+                  <div class="toc-subs-inner">
+                    <ul>
+                      {g.subs.map((s) => (
+                        <li class={`lv-${s.lv}`}>
+                          <a href={`#${s.h.slug}`} data-toc-link={s.h.slug} title={s.h.text}>
+                            {s.h.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+              )}
+            </>
+          ))}
+        </ul>
+      </div>
       <p class="toc-percent font-mono" data-toc-percent aria-hidden="true" />
       <span class="toc-rail" aria-hidden="true">
         <span class="toc-rail-fill" data-toc-rail />
@@ -95,9 +99,28 @@ for (const h of toc) {
     position: sticky;
     top: 96px;
     max-height: calc(100svh - 140px);
-    overflow-y: auto;
-    padding-left: 18px;
+    display: flex;
+    flex-direction: column;
+    /* 整个「脊柱+文字」单元按内容取宽,在 aside 栏内左右居中 */
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
     border-left: 1px solid var(--color-border);
+  }
+
+  /* 滚动区:只有它在超长时滚动;滚动条隐藏——目录滚动是兜底行为,
+     不该成为视觉元素(当前位置由 is-current 与进度轨道表达) */
+  .toc-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    /* 19px = 18px 原缩进 + 1px,给 is-current 指示条(left:-19px)留出不裁切的余量 */
+    padding-left: 19px;
+    scrollbar-width: none;
+  }
+
+  .toc-scroll::-webkit-scrollbar {
+    display: none;
   }
 
   .toc-heading {
@@ -200,7 +223,8 @@ for (const h of toc) {
     }
   }
 
-  /* 阅读进度轨道:沿目录左缘生长 */
+  /* 阅读进度轨道:沿目录左缘生长。宿主 .toc-desktop 自身不滚动,
+     top:0/bottom:0 锚定的就是可视高度——列表再长轨道也不跟着延长 */
   .toc-rail {
     position: absolute;
     left: -1px;
@@ -221,6 +245,8 @@ for (const h of toc) {
   }
 
   .toc-percent {
+    flex-shrink: 0; /* 钉在目录底部,不随滚动区滚动 */
+    padding-left: 19px;
     margin-top: 14px;
     font-size: var(--text-xs);
     font-weight: var(--weight-label);
