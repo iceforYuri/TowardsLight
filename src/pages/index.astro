@@ -4,6 +4,7 @@ import CenteredHero from '../components/CenteredHero.astro';
 import FloatingMainCard from '../components/FloatingMainCard.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import PostList from '../components/PostList.astro';
+import FeaturedPostCard from '../components/FeaturedPostCard.astro';
 import FlipRow from '../components/FlipRow.astro';
 import TechLinkCard from '../components/TechLinkCard.astro';
 import Icon from '../components/Icon.astro';
@@ -24,7 +25,9 @@ const jsonLd = {
   description: site.bio,
   inLanguage: 'zh-CN',
 };
-const recentPosts = posts.slice(0, 5);
+// 精选文章:首页独立策展区块,最多 3 篇(按日期倒序);精选不再重复出现在近期列表
+const featuredPosts = posts.filter((p) => p.data.featured).slice(0, 3);
+const recentPosts = posts.filter((p) => !p.data.featured).slice(0, 5);
 // 首页「常用去处」:读独立的 home 字段(featured 只管 Links 页卡片形态),最多 3 个
 const homeLinks = techLinks.filter((l) => l.home).slice(0, 3);
 // 精选卡跟随所在分组的整组色调(分组没配 tone 则保持默认珊瑚)
@@ -146,11 +149,30 @@ const statsSegments: StatSegment[] = firstPost
 
         <hr class="home-divider" />
 
-        {/* 近期文章 */}
-        <section>
-          <SectionHeader title="近期文章" count={posts.length} href={u('/archive')} linkText="归档" />
-          <PostList posts={recentPosts} />
-        </section>
+        {/* 精选文章:策展区块,仅在有精选时出现 */}
+        {
+          featuredPosts.length > 0 && (
+            <>
+              <section>
+                <SectionHeader title="精选文章" />
+                <div class="featured-posts">
+                  {featuredPosts.map((post) => <FeaturedPostCard post={post} />)}
+                </div>
+              </section>
+              <hr class="home-divider" />
+            </>
+          )
+        }
+
+        {/* 近期文章:仅当存在非精选文章时出现(全部精选的极端期不留空列表) */}
+        {
+          recentPosts.length > 0 && (
+            <section>
+              <SectionHeader title="近期文章" count={posts.length} href={u('/archive')} linkText="归档" />
+              <PostList posts={recentPosts} />
+            </section>
+          )
+        }
 
         <hr class="home-divider" />
 
@@ -365,6 +387,19 @@ const statsSegments: StatSegment[] = firstPost
     border: none;
     border-top: 1px solid var(--color-border);
     margin-block: clamp(28px, 4vw, 40px);
+  }
+
+  .featured-posts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-top: 16px;
+  }
+
+  /* 只有 1~2 张卡时限制最大宽度,避免单卡拉伸整行 */
+  .featured-posts:has(> :first-child:last-child),
+  .featured-posts:has(> :nth-child(2):last-child) {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 360px));
   }
 
   .featured-links {

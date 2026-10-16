@@ -1,0 +1,119 @@
+---
+/**
+ * 精选文章卡:首页「精选文章」区块的卡片形态。
+ * 与 TechLinkCard 同一卡片语言(中性面、悬停抬升),身份标记为珊瑚星标;
+ * 整张卡是链接,元信息(日期/分类)只做展示,不嵌套链接。
+ */
+import Icon from './Icon.astro';
+import { formatDate, type Post } from '../utils/posts';
+import { u } from '../utils/url';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const { title, description, pubDate, category } = post.data;
+---
+
+<a href={u(`/posts/${post.id}`)} class="featured-post-card">
+  <div class="card-top">
+    <span class="card-star" aria-hidden="true">
+      <Icon name="star" size={17} />
+    </span>
+    <time class="card-date font-mono" datetime={pubDate.toISOString()}>{formatDate(pubDate)}</time>
+  </div>
+  <h3 class="card-title">{title}</h3>
+  <p class="card-desc">{description}</p>
+  <span class="card-category">
+    <Icon name="folder" size={13} />
+    {category}
+  </span>
+</a>
+
+<style>
+  .featured-post-card {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .featured-post-card:hover {
+    border-color: color-mix(in oklab, var(--color-accent) 45%, var(--color-border));
+    box-shadow: var(--shadow-raised);
+    transform: translateY(-2px);
+    color: var(--color-text);
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  /* 精选身份:珊瑚淡染星标,与链接卡的组色图标位对应 */
+  .card-star {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+  }
+
+  .card-date {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-label);
+    color: var(--color-muted);
+  }
+
+  .card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    transition: color 0.2s ease;
+  }
+
+  .featured-post-card:hover .card-title {
+    color: var(--color-accent-text);
+  }
+
+  .card-desc {
+    margin-top: 6px;
+    font-size: var(--text-md);
+    line-height: 1.7;
+    color: var(--color-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .card-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 14px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-label);
+    color: var(--color-contrast);
+  }
+</style>

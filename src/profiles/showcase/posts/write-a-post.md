@@ -28,7 +28,8 @@ draft: false               # true 时整篇不进入构建
 cover: /images/covers/wide.svg  # 可选封面
 coverAlt: 封面的描述文字          # 有封面时建议填写
 coverPosition: center 30%       # 可选,裁切焦点
-featured: false                 # 可选,预留的精选标记
+featured: false                 # 精选:首页「精选文章」卡片区展示,最多 3 篇,
+                                # 且不再重复出现在「近期文章」列表;别贪多
 ---
 ```
 
