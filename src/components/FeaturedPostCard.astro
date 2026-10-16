@@ -2,7 +2,7 @@
 /**
  * 精选文章卡:首页「精选文章」区块的卡片形态。
  * 与 TechLinkCard 同一卡片语言(中性面、悬停抬升),身份标记为珊瑚星标;
- * 整张卡是链接,元信息(日期/分类)只做展示,不嵌套链接。
+ * 整张卡是链接,元信息(日期/分类/前 3 个标签)只做展示,不嵌套链接。
  */
 import Icon from './Icon.astro';
 import { formatDate, type Post } from '../utils/posts';
@@ -13,7 +13,8 @@ interface Props {
 }
 
 const { post } = Astro.props;
-const { title, description, pubDate, category } = post.data;
+const { title, description, pubDate, category, tags } = post.data;
+const cardTags = tags.slice(0, 3);
 ---
 
 <a href={u(`/posts/${post.id}`)} class="featured-post-card">
@@ -25,10 +26,24 @@ const { title, description, pubDate, category } = post.data;
   </div>
   <h3 class="card-title">{title}</h3>
   <p class="card-desc">{description}</p>
-  <span class="card-category">
-    <Icon name="folder" size={13} />
-    {category}
-  </span>
+  <div class="card-meta font-mono">
+    <span class="card-category">
+      <Icon name="folder" size={13} />
+      {category}
+    </span>
+    {
+      cardTags.length > 0 && (
+        <span class="card-tags">
+          {cardTags.map((tag) => (
+            <span class="card-tag">
+              <Icon name="tag" size={12} />
+              {tag}
+            </span>
+          ))}
+        </span>
+      )
+    }
+  </div>
 </a>
 
 <style>
@@ -107,13 +122,41 @@ const { title, description, pubDate, category } = post.data;
     flex: 1;
   }
 
+  /* 底部元信息行:分类居左,标签居右(最多 3 个,与列表行同套色彩约定) */
+  .card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 14px;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-label);
+  }
+
   .card-category {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-top: 14px;
-    font-size: var(--text-sm);
-    font-weight: var(--weight-label);
     color: var(--color-contrast);
+    flex-shrink: 0;
+  }
+
+  .card-tags {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    max-width: 96px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-accent-text);
   }
 </style>
