@@ -24,6 +24,7 @@
   --text-sm: 13px;
   --text-md: 14px;
   --text-lg: 15px;
+  --text-xl: 16px;
 
   /* 辅助小字统一字重:400 在 ≤14px 中文上笔画过细 */
   --weight-label: 500;
