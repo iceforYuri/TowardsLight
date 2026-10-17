@@ -168,20 +168,25 @@ for (const h of toc) {
     color: var(--color-text);
   }
 
-  /* 当前小节:沿所在族色相加深 + 加粗 + 下划线,左侧指示条保留 */
+  /* 当前小节:加粗 + 下划线 + 左侧指示条,全部随本级色相的全强度版本
+     (currentColor),不再让珊瑚压住所有级 */
   .toc-desktop a.is-current {
-    color: var(--color-accent-text);
     font-weight: 600;
     text-decoration: underline;
-    text-decoration-color: var(--color-accent);
+    text-decoration-color: currentColor;
     text-underline-offset: 3px;
   }
 
+  .toc-desktop .lv-0 a.is-current,
+  .toc-desktop .lv-2 a.is-current,
+  .toc-desktop .lv-4 a.is-current {
+    color: var(--color-accent-text);
+  }
+
+  .toc-desktop .lv-1 a.is-current,
   .toc-desktop .lv-3 a.is-current,
-  .toc-desktop .lv-4 a.is-current,
   .toc-desktop .lv-5 a.is-current {
-    color: color-mix(in oklab, var(--color-contrast) 72%, var(--color-text));
-    text-decoration-color: var(--color-contrast);
+    color: var(--color-contrast);
   }
 
   .toc-desktop a.is-current::before {
@@ -192,7 +197,7 @@ for (const h of toc) {
     bottom: 2px;
     width: 2px;
     border-radius: 2px;
-    background: var(--color-accent);
+    background: currentColor;
   }
 
   /* 深层级收放已由渐进折叠取代(见上方 li.collapsed);保留 reduced-motion 兜底 */
@@ -251,9 +256,11 @@ for (const h of toc) {
     padding-left: 26px;
   }
 
-  .toc-desktop .lv-0 a:not(.is-current),
-  .toc-desktop .lv-1 a:not(.is-current),
-  .toc-desktop .lv-2 a:not(.is-current) {
+  /* 层级配色:偶数级珊瑚(accent-text)、奇数级青(contrast),交替提供相邻区分;
+     随深度向 muted 淡化承担全局深度感,但 lv5 仍保留 55% 色相合量——
+     淡过头两色相会在深层趋同,交替就失去意义。
+     混合而非 opacity:两个端点对比度都 ≥4.5,混合不会跌穿 */
+  .toc-desktop .lv-0 a:not(.is-current) {
     /* accent 直接上字对比度不足(4.16),用文字级 accent-text */
     color: var(--color-accent-text);
   }
@@ -266,20 +273,28 @@ for (const h of toc) {
     font-size: var(--text-sm);
   }
 
+  .toc-desktop .lv-1 a:not(.is-current) {
+    color: color-mix(in oklab, var(--color-contrast) 88%, var(--color-muted));
+  }
+
+  .toc-desktop .lv-2 a:not(.is-current) {
+    color: color-mix(in oklab, var(--color-accent-text) 78%, var(--color-muted));
+  }
+
   /* lv-3~5 字号触底 12px 下限,层级只靠色递进(opacity 会击穿对比度) */
   .toc-desktop .lv-3 a:not(.is-current) {
     font-size: var(--text-xs);
-    color: var(--color-contrast);
+    color: color-mix(in oklab, var(--color-contrast) 68%, var(--color-muted));
   }
 
   .toc-desktop .lv-4 a:not(.is-current) {
     font-size: var(--text-xs);
-    color: color-mix(in oklab, var(--color-contrast) 80%, var(--color-muted));
+    color: color-mix(in oklab, var(--color-accent-text) 60%, var(--color-muted));
   }
 
   .toc-desktop .lv-5 a:not(.is-current) {
     font-size: var(--text-xs);
-    color: color-mix(in oklab, var(--color-contrast) 65%, var(--color-muted));
+    color: color-mix(in oklab, var(--color-contrast) 55%, var(--color-muted));
   }
 
   .toc-mobile {
@@ -341,33 +356,34 @@ for (const h of toc) {
     padding-left: 30px;
   }
 
-  .toc-panel .lv-0 a,
-  .toc-panel .lv-1 a,
-  .toc-panel .lv-2 a {
+  /* 与桌面目录同一套层级色相:偶数级珊瑚、奇数级青、随深度向 muted 淡化 */
+  .toc-panel .lv-0 a {
     color: var(--color-accent-text);
   }
 
   .toc-panel .lv-1 a {
     font-size: var(--text-md);
+    color: color-mix(in oklab, var(--color-contrast) 88%, var(--color-muted));
   }
 
   .toc-panel .lv-2 a {
     font-size: var(--text-sm);
+    color: color-mix(in oklab, var(--color-accent-text) 78%, var(--color-muted));
   }
 
   .toc-panel .lv-3 a {
     font-size: var(--text-xs);
-    color: var(--color-contrast);
+    color: color-mix(in oklab, var(--color-contrast) 68%, var(--color-muted));
   }
 
   .toc-panel .lv-4 a {
     font-size: var(--text-xs);
-    color: color-mix(in oklab, var(--color-contrast) 80%, var(--color-muted));
+    color: color-mix(in oklab, var(--color-accent-text) 60%, var(--color-muted));
   }
 
   .toc-panel .lv-5 a {
     font-size: var(--text-xs);
-    color: color-mix(in oklab, var(--color-contrast) 65%, var(--color-muted));
+    color: color-mix(in oklab, var(--color-contrast) 55%, var(--color-muted));
   }
 </style>
 
