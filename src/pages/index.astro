@@ -333,7 +333,9 @@ const statsSegments: StatSegment[] = firstPost
   }
 
   /* 羽化幕布(.home-feather):顶部 200px 透明→画布渐变,独立转场组
-     (home-feather),与壁纸同速率显现;其下由 .home-body 的纯画布色接续。
+     (home-feather),与壁纸同速率显现;.home-body 背景是 200px 处的硬切渐变——
+     透明段让壁纸透过来(实心画布会把壁纸盖死,羽化就失效了),实心段接续画布。
+     两层叠加 = 与原单渐变完全一致的合成。
      页脚方向由 padding 承担间距,footer 的 margin-top 在首页归零,
      保证画布色不间断盖到页脚 */
   .home-feather {
@@ -349,7 +351,7 @@ const statsSegments: StatSegment[] = firstPost
   .home-body {
     position: relative;
     z-index: 10;
-    background: var(--color-canvas);
+    background: linear-gradient(to bottom, transparent 200px, var(--color-canvas) 200px);
     padding-bottom: 96px;
   }
 
