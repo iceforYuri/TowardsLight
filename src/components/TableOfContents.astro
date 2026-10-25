@@ -281,19 +281,24 @@ for (const h of toc) {
     color: color-mix(in oklab, var(--color-accent-text) 78%, var(--color-muted));
   }
 
-  /* lv-3~5 字号触底 13px 下限,层级只靠色递进(opacity 会击穿对比度) */
-  .toc-desktop .lv-3 a:not(.is-current) {
+  /* lv-3~5 字号触底 13px 下限,层级只靠色递进(opacity 会击穿对比度)。
+     字号必须与 :not(.is-current) 的颜色规则分离——否则聚焦时字号规则失效,
+     文字会跳回基础字号(16px)突然变大 */
+  .toc-desktop .lv-3 a,
+  .toc-desktop .lv-4 a,
+  .toc-desktop .lv-5 a {
     font-size: var(--text-sm);
+  }
+
+  .toc-desktop .lv-3 a:not(.is-current) {
     color: color-mix(in oklab, var(--color-contrast) 68%, var(--color-muted));
   }
 
   .toc-desktop .lv-4 a:not(.is-current) {
-    font-size: var(--text-sm);
     color: color-mix(in oklab, var(--color-accent-text) 60%, var(--color-muted));
   }
 
   .toc-desktop .lv-5 a:not(.is-current) {
-    font-size: var(--text-sm);
     color: color-mix(in oklab, var(--color-contrast) 55%, var(--color-muted));
   }
 
