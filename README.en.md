@@ -1,8 +1,10 @@
-# TowardsLight
+<h1 align="center">TowardsLight</h1>
 
-![Astro 5](https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white)
-![Node.js 22 recommended](<https://img.shields.io/badge/Node.js-22%20recommended-25323D?logo=nodedotjs&logoColor=white>)
-![License MIT](https://img.shields.io/badge/License-MIT-blue)
+<p align="center">
+  <img alt="Astro 5" src="https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white">
+  <img alt="Node.js 22 recommended" src="https://img.shields.io/badge/Node.js-22%20recommended-25323D?logo=nodedotjs&logoColor=white">
+  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
+</p>
 
 <p align="center"><strong>An Astro publishing system that treats content boundaries, the Markdown compiler, and visual state as parts of one static build.</strong></p>
 

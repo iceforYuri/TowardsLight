@@ -1,8 +1,10 @@
-# 拾光集 · TowardsLight
+<h1 align="center">拾光集 · TowardsLight</h1>
 
-![Astro 5](https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white)
-![Node.js 22 recommended](<https://img.shields.io/badge/Node.js-22%20recommended-25323D?logo=nodedotjs&logoColor=white>)
-![License MIT](https://img.shields.io/badge/License-MIT-blue)
+<p align="center">
+  <img alt="Astro 5" src="https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white">
+  <img alt="Node.js 22 recommended" src="https://img.shields.io/badge/Node.js-22%20recommended-25323D?logo=nodedotjs&logoColor=white">
+  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
+</p>
 
 <p align="center"><strong>一套把内容边界、Markdown 编译链与视觉状态纳入同一静态构建流程的 Astro 写作系统。</strong></p>
 
