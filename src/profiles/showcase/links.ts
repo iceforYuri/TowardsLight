@@ -12,6 +12,7 @@ export interface LinkGroupDef {
 
 /** 链接分组:id 供链接的 group 字段引用,label 为页面显示名;tone 给整组浸染色调 */
 export const linkGroups = [
+  { id: 'towards-light', label: 'TowardsLight', description: '流光定影，拾光逐金', tone: 'accent' },
   { id: 'code', label: 'Code', description: '代码托管与开源项目', tone: 'steel' },
   { id: 'build', label: 'Build', description: '构建本站与日常项目的工具链',
       tone: 'accent'
@@ -165,6 +166,24 @@ export const techLinks: TechLink[] = [
     icon: 'rss',
     external: true,
     status: '在读 40+ 订阅',
+  },
+  {
+    title: 'TowardsLight',
+    description: 'nothing is impossible',
+    href: 'https://towardslight.vercel.app/',
+    group: 'towards-light',
+    icon: 'home',
+    featured: true,
+  },
+  {
+    title: 'TowardsLight 个人站',
+    description: '个人博客，敬请查看！',
+    href: 'https://towardslightcontent.vercel.app/',
+    group: 'towards-light',
+    icon: 'archive',
+    external: true,
+    featured: true,
+    status: 'upgrading',
   },
 ];
 
