@@ -1,8 +1,8 @@
 <h1 align="center">拾光集 · TowardsLight</h1>
 
 <p align="center">
-  <img alt="Astro 5" src="https://img.shields.io/badge/Astro-5-BC52EE?logo=astro&logoColor=white">
-  <img alt="Node.js 22 recommended" src="https://img.shields.io/badge/Node.js-22%20recommended-25323D?logo=nodedotjs&logoColor=white">
+  <img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white">
+  <img alt="Node.js 22.23.4+" src="https://img.shields.io/badge/Node.js-22.23.4%2B-25323D?logo=nodedotjs&logoColor=white">
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
@@ -37,7 +37,7 @@ TowardsLight 将个人内容、渲染规则和页面表达放在三个明确的�
 
 ## 快速开始
 
-推荐 Node.js 22。Astro 5 同时支持 Node.js `18.20.8`、`20.3+` 与 `22+`。在项目根目录运行：
+需要 Node.js `22.23.4` 或更高版本（Astro 7 的运行时要求）。在项目根目录运行：
 
 ```bash
 git clone https://github.com/iceforYuri/TowardsLight.git

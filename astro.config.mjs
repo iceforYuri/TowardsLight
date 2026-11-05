@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { unified } from '@astrojs/markdown-remark';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { rehypeImageDecoding } from './src/plugins/rehype-image-decoding.mjs';
@@ -55,8 +56,10 @@ export default defineConfig({
   markdown: {
     // 公式:remark-math 解析 $..$/$$..$$,rehype-katex 构建期渲染为 HTML(零客户端 JS)
     // remark-image-guard 放在最前:缺席的正文图片换成占位图,避免一张图拖垮全站
-    remarkPlugins: [remarkImageGuard, remarkMath],
-    rehypePlugins: [rehypeKatex, rehypeAlerts, rehypeImageDecoding, rehypeImageFigcaption, rehypeMermaid],
+    processor: unified({
+      remarkPlugins: [remarkImageGuard, remarkMath],
+      rehypePlugins: [rehypeKatex, rehypeAlerts, rehypeImageDecoding, rehypeImageFigcaption, rehypeMermaid],
+    }),
     shikiConfig: {
       transformers: [langBadge],
       themes: {
