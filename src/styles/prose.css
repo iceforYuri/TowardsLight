@@ -8,6 +8,18 @@
   font-size: 17.5px;
   line-height: 1.85;
   color: var(--color-text);
+  font-kerning: normal;
+  /* 行首全角标点挤压、中西文间自动留白;不支持的浏览器忽略 */
+  text-spacing-trim: trim-start;
+  text-autospace: normal;
+  /* 宽表在窄屏下的列宽规则用容器查询 */
+  container-type: inline-size;
+  /* 表号 / 图号:每篇文章从 01 开始 */
+  counter-reset: prose-table prose-figure;
+}
+
+.prose ::selection {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 .prose > * + * {
@@ -45,14 +57,20 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-/* h2 节 */
+/* h2 节:顶部分隔线从强调色起笔、向右渐隐 */
 .prose h2 {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.45em;
   margin-top: 2.4em;
   padding-top: 0.6em;
-  border-top: 1px solid var(--color-border);
+  background: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-accent) 45%, transparent),
+      var(--color-hairline) 18%,
+      transparent 92%
+    )
+    top / 100% 1px no-repeat;
 }
 
 /* h3 小节 */
@@ -150,15 +168,15 @@
 
 /* ---- 提示块(GitHub Alerts,rehype-alerts 输出) ----
    五色语义:note=steel / tip=contrast / important=accent / warning=dedicated / caution=danger;
-   图标、左边框与小标题着色,底色用 color-mix 取 7% 淡染,正文保持默认文字色 */
+   贴在卡面上的色片:不画外框,底色用 color-mix 取 6.5% 淡染,左线用内阴影画(圆角处不被斜切),
+   正文保持默认文字色 */
 .prose .alert {
   --alert-c: var(--color-steel);
   margin-inline: 0;
   padding: 0.85em 1.15em;
-  border: 1px solid color-mix(in srgb, var(--alert-c) 24%, transparent);
-  border-left: 3px solid var(--alert-c);
-  border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--alert-c) 7%, transparent);
+  border-radius: var(--radius-block);
+  background: color-mix(in srgb, var(--alert-c) 6.5%, transparent);
+  box-shadow: inset 2.5px 0 0 var(--alert-c);
 }
 
 .prose .alert-note {
@@ -222,7 +240,7 @@
 .prose details.alert summary:focus-visible {
   outline: 2px solid var(--alert-c);
   outline-offset: -2px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-block);
 }
 
 .prose details.alert .alert-chevron {
@@ -244,35 +262,37 @@
 
 .prose hr {
   border: none;
-  border-top: 1px solid var(--color-border);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-hairline) 20%, var(--color-hairline) 80%, transparent);
   margin-block: 2.5em;
 }
 
-/* 行内代码 */
+/* 行内代码:中性小签(井色底 + 细线环),与正文链接的强调色拉开 */
 .prose :not(pre) > code {
   font-family: var(--font-mono);
   font-size: 0.82em;
-  padding: 0.15em 0.45em;
-  background: var(--color-accent-soft);
-  border-radius: 6px;
-  color: var(--color-accent-text);
+  padding: 0.12em 0.4em;
+  background: var(--color-well);
+  border-radius: var(--radius-inline);
+  box-shadow: inset 0 0 0 1px var(--color-hairline);
+  color: color-mix(in srgb, var(--color-accent-text) 70%, var(--color-text));
   word-break: break-word;
 }
 
-/* 代码块:接入 Shiki 双主题 CSS 变量 */
+/* 代码块:凹进卡面的"井"(内阴影代替边框);接入 Shiki 双主题 CSS 变量 */
 .prose pre {
   padding: 1.1em 1.3em;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface-raised);
+  border-radius: var(--radius-block);
+  background: var(--color-well);
+  box-shadow: var(--shadow-well);
   overflow-x: auto;
   font-size: var(--text-sm);
   line-height: 1.7;
 }
 
 .prose pre.astro-code {
-  /* 亮主题:用表面色与卡片形成微差,不与卡片同色 */
-  background-color: var(--color-surface-raised);
+  /* 两套主题都用井色,不取 Shiki 主题自带底色 */
+  background-color: var(--color-well);
   position: relative;
   padding-top: 2.1em;
 }
@@ -339,9 +359,9 @@
   position: relative;
   margin: 1.6em 0;
   padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: var(--color-surface-raised);
+  border-radius: var(--radius-block);
+  background: var(--color-well);
+  box-shadow: var(--shadow-well);
 }
 .prose .mermaid-chrome {
   position: absolute;
@@ -442,6 +462,7 @@ html[data-theme='dark'] .prose .mermaid-svg-dark {
   border: 0;
   border-radius: 0;
   background: transparent;
+  box-shadow: none;
 }
 .prose .mermaid-figure .mermaid-source::before {
   content: none;
@@ -472,10 +493,6 @@ html[data-theme='dark'] .prose .mermaid-svg-dark {
   }
 }
 
-html[data-theme='dark'] .prose pre.astro-code {
-  background-color: var(--shiki-dark-bg);
-}
-
 .prose pre.astro-code span {
   color: var(--shiki-light);
 }
@@ -491,46 +508,200 @@ html[data-theme='dark'] .prose pre.astro-code span {
   color: var(--color-text);
 }
 
-/* 表格 */
-.prose .table-wrapper,
-.prose table {
-  width: 100%;
+/* ---- 表格 ----
+   结构(rehype-tables 输出):.table-wrap > .table-frame > .table-scroll > table
+   - wrap:外边距与表号;frame:圆角、外框、滚动边缘阴影;scroll:横向滚动
+   - 表头用结构色青绿(CONTEXT.md:contrast = 结构、状态)淡染,斑马纹分行,首列加粗作行名
+   - 横向溢出时由 scripts/table-scroll.ts 写 data-scroll=start|mid|end,
+     驱动边缘阴影、冻结首列的分隔影和"左右滑动"提示 */
+.prose .table-wrap {
+  margin-block: 1.8em;
+  counter-increment: prose-table;
+}
+
+.prose .table-wrap::before {
+  content: 'TABLE ' counter(prose-table, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.55em;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-label);
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+
+.prose .table-frame {
+  position: relative;
+  border-radius: var(--radius-block);
+  background: var(--color-card);
+  overflow: hidden;
+  /* outline 画在单元格底色之上,并跟随圆角 */
+  outline: 1px solid var(--color-hairline);
+  outline-offset: -1px;
+}
+
+.prose .table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+.prose .table-scroll:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-block);
 }
 
 .prose table {
-  border-collapse: collapse;
-  font-size: 0.92em;
-  display: block;
-  overflow-x: auto;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9em;
+  line-height: 1.7;
+  font-variant-numeric: tabular-nums;
 }
 
 .prose th,
 .prose td {
-  padding: 0.6em 1em;
-  border: 1px solid var(--color-border);
-  text-align: left;
-  white-space: nowrap;
+  padding: 0.7em 1em;
+  text-align: start;
+  vertical-align: top;
 }
 
-.prose td {
-  white-space: normal;
-  min-width: 8em;
+/* 尊重 Markdown 的 :---: / ---: 对齐(remark 输出 align 属性) */
+.prose :is(th, td)[align='center'] {
+  text-align: center;
+}
+
+.prose :is(th, td)[align='right'] {
+  text-align: right;
 }
 
 .prose th {
   font-family: var(--font-ui);
   font-weight: 600;
-  background: var(--color-surface-raised);
+  font-size: 0.94em;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--color-contrast);
+  background: color-mix(in srgb, var(--color-contrast) 9%, var(--color-card));
+  border-bottom: 1.5px solid color-mix(in srgb, var(--color-contrast) 70%, transparent);
+  padding-block: 0.62em;
 }
 
-/* 图片 */
+.prose td {
+  min-width: 7em;
+  background: var(--color-card);
+  transition: background-color 0.15s ease;
+}
+
+.prose tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--color-text) 2.5%, var(--color-card));
+}
+
+.prose tbody tr:hover td {
+  background: color-mix(in srgb, var(--color-contrast) 5%, var(--color-card));
+}
+
+/* 首列 = 行名 */
+.prose td:first-child {
+  min-width: 0;
+  font-weight: 600;
+}
+
+/* 命令、字段名独占一格时不折行 */
+.prose td:has(> code:only-child),
+.prose td code {
+  white-space: nowrap;
+}
+
+/* 数字列(带对齐标记)按内容取宽 */
+.prose td[align] {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* 冻结首列:仅在横向溢出时才有可见效果 */
+.prose :is(th, td):first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.prose .table-wrap:is([data-scroll='mid'], [data-scroll='end']) :is(th, td):first-child {
+  box-shadow: 6px 0 10px -6px color-mix(in srgb, var(--color-text) 28%, transparent);
+}
+
+/* 边缘阴影:还有内容没露出来的一侧 */
+.prose .table-frame::before,
+.prose .table-frame::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 28px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.prose .table-frame::before {
+  left: 0;
+  background: linear-gradient(to right, color-mix(in srgb, var(--color-text) 14%, transparent), transparent);
+}
+
+.prose .table-frame::after {
+  right: 0;
+  background: linear-gradient(to left, color-mix(in srgb, var(--color-text) 14%, transparent), transparent);
+}
+
+.prose .table-wrap:is([data-scroll='mid'], [data-scroll='end']) .table-frame::before,
+.prose .table-wrap:is([data-scroll='start'], [data-scroll='mid']) .table-frame::after {
+  opacity: 1;
+}
+
+/* 横向溢出提示:首次滚动后淡出 */
+.prose .table-wrap[data-scroll]::after {
+  content: '← 左右滑动查看 →';
+  display: block;
+  margin-top: 0.4em;
+  font-family: var(--font-ui);
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+  text-align: right;
+  transition: opacity 0.3s ease;
+}
+
+.prose .table-wrap[data-scroll]:not([data-scroll='start'])::after {
+  opacity: 0;
+}
+
+/* 窄列宽:表头允许折行,首列给出可读宽度,四列以上的正文列保底 9em,多出的交给横向滚动 */
+@container (max-width: 560px) {
+  .prose th {
+    white-space: normal;
+  }
+
+  .prose td {
+    min-width: 6em;
+  }
+
+  .prose td:first-child {
+    min-width: 5.5em;
+  }
+
+  .prose table:has(th:nth-child(4)) td:not([align]) {
+    min-width: 9em;
+  }
+}
+
+/* 图片:墨色环替代灰边框,hover 轻抬提示可点击放大 */
 .prose img {
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius-block);
   margin-inline: auto;
-  box-shadow:
-    0 14px 44px rgba(20, 25, 20, 0.1),
-    0 2px 10px rgba(20, 25, 20, 0.05);
+  box-shadow: var(--shadow-figure);
   cursor: zoom-in;
   transition:
     box-shadow 0.25s ease,
@@ -539,21 +710,7 @@ html[data-theme='dark'] .prose pre.astro-code span {
 
 .prose img:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 20px 56px rgba(20, 25, 20, 0.15),
-    0 4px 14px rgba(20, 25, 20, 0.07);
-}
-
-html[data-theme='dark'] .prose img {
-  box-shadow:
-    0 14px 44px rgba(0, 0, 0, 0.36),
-    0 2px 10px rgba(0, 0, 0, 0.24);
-}
-
-html[data-theme='dark'] .prose img:hover {
-  box-shadow:
-    0 20px 56px rgba(0, 0, 0, 0.46),
-    0 4px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-figure-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -566,9 +723,14 @@ html[data-theme='dark'] .prose img:hover {
   }
 }
 
-/* 图片说明:浅灰斜体、接近正文大小,与正文拉开气质但不抢戏 */
+/* 图片说明:浅灰斜体、接近正文大小,与正文拉开气质但不抢戏;
+   有说明的图自动编号 FIG. 01(等宽,与表号、代码语言徽章同一套标注字) */
 .prose figure {
   margin: 2em 0;
+}
+
+.prose figure:has(> figcaption) {
+  counter-increment: prose-figure;
 }
 
 .prose figcaption {
@@ -578,6 +740,17 @@ html[data-theme='dark'] .prose img:hover {
   font-style: italic;
   line-height: 1.6;
   color: var(--color-muted);
+}
+
+.prose figcaption::before {
+  content: 'FIG. ' counter(prose-figure, decimal-leading-zero);
+  margin-right: 0.8em;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-style: normal;
+  font-weight: var(--weight-label);
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
 }
 
 /* 公式(KaTeX 构建期渲染,见 astro.config) */
@@ -599,7 +772,7 @@ html[data-theme='dark'] .prose img:hover {
 .prose .footnotes {
   margin-top: 3em;
   padding-top: 1.5em;
-  border-top: 1px solid var(--color-border);
+  background: linear-gradient(90deg, var(--color-hairline), transparent 70%) top / 100% 1px no-repeat;
   font-size: 0.88em;
   color: var(--color-muted);
 }

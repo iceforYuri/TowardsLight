@@ -96,10 +96,12 @@ const ogImage = rawImage
       import { initImgReveal } from '../scripts/img-reveal';
       import { initCodeCopy } from '../scripts/code-copy';
       import { initMermaidFigures } from '../scripts/mermaid-figure';
+      import { initTableScroll } from '../scripts/table-scroll';
       document.addEventListener('astro:page-load', () => {
         initImgReveal();
         initCodeCopy();
         initMermaidFigures();
+        initTableScroll();
       });
       // after-swap 先跑一轮揭示:它在新页快照捕获之前,同步亮图才进得了快照
       // (page-load 作硬加载与边角兜底;initImgReveal 幂等)

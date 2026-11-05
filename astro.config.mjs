@@ -8,6 +8,7 @@ import { rehypeImageDecoding } from './src/plugins/rehype-image-decoding.mjs';
 import { rehypeMermaid } from './src/plugins/rehype-mermaid.mjs';
 import { rehypeImageFigcaption } from './src/plugins/rehype-image-figcaption.mjs';
 import { rehypeAlerts } from './src/plugins/rehype-alerts.mjs';
+import { rehypeTables } from './src/plugins/rehype-tables.mjs';
 import { remarkImageGuard, viteImageGuard } from './src/plugins/image-guard.mjs';
 
 // 把 fence 的语言写到 <pre data-language> 上,由 CSS 生成右上角语言徽章;
@@ -58,7 +59,7 @@ export default defineConfig({
     // remark-image-guard 放在最前:缺席的正文图片换成占位图,避免一张图拖垮全站
     processor: unified({
       remarkPlugins: [remarkImageGuard, remarkMath],
-      rehypePlugins: [rehypeKatex, rehypeAlerts, rehypeImageDecoding, rehypeImageFigcaption, rehypeMermaid],
+      rehypePlugins: [rehypeKatex, rehypeAlerts, rehypeTables, rehypeImageDecoding, rehypeImageFigcaption, rehypeMermaid],
     }),
     shikiConfig: {
       transformers: [langBadge],
