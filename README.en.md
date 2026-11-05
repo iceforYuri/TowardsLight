@@ -10,7 +10,7 @@
 
 <p align="center"><a href="./README.md">简体中文</a> · <a href="./README.en.md">English</a></p>
 
-![TowardsLight overview: light and dark home pages inside a profile-driven content space](public/poster/01-flat-hero.png)
+![TowardsLight overview: light and dark home pages inside a profile-driven content space](public/poster/01-flat-hero.webp)
 
 ## Why TowardsLight
 
@@ -31,9 +31,9 @@ The four scenes below show the theme system, long-form reading, responsive compo
 
 | Theme / Light + Dark                                                                                                                                  | Reading / Room to Read                                                                                                                                   |
 | :---------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ![Light and dark home pages with one visual language](public/poster/02-flat-light-dark.png)Semantic tokens · light/dark themes · shared composition | ![Article typography, diagrams, and editor workflow](public/poster/03-editorial-collage.png)Article typography · hand-drawn diagrams · editor workflow |
+| ![Light and dark home pages with one visual language](public/poster/02-flat-light-dark.webp)Semantic tokens · light/dark themes · shared composition | ![Article typography, diagrams, and editor workflow](public/poster/03-editorial-collage.webp)Article typography · hand-drawn diagrams · editor workflow |
 | **Responsive / Made to Adapt**                                                                                                                  | **Discovery / Explore Your Space**                                                                                                                 |
-| ![Link, code, desktop, and mobile views](public/poster/04-responsive-collage.png)Desktop · mobile · link directory · code reading                  | ![Chronological archive and tag discovery](public/poster/05-spacious-discovery.png)Chronological archive · tag aggregation · spatial discovery         |
+| ![Link, code, desktop, and mobile views](public/poster/04-responsive-collage.webp)Desktop · mobile · link directory · code reading                  | ![Chronological archive and tag discovery](public/poster/05-spacious-discovery.webp)Chronological archive · tag aggregation · spatial discovery         |
 
 ## Quick start
 

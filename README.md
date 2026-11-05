@@ -10,7 +10,7 @@
 
 <p align="center"><a href="./README.md">简体中文</a> · <a href="./README.en.md">English</a></p>
 
-![TowardsLight 主视觉：明暗两种首页形态与档案式内容空间](public/poster/01-flat-hero.png)
+![TowardsLight 主视觉：明暗两种首页形态与档案式内容空间](public/poster/01-flat-hero.webp)
 
 ## 为什么选择拾光集
 
@@ -31,9 +31,9 @@ TowardsLight 将个人内容、渲染规则和页面表达放在三个明确的�
 
 | 主题系统 / Light + Dark                                                                                        | 长文阅读 / Room to Read                                                                                         |
 | :------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| ![同一内容语言下的明亮与深色首页](public/poster/02-flat-light-dark.png)语义令牌 · 明暗双主题 · 统一构图      | ![文章排印、手绘图与编辑器写作流程](public/poster/03-editorial-collage.png)文章排印 · 手绘图解 · 编辑器工作流 |
+| ![同一内容语言下的明亮与深色首页](public/poster/02-flat-light-dark.webp)语义令牌 · 明暗双主题 · 统一构图      | ![文章排印、手绘图与编辑器写作流程](public/poster/03-editorial-collage.webp)文章排印 · 手绘图解 · 编辑器工作流 |
 | **响应式重排 / Made to Adapt**                                                                           | **内容发现 / Explore Your Space**                                                                         |
-| ![桌面、移动端、链接与代码视图](public/poster/04-responsive-collage.png)桌面 · 移动端 · 链接目录 · 代码阅读 | ![按年份归档与标签发现的界面](public/poster/05-spacious-discovery.png)年份归档 · 标签聚合 · 空间化内容探索    |
+| ![桌面、移动端、链接与代码视图](public/poster/04-responsive-collage.webp)桌面 · 移动端 · 链接目录 · 代码阅读 | ![按年份归档与标签发现的界面](public/poster/05-spacious-discovery.webp)年份归档 · 标签聚合 · 空间化内容探索    |
 
 ## 快速开始
 
