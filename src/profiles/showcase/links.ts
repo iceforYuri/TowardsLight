@@ -177,7 +177,7 @@ export const techLinks: TechLink[] = [
   },
   {
     title: 'TowardsLight 个人站',
-    description: '个人博客，敬请查看！',
+    description: '个人博客，敬请浏览！',
     href: 'https://towardslightcontent.vercel.app/',
     group: 'towards-light',
     icon: 'archive',

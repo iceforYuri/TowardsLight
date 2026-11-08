@@ -44,3 +44,8 @@ src/generated/
 fonts-src/**/*.exe
 fonts-src/**/*.zip
 fonts-src/**/*.rar
+
+# 本地研究、调试与 agent 工作区
+.agentgfm-work/
+.claude/
+table-lab/
