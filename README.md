@@ -8,6 +8,8 @@
 
 <p align="center"><strong>一套把内容边界、Markdown 编译链与视觉状态纳入同一静态构建流程的 Astro 写作系统。</strong></p>
 
+<p align="center"><a href="https://towardslight.vercel.app/">演示网站</a> · <a href="https://towardslightcontent.vercel.app/">个人使用</a> · <a href="https://github.com/iceforYuri/TowardsLight_extension">插件仓库</a></p>
+
 <p align="center"><a href="./README.md">简体中文</a> · <a href="./README.en.md">English</a></p>
 
 ![TowardsLight 主视觉：明暗两种首页形态与档案式内容空间](public/poster/01-flat-hero.webp)
@@ -29,10 +31,10 @@ TowardsLight 将个人内容、渲染规则和页面表达放在三个明确的�
 
 以下四张场景图分别展示主题系统、长文阅读、响应式重排与内容发现。
 
-| 主题系统 / Light + Dark                                                                                        | 长文阅读 / Room to Read                                                                                         |
-| :------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
+| 主题系统 / Light + Dark                                                                                         | 长文阅读 / Room to Read                                                                                          |
+| :-------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
 | ![同一内容语言下的明亮与深色首页](public/poster/02-flat-light-dark.webp)语义令牌 · 明暗双主题 · 统一构图      | ![文章排印、手绘图与编辑器写作流程](public/poster/03-editorial-collage.webp)文章排印 · 手绘图解 · 编辑器工作流 |
-| **响应式重排 / Made to Adapt**                                                                           | **内容发现 / Explore Your Space**                                                                         |
+| **响应式重排 / Made to Adapt**                                                                            | **内容发现 / Explore Your Space**                                                                          |
 | ![桌面、移动端、链接与代码视图](public/poster/04-responsive-collage.webp)桌面 · 移动端 · 链接目录 · 代码阅读 | ![按年份归档与标签发现的界面](public/poster/05-spacious-discovery.webp)年份归档 · 标签聚合 · 空间化内容探索    |
 
 ## 快速开始

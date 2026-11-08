@@ -8,6 +8,8 @@
 
 <p align="center"><strong>An Astro publishing system that treats content boundaries, the Markdown compiler, and visual state as parts of one static build.</strong></p>
 
+<p align="center"><a href="https://towardslight.vercel.app/">Demo Site</a> · <a href="https://towardslightcontent.vercel.app/">Personal Site</a> · <a href="https://github.com/iceforYuri/TowardsLight_extension">VS Code Extension</a></p>
+
 <p align="center"><a href="./README.md">简体中文</a> · <a href="./README.en.md">English</a></p>
 
 ![TowardsLight overview: light and dark home pages inside a profile-driven content space](public/poster/01-flat-hero.webp)
