@@ -32,7 +32,7 @@ export const site = {
   ],
   socialLinks: [
     { label: 'GitHub', href: 'https://github.com', icon: 'github' },
-    { label: '模板参考', href: 'https://github.com/iceforYuri/TowardsLight', icon: 'database' },
+    { label: 'template', href: 'https://github.com/iceforYuri/TowardsLight', icon: 'database' },
     { label: 'RSS', href: '/rss.xml', icon: 'rss' },
   ],
   homeHero: {

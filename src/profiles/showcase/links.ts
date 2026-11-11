@@ -185,6 +185,16 @@ export const techLinks: TechLink[] = [
     featured: true,
     status: 'upgrading',
   },
+  {
+    title: 'TowardsLight-Plunge',
+    description: '独属于TowardsLight的博客管理扩展',
+    href: 'https://github.com/iceforYuri/TowardsLight_extension',
+    group: 'towards-light',
+    icon: 'wrench',
+    external: true,
+    featured: true,
+    status: 'online',
+  },
 ];
 
 // 构建期校验:group 引用了未声明的分组 id 时直接报错,避免链接静默消失
