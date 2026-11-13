@@ -2,7 +2,7 @@
 
 <p align="center">
   <img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white">
-  <img alt="Node.js 22.23.4+" src="https://img.shields.io/badge/Node.js-22.23.4%2B-25323D?logo=nodedotjs&logoColor=white">
+  <img alt="Node.js 26.x" src="https://img.shields.io/badge/Node.js-26.x-25323D?logo=nodedotjs&logoColor=white">
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
@@ -39,7 +39,7 @@ TowardsLight 将个人内容、渲染规则和页面表达放在三个明确的�
 
 ## 🚀 快速开始
 
-需要 Node.js `22.23.4` 或更高版本（Astro 7 的运行时要求）。在项目根目录运行：
+本项目固定使用 Node.js `26.x`，让本地与 Vercel 部署保持一致。在项目根目录运行：
 
 ```bash
 git clone https://github.com/iceforYuri/TowardsLight.git

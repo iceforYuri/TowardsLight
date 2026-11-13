@@ -2,7 +2,7 @@
 
 <p align="center">
   <img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white">
-  <img alt="Node.js 22.23.4+" src="https://img.shields.io/badge/Node.js-22.23.4%2B-25323D?logo=nodedotjs&logoColor=white">
+  <img alt="Node.js 26.x" src="https://img.shields.io/badge/Node.js-26.x-25323D?logo=nodedotjs&logoColor=white">
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
@@ -39,7 +39,7 @@ The four scenes below show the theme system, long-form reading, responsive compo
 
 ## 🚀 Quick start
 
-Node.js `22.23.4` or newer is required by Astro 7. Run these commands from the project root:
+Node.js `26.x` is pinned for local development and Vercel deployments. Run these commands from the project root:
 
 ```bash
 git clone https://github.com/iceforYuri/TowardsLight.git
