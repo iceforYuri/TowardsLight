@@ -8,13 +8,13 @@
 
 <p align="center"><strong>An Astro publishing system that treats content boundaries, the Markdown compiler, and visual state as parts of one static build.</strong></p>
 
-<p align="center"><a href="https://towardslight.vercel.app/">Demo Site</a> · <a href="https://towardslightcontent.vercel.app/">Personal Site</a> · <a href="https://github.com/iceforYuri/TowardsLight_extension">VS Code Extension</a></p>
+<p align="center"><a href="https://towardslight.vercel.app/">🌐 Demo Site</a> · <a href="https://towardslightcontent.vercel.app/">🏡 Personal Site</a> · <a href="https://github.com/iceforYuri/TowardsLight_extension">🧩 VS Code Extension</a></p>
 
-<p align="center"><a href="./README.md">简体中文</a> · <a href="./README.en.md">English</a></p>
+<p align="center"><a href="./README.md">English</a> · <a href="./README_zh.md">简体中文</a></p>
 
 ![TowardsLight overview: light and dark home pages inside a profile-driven content space](public/poster/01-flat-hero.webp)
 
-## Why TowardsLight
+## ✨ Why TowardsLight
 
 TowardsLight separates personal content, rendering rules, and page presentation into three explicit layers: a profile determines what can be built, the Markdown pipeline determines how content becomes structure, and the interface layer determines how that structure and its state are read. The result is both a personal site template and a static publishing system that can evolve on its own terms.
 
@@ -27,7 +27,7 @@ TowardsLight separates personal content, rendering rules, and page presentation 
 | **Image engineering**     | Article image asset pipeline optimization · WebP derivatives for large site images · missing-image placeholder and warning · cache isolation between profiles                                        |
 | **Search and publishing** | Fuse.js full-text search · shortcut access and result reranking · site prefetch · slow-navigation feedback · RSS, sitemap, share cards, and structured data                                         |
 
-## Interface
+## 🖼️ Interface
 
 The four scenes below show the theme system, long-form reading, responsive composition, and content discovery.
 
@@ -37,7 +37,7 @@ The four scenes below show the theme system, long-form reading, responsive compo
 | **Responsive / Made to Adapt**                                                                                                                  | **Discovery / Explore Your Space**                                                                                                                 |
 | ![Link, code, desktop, and mobile views](public/poster/04-responsive-collage.webp)Desktop · mobile · link directory · code reading                  | ![Chronological archive and tag discovery](public/poster/05-spacious-discovery.webp)Chronological archive · tag aggregation · spatial discovery         |
 
-## Quick start
+## 🚀 Quick start
 
 Node.js `22.23.4` or newer is required by Astro 7. Run these commands from the project root:
 
@@ -57,7 +57,7 @@ npm run preview
 
 The bundled `showcase` profile is used when no profile is specified and there is no valid `personal/site.ts` at the project root.
 
-## Profiles
+## 🗂️ Profiles
 
 Posts, site settings, links, and images form one **profile directory**. The template reads it through `src/profiles/active` and maps site-level images through `public/images`. Resolution order:
 
@@ -67,7 +67,7 @@ Posts, site settings, links, and images form one **profile directory**. The temp
 
 `site.ts`, `links.ts`, and `posts/` are required; `images/` is optional. When the profile changes, the setup script rebuilds the directory links, validates the target, and clears Astro content caches if the target moved. One working copy serves one profile at a time; use a separate `git worktree` when two profiles need to run side by side.
 
-### Create a profile from an empty directory
+### 🧩 Create a profile from an empty directory
 
 ```powershell
 npm run new-profile -- C:/path/to/my-blog-data
@@ -88,7 +88,7 @@ my-blog-data/
 
 Restart a running dev server after switching profiles. Keeping content in a separate repository lets you update the template without merging private posts; any new profile fields introduced by a template update still need to be added to that profile.
 
-## Markdown pipeline
+## ✒️ Markdown pipeline
 
 | Content                     | Current implementation                                                                                                                                                         |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -99,7 +99,7 @@ Restart a running dev server after switching profiles. Keeping content in a sepa
 | **Code**              | Shiki light/dark tokens; original fence language badge; copy control; idempotent soft-navigation binding                                                                       |
 | **Image interaction** | No third-party dependency; click / Enter / Space / ESC / backdrop close; scroll lock; focus return; failed-image protection; `prefers-reduced-motion`                        |
 
-## Write a post
+## ✍️ Write a post
 
 Create a `.md` file in the active profile's `posts/` directory:
 
@@ -128,13 +128,13 @@ Put article images under `posts/image/<post-name>/` and reference them by relati
 
 The home page shows at most three `featured` posts. The recent list excludes only featured posts that are actually displayed, so additional featured posts fall back naturally in chronological order. The bundled “How to write a post on this blog” example covers the full workflow.
 
-## Theme, navigation, and feedback
+## 🎨 Theme, navigation, and feedback
 
 The light and dark themes combine the profile's `themeDefault` with a visitor's stored choice. Color, surface, border, and accent values run through semantic variables. An inline script chooses among `localStorage`, the profile default, and the operating-system preference before first paint. During View Transition navigation, the current theme, direction, and page type move into the next document so it does not reflash into another visual state.
 
 The home wallpaper freezes through a sticky track; JavaScript only calculates the extra travel between the identity block and the main card instead of simulating `fixed` with frame-by-frame scroll events. All static pages use the `load` prefetch strategy and enter the cache after the current page finishes loading. The navigation progress bar appears only after 120ms, keeping quick transitions quiet. The Dock, wallpaper, feathered veil, and search layer occupy explicit z-index and transition layers, and reduced-motion mode keeps the complete layout and interaction path.
 
-## Configure the site
+## ⚙️ Configure the site
 
 | Surface                        | Location and responsibility                                                                                       |
 | ------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
@@ -145,7 +145,7 @@ The home wallpaper freezes through a sticky track; JavaScript only calculates th
 
 For links, `featured` controls the larger card treatment on the links page while `home` controls home-page placement; they are independent. Restart the dev server after changing the active profile. The next startup log identifies profile-link changes and content-cache cleanup.
 
-## Project structure
+## 🧱 Project structure
 
 ```text
 src/
@@ -161,7 +161,7 @@ src/
 
 Template code and profile content share a schema without sharing a version history. Routes organize compiled output, while image assets, link indexes, search results, and RSS are all derived from the active profile.
 
-## Commands
+## 📦 Commands
 
 | Command                                | Purpose                                                                          |
 | -------------------------------------- | -------------------------------------------------------------------------------- |
@@ -175,18 +175,18 @@ Template code and profile content share a schema without sharing a version histo
 | `npm run fonts`                      | Update self-hosted font assets                                                   |
 | `npm run fonts:display`              | Regenerate display-font subsets                                                  |
 
-## Deployment
+## ☁️ Deployment
 
 Run `npm run build` and publish `dist/` to any static host. Put the production URL in the profile's `siteUrl`, or override it with `SITE_URL`; set `SITE_BASE` when deploying under a subpath. Canonical URLs, RSS, sitemap, internal links, and structured data all use the same URL configuration.
 
-## Related project
+## 🧩 Related project
 
 - [TowardsLight_extension](https://github.com/iceforYuri/TowardsLight_extension): a VS Code sidebar for managing posts, categories, links, and site settings, with a real development-server preview.
 
-## Icons and fonts
+## 🔤 Icons and fonts
 
 Icons are emitted as inline Lucide SVGs on demand. Body and UI fonts are self-hosted in `public/fonts/`: Playfair Display, Noto Serif SC, Noto Sans SC, Inter, and JetBrains Mono. The home and section headings use additional subsetted display fonts. Local alias family names and system fallbacks prevent unrelated same-name variable fonts from changing the intended weights.
 
-## License
+## 📄 License
 
 MIT

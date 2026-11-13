@@ -1,4 +1,4 @@
-<h1 align="center">拾光集 · TowardsLight</h1>
+<h1 align="center">TowardsLight</h1>
 
 <p align="center">
   <img alt="Astro 7" src="https://img.shields.io/badge/Astro-7-BC52EE?logo=astro&logoColor=white">
@@ -6,40 +6,40 @@
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-blue">
 </p>
 
-<p align="center"><strong>一套把内容边界、Markdown 编译链与视觉状态纳入同一静态构建流程的 Astro 写作系统。</strong></p>
+<p align="center"><strong>An Astro publishing system that treats content boundaries, the Markdown compiler, and visual state as parts of one static build.</strong></p>
 
-<p align="center"><a href="https://towardslight.vercel.app/">演示网站</a> · <a href="https://towardslightcontent.vercel.app/">个人使用</a> · <a href="https://github.com/iceforYuri/TowardsLight_extension">插件仓库</a></p>
+<p align="center"><a href="https://towardslight.vercel.app/">🌐 Demo Site</a> · <a href="https://towardslightcontent.vercel.app/">🏡 Personal Site</a> · <a href="https://github.com/iceforYuri/TowardsLight_extension">🧩 VS Code Extension</a></p>
 
-<p align="center"><a href="./README.md">简体中文</a> · <a href="./README.en.md">English</a></p>
+<p align="center"><a href="./README.md">English</a> · <a href="./README_zh.md">简体中文</a></p>
 
-![TowardsLight 主视觉：明暗两种首页形态与档案式内容空间](public/poster/01-flat-hero.webp)
+![TowardsLight overview: light and dark home pages inside a profile-driven content space](public/poster/01-flat-hero.webp)
 
-## 为什么选择拾光集
+## ✨ Why TowardsLight
 
-TowardsLight 将个人内容、渲染规则和页面表达放在三个明确的层次里：档案决定“哪些内容可以被构建”，Markdown 管线决定“内容如何成为结构”，界面层决定“结构与状态如何被阅读”。因此，它既是一套个人站点模板，也是一套可以独立演进的静态发布系统。
+TowardsLight separates personal content, rendering rules, and page presentation into three explicit layers: a profile determines what can be built, the Markdown pipeline determines how content becomes structure, and the interface layer determines how that structure and its state are read. The result is both a personal site template and a static publishing system that can evolve on its own terms.
 
-| 方向                    | 能力                                                                                                                   |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **内容与模板**    | 独立内容档案 · 外部目录 / `personal/` / 内置示例自动识别 · 空目录生成站点配置、首篇文章与 CI · 模板和内容独立维护 |
-| **Markdown 渲染** | KaTeX 公式 · 手绘风 Mermaid（明暗双版、图与源码切换） · 提示块 · 图片图注 · 双主题代码高亮与复制                   |
-| **长文阅读**      | 按阅读位置渐进展开的目录 · 当前章节笔触标记 · 移动端完整目录 · 阅读进度 · 图片灯箱与键盘操作                       |
-| **主题与动效**    | 首屏无闪烁的明暗主题 · 软导航状态延续 · Hero 壁纸羽化过渡 · Dock 导航联动动效 · 减少动态效果适配                   |
-| **图片工程**      | 文章图片资产管线优化 · 站点大图 WebP 派生 · 缺失图占位与告警 · 档案切换缓存隔离                                     |
-| **搜索与发布**    | Fuse.js 全文搜索 · 快捷唤起与命中重排 · 全站预取 · 慢导航反馈 · RSS、Sitemap、分享卡片与结构化数据                 |
+| Area                            | Capabilities                                                                                                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Content and template**  | Separate profile directory · external / `personal/` / built-in showcase detection · empty-directory scaffold with site settings, first post, and CI · independent template and content maintenance |
+| **Markdown rendering**    | KaTeX math · hand-drawn Mermaid with light/dark variants and a diagram/source toggle · callouts · image captions · dual-theme code highlighting and copy                                            |
+| **Long-form reading**     | Reading-position progressive outline · current-section stroke · full mobile outline · reading progress · image lightbox with keyboard controls                                                      |
+| **Theme and motion**      | Flash-free light/dark themes · state continuity across soft navigation · feathered hero wallpaper · linked Dock navigation motion · reduced-motion support                                          |
+| **Image engineering**     | Article image asset pipeline optimization · WebP derivatives for large site images · missing-image placeholder and warning · cache isolation between profiles                                        |
+| **Search and publishing** | Fuse.js full-text search · shortcut access and result reranking · site prefetch · slow-navigation feedback · RSS, sitemap, share cards, and structured data                                         |
 
-## 界面
+## 🖼️ Interface
 
-以下四张场景图分别展示主题系统、长文阅读、响应式重排与内容发现。
+The four scenes below show the theme system, long-form reading, responsive composition, and content discovery.
 
-| 主题系统 / Light + Dark                                                                                         | 长文阅读 / Room to Read                                                                                          |
-| :-------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------- |
-| ![同一内容语言下的明亮与深色首页](public/poster/02-flat-light-dark.webp)语义令牌 · 明暗双主题 · 统一构图      | ![文章排印、手绘图与编辑器写作流程](public/poster/03-editorial-collage.webp)文章排印 · 手绘图解 · 编辑器工作流 |
-| **响应式重排 / Made to Adapt**                                                                            | **内容发现 / Explore Your Space**                                                                          |
-| ![桌面、移动端、链接与代码视图](public/poster/04-responsive-collage.webp)桌面 · 移动端 · 链接目录 · 代码阅读 | ![按年份归档与标签发现的界面](public/poster/05-spacious-discovery.webp)年份归档 · 标签聚合 · 空间化内容探索    |
+| Theme / Light + Dark                                                                                                                                  | Reading / Room to Read                                                                                                                                   |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ![Light and dark home pages with one visual language](public/poster/02-flat-light-dark.webp)Semantic tokens · light/dark themes · shared composition | ![Article typography, diagrams, and editor workflow](public/poster/03-editorial-collage.webp)Article typography · hand-drawn diagrams · editor workflow |
+| **Responsive / Made to Adapt**                                                                                                                  | **Discovery / Explore Your Space**                                                                                                                 |
+| ![Link, code, desktop, and mobile views](public/poster/04-responsive-collage.webp)Desktop · mobile · link directory · code reading                  | ![Chronological archive and tag discovery](public/poster/05-spacious-discovery.webp)Chronological archive · tag aggregation · spatial discovery         |
 
-## 快速开始
+## 🚀 Quick start
 
-需要 Node.js `22.23.4` 或更高版本（Astro 7 的运行时要求）。在项目根目录运行：
+Node.js `22.23.4` or newer is required by Astro 7. Run these commands from the project root:
 
 ```bash
 git clone https://github.com/iceforYuri/TowardsLight.git
@@ -48,26 +48,26 @@ npm install
 npm run dev       # http://localhost:4321
 ```
 
-生产构建会先做类型检查，再将静态站点输出到 `dist/`：
+A production build performs type checking first, then writes the static site to `dist/`:
 
 ```bash
 npm run build
 npm run preview
 ```
 
-没有显式指定档案，且根目录不存在有效的 `personal/site.ts` 时，项目会使用内置 `showcase` 示例档案。
+The bundled `showcase` profile is used when no profile is specified and there is no valid `personal/site.ts` at the project root.
 
-## 档案机制
+## 🗂️ Profiles
 
-文章、站点配置、链接和图片共同组成一个**档案目录**。模板通过 `src/profiles/active` 读取当前档案，并通过 `public/images` 将站点级图片映射到同一来源。解析顺序为：
+Posts, site settings, links, and images form one **profile directory**. The template reads it through `src/profiles/active` and maps site-level images through `public/images`. Resolution order:
 
-1. `SITE_PROFILE_DIR` 环境变量显式指定的目录；
-2. 项目根目录的 `personal/`，前提是其中存在 `site.ts`；
-3. `src/profiles/showcase/` 内置示例。
+1. The directory specified by `SITE_PROFILE_DIR`;
+2. Root-level `personal/`, if it contains `site.ts`;
+3. The bundled `src/profiles/showcase/` example.
 
-`site.ts`、`links.ts` 和 `posts/` 是必需项，`images/` 可选。切换档案时，脚本会重建指向、校验目标目录，并在指向发生变化时清理 Astro 内容缓存。一个工作副本同一时间服务一个档案；需要并排比较两套内容时，应为第二套档案建立独立的 `git worktree`。
+`site.ts`, `links.ts`, and `posts/` are required; `images/` is optional. When the profile changes, the setup script rebuilds the directory links, validates the target, and clears Astro content caches if the target moved. One working copy serves one profile at a time; use a separate `git worktree` when two profiles need to run side by side.
 
-### 从空目录创建档案
+### 🧩 Create a profile from an empty directory
 
 ```powershell
 npm run new-profile -- C:/path/to/my-blog-data
@@ -75,118 +75,118 @@ $env:SITE_PROFILE_DIR = 'C:/path/to/my-blog-data'
 npm run dev
 ```
 
-`new-profile` 会在目标为空时生成一套可启动的档案骨架，包括 `site.ts`、`links.ts`、`posts/`、`images/`、第一篇草稿以及基于模板仓库的构建校验工作流。若目标为空目录之外没有额外设置，放在项目根目录的 `personal/` 会被自动命中，并可用独立 Git 仓库维护。
+When the target is empty, `new-profile` creates a runnable profile with `site.ts`, `links.ts`, `posts/`, `images/`, a first draft, and a build-validation workflow based on the template repository. A profile placed at the project's `personal/` path is detected automatically and can be maintained as its own Git repository.
 
 ```text
 my-blog-data/
-├── site.ts      # 站名、作者、Hero、默认主题、页面文案与分类配置
-├── links.ts     # 链接分组、色调、卡片形态、状态与首页展示规则
-├── posts/       # Markdown 文章
-│   └── image/   # 文章级图片，以相对路径引用
-└── images/      # 可选：头像、Hero、页面背景与共用封面，以 /images/... 引用
+├── site.ts      # site name, author, hero, default theme, page copy, category settings
+├── links.ts     # link groups, tones, card styles, status, and home-page placement
+├── posts/       # Markdown posts
+│   └── image/   # post-level images referenced by relative path
+└── images/      # optional: avatar, hero, page backgrounds, shared covers via /images/...
 ```
 
-档案目录切换后请重启正在运行的 dev server。内容仓库与模板仓库分离时，升级模板无需合并私人文章；由档案新增的配置字段仍应在模板升级后及时补齐。
+Restart a running dev server after switching profiles. Keeping content in a separate repository lets you update the template without merging private posts; any new profile fields introduced by a template update still need to be added to that profile.
 
-## Markdown 渲染管线
+## ✒️ Markdown pipeline
 
-| 内容类型               | 当前实现                                                                                                                                           |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **数学公式**     | `remark-math` 解析；`KaTeX 0.16.47` 构建期 HTML；零公式运行时；版本锁定上下标与重叠规则                                                        |
-| **Mermaid 图表** | Playwright Chromium 构建期渲染；串行明暗双版 SVG；`handDrawn` 手绘风格；固定 `handDrawnSeed`；图与源码切换；语法错误、浏览器不可用时回退代码块 |
-| **提示块**       | `NOTE` / `TIP` / `IMPORTANT` / `WARNING` / `CAUTION` 五类语义；自定义标题；`+` / `-` 控制原生 `<details>` 初始状态                 |
-| **正文图片**     | Astro 资产管线；`alt` 自动图注；remark + Vite 双层哨兵；缺失图 SVG 占位；原路径告警                                                              |
-| **代码块**       | Shiki 明暗双主题 token；原始 fence 语言徽章；复制按钮；软导航幂等绑定                                                                              |
-| **图片交互**     | 零第三方依赖；点击 / Enter / Space / ESC / 背板关闭；滚动锁；焦点归还；失败图保护；`prefers-reduced-motion`                                      |
+| Content                     | Current implementation                                                                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Math**              | `remark-math` parsing; build-time `KaTeX 0.16.47` HTML; no formula runtime; pinned superscript, subscript, and overlap rules                                               |
+| **Mermaid**           | Build-time Playwright Chromium rendering; serial light/dark SVGs; `handDrawn` style; fixed `handDrawnSeed`; diagram/source toggle; syntax and unavailable-browser fallback |
+| **Callouts**          | `NOTE` / `TIP` / `IMPORTANT` / `WARNING` / `CAUTION`; custom titles; `+` / `-` native `<details>` initial state                                                |
+| **Article images**    | Astro asset pipeline; `alt`-derived captions; two-layer remark + Vite guard; missing-image SVG placeholder; original-path warning                                            |
+| **Code**              | Shiki light/dark tokens; original fence language badge; copy control; idempotent soft-navigation binding                                                                       |
+| **Image interaction** | No third-party dependency; click / Enter / Space / ESC / backdrop close; scroll lock; focus return; failed-image protection; `prefers-reduced-motion`                        |
 
-## 写一篇文章
+## ✍️ Write a post
 
-在当前档案的 `posts/` 下新建 `.md` 文件：
+Create a `.md` file in the active profile's `posts/` directory:
 
 ```yaml
 ---
-title: 文章标题
-description: 文章摘要
+title: Post title
+description: A short summary
 pubDate: 2026-09-05
-updatedDate: 2026-09-06         # 可选
-category: 前端
-tags: [Astro, 博客]
-draft: false                    # true 时不进入公开构建和索引
-cover: /images/covers/wide.svg  # 可选；也可使用 image/my-post/cover.jpg
-coverAlt: 封面描述               # 可选
-coverPosition: center 30%        # 可选，调整裁切焦点
-featured: false                 # 可选，首页精选文章
+updatedDate: 2026-09-06         # optional
+category: Frontend
+tags: [Astro, Blogging]
+draft: false                    # true keeps the post out of public builds and indexes
+cover: /images/covers/wide.svg  # optional; image/my-post/cover.jpg also works
+coverAlt: Cover description     # optional
+coverPosition: center 30%       # optional crop focus
+featured: false                 # optional home-page featured post
 ---
 ```
 
-文章图片建议放在 `posts/image/<文章名>/` 下，并以相对路径引用。提示块在引用块首行写入类型标记：
+Put article images under `posts/image/<post-name>/` and reference them by relative path. Start a callout block with a type marker:
 
 ```md
-> [!NOTE]+ 自定义标题
-> 这段内容默认展开。
+> [!NOTE]+ Optional custom title
+> This content is expanded by default.
 ```
 
-首页最多展示三篇 `featured` 文章；近期文章只排除实际展出的精选，因此超出上限的精选仍会按时间自然回落。完整写法见内置示例文章《如何在这个博客上写一篇文章》。
+The home page shows at most three `featured` posts. The recent list excludes only featured posts that are actually displayed, so additional featured posts fall back naturally in chronological order. The bundled “How to write a post on this blog” example covers the full workflow.
 
-## 主题、导航与反馈
+## 🎨 Theme, navigation, and feedback
 
-明暗主题由档案中的 `themeDefault` 与访客的本地选择共同决定，颜色、表面、边框和强调色统一通过语义变量管理。首次绘制前的内联脚本会在 `localStorage`、档案默认值和系统配色之间完成选择；View Transition 软导航时，当前主题、导航方向和页面类型会复制到新文档，避免刷新成另一套视觉状态。
+The light and dark themes combine the profile's `themeDefault` with a visitor's stored choice. Color, surface, border, and accent values run through semantic variables. An inline script chooses among `localStorage`, the profile default, and the operating-system preference before first paint. During View Transition navigation, the current theme, direction, and page type move into the next document so it does not reflash into another visual state.
 
-首页的壁纸冻结由 sticky 轨道驱动，脚本只计算身份组与主卡片之间需要补充的行程，不通过逐帧滚动事件模拟 fixed。页面预取采用 `load` 策略，所有静态页面在加载完成后进入缓存；只有导航超过 120ms 时才显示进度，避免快速切换时闪烁。Dock、壁纸、羽化幕布和搜索层分别处于明确的 z-index 与转场层中，动效关闭后仍保留完整的布局与操作路径。
+The home wallpaper freezes through a sticky track; JavaScript only calculates the extra travel between the identity block and the main card instead of simulating `fixed` with frame-by-frame scroll events. All static pages use the `load` prefetch strategy and enter the cache after the current page finishes loading. The navigation progress bar appears only after 120ms, keeping quick transitions quiet. The Dock, wallpaper, feathered veil, and search layer occupy explicit z-index and transition layers, and reduced-motion mode keeps the complete layout and interaction path.
 
-## 配置站点
+## ⚙️ Configure the site
 
-| 配置面               | 位置与职责                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------ |
-| **内容身份**   | 档案 `site.ts`；站名、作者、Hero、页面文案、默认主题、当前状态与分类呈现                 |
-| **链接空间**   | 档案 `links.ts`；分组与色调、链接状态、链接页卡片、首页“常用去处”（最多三项）          |
-| **视觉令牌**   | `src/styles/global.css`；明暗主题画布、表面、文字、边框、强调色、阴影与排版尺度          |
-| **构建与部署** | 档案 `site.ts` 的 `siteUrl`；`SITE_URL` / `SITE_BASE` 环境变量覆盖；子路径感知链接 |
+| Surface                        | Location and responsibility                                                                                       |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| **Content identity**     | Profile `site.ts`; site name, author, hero, page copy, default theme, current status, and category presentation |
+| **Link space**           | Profile `links.ts`; groups and tones, link status, links-page cards, and up to three home-page destinations     |
+| **Visual tokens**        | `src/styles/global.css`; light/dark canvas, surfaces, text, borders, accents, shadows, and type scale           |
+| **Build and deployment** | `siteUrl` in profile `site.ts`; `SITE_URL` / `SITE_BASE` environment overrides; base-aware links          |
 
-`featured` 在链接页控制大卡片形态，`home` 控制首页展示；二者相互独立。修改当前档案后重新启动 dev server，指向变化及内容缓存清理会在下一次启动日志中明确显示。
+For links, `featured` controls the larger card treatment on the links page while `home` controls home-page placement; they are independent. Restart the dev server after changing the active profile. The next startup log identifies profile-link changes and content-cache cleanup.
 
-## 项目结构
+## 🧱 Project structure
 
 ```text
 src/
-├── components/       页面组件、目录、灯箱、搜索与主题控件
-├── layouts/          页面壳层、主题初始化与软导航状态
-├── pages/            首页、文章、归档、标签、分类、链接与内容索引
-├── plugins/          Markdown、图片、图注与提示块处理器
-├── profiles/         当前档案指向与内置 showcase
-├── scripts/          图、代码复制与导航等渐进增强
-├── styles/           语义令牌、排版与 View Transition 样式
-└── utils/            内容排序、URL、图片派生与阅读统计
+├── components/       page components, outline, lightbox, search, and theme controls
+├── layouts/          page shell, theme initialization, and soft-navigation state
+├── pages/            home, posts, archive, tags, categories, links, and content indexes
+├── plugins/          Markdown, image, caption, and callout processors
+├── profiles/         current-profile links and bundled showcase
+├── scripts/          image, code-copy, and navigation enhancements
+├── styles/           semantic tokens, typography, and View Transition styles
+└── utils/            post ordering, URL, image derivatives, and reading statistics
 ```
 
-模板代码与档案内容遵循同一 Schema，但不共享版本历史。页面路由只负责组织编译结果，内容图片、链接索引、搜索结果与 RSS 均由当前档案派生。
+Template code and profile content share a schema without sharing a version history. Routes organize compiled output, while image assets, link indexes, search results, and RSS are all derived from the active profile.
 
-## 命令
+## 📦 Commands
 
-| 命令 | 作用 |
-| --------------------------------- | ---------------------------------------------- |
-| `npm run dev` | 解析当前档案 · 生成图片派生 · 启动开发服务器 |
-| `npm run build` | `astro check` · 生产构建 · 输出 `dist/` |
-| `npm run preview` | 本地预览生产构建 |
-| `npm test` | 图片哨兵测试 · 提示块测试 |
-| `npm run check` | Astro 检查 · TypeScript 检查 |
-| `npm run frontmatter:check` | 检查当前档案文章元数据 |
-| `npm run new-profile -- <目录>` | 空目录档案脚手架 · 首篇文章 · 构建校验工作流 |
-| `npm run fonts` | 更新自托管字体资源 |
-| `npm run fonts:display` | 重新生成标题艺术体子集 |
+| Command                                | Purpose                                                                          |
+| -------------------------------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`                        | Resolve active profile · generate image derivatives · start development server |
+| `npm run build`                      | `astro check` · production build · output `dist/`                          |
+| `npm run preview`                    | Preview production build locally                                                 |
+| `npm test`                           | Image-guard tests · callout tests                                               |
+| `npm run check`                      | Astro check · TypeScript check                                                  |
+| `npm run frontmatter:check`          | Validate active-profile post metadata                                            |
+| `npm run new-profile -- <directory>` | Empty-directory profile scaffold · first post · build-validation workflow      |
+| `npm run fonts`                      | Update self-hosted font assets                                                   |
+| `npm run fonts:display`              | Regenerate display-font subsets                                                  |
 
-## 部署
+## ☁️ Deployment
 
-执行 `npm run build`，将 `dist/` 发布到任意静态托管平台。正式域名写入档案的 `siteUrl`，或通过 `SITE_URL` 覆盖；部署在子路径时设置 `SITE_BASE`。canonical、RSS、sitemap、页面内部链接与结构化数据会使用同一组 URL 信息。
+Run `npm run build` and publish `dist/` to any static host. Put the production URL in the profile's `siteUrl`, or override it with `SITE_URL`; set `SITE_BASE` when deploying under a subpath. Canonical URLs, RSS, sitemap, internal links, and structured data all use the same URL configuration.
 
-## 相关项目
+## 🧩 Related project
 
-- [TowardsLight_extension](https://github.com/iceforYuri/TowardsLight_extension)：配套 VS Code 扩展，在侧边栏管理文章、分类、链接与站点配置，并从编辑器启动真实开发服务器预览。
+- [TowardsLight_extension](https://github.com/iceforYuri/TowardsLight_extension): a VS Code sidebar for managing posts, categories, links, and site settings, with a real development-server preview.
 
-## 图标与字体
+## 🔤 Icons and fonts
 
-图标来自按需输出的内联 Lucide SVG。正文与界面字体自托管于 `public/fonts/`，包括 Playfair Display、Noto Serif SC、Noto Sans SC、Inter 与 JetBrains Mono；首页与章节标题另使用子集化艺术字体。字体使用本地别名族名和系统回退，避免同名可变字体改变既定字重。
+Icons are emitted as inline Lucide SVGs on demand. Body and UI fonts are self-hosted in `public/fonts/`: Playfair Display, Noto Serif SC, Noto Sans SC, Inter, and JetBrains Mono. The home and section headings use additional subsetted display fonts. Local alias family names and system fallbacks prevent unrelated same-name variable fonts from changing the intended weights.
 
-## License
+## 📄 License
 
 MIT

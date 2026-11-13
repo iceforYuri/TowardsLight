@@ -31,8 +31,8 @@ export const site = {
     { label: 'Links', href: '/links', icon: 'link' },
   ],
   socialLinks: [
-    { label: 'GitHub', href: 'https://github.com', icon: 'github' },
-    { label: 'template', href: 'https://github.com/iceforYuri/TowardsLight', icon: 'database' },
+    { label: 'GitHub', href: 'https://github.com/iceforYuri/TowardsLight', icon: 'github' },
+    { label: 'extension', href: 'https://github.com/iceforYuri/TowardsLight_extension', icon: 'puzzle' },
     { label: 'RSS', href: '/rss.xml', icon: 'rss' },
   ],
   homeHero: {
