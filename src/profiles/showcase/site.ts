@@ -31,10 +31,10 @@ export const site = {
     { label: 'Links', href: '/links', icon: 'link' },
   ],
   socialLinks: [
-    { label: 'GitHub', href: 'https://github.com/iceforYuri/TowardsLight', icon: 'github' },
-    { label: 'extension', href: 'https://github.com/iceforYuri/TowardsLight_extension', icon: 'puzzle' },
-    { label: 'RSS', href: '/rss.xml', icon: 'rss' },
-  ],
+          { label: 'GitHub', href: 'https://github.com/iceforYuri', icon: 'github' },
+          { label: 'Extension', href: 'https://github.com/iceforYuri/TowardsLight_extension', icon: 'puzzle' },
+          { label: 'Template', href: 'https://github.com/iceforYuri/TowardsLight', icon: 'database' }
+        ],
   homeHero: {
     greeting: '拾光集',
     titleEn: 'TowardsLight',
