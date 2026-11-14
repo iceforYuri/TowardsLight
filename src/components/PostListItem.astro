@@ -101,6 +101,12 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
   /* 标题链接:文字本身可点，点击范围通过 ::after 拉伸到整行 */
   .title-link {
     color: inherit;
+    padding-bottom: 2px;
+    background-image: linear-gradient(var(--color-accent-text), var(--color-accent-text));
+    background-position: 0% 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    transition: background-size 0.25s cubic-bezier(0.55, 0.06, 0.68, 0.19);
   }
 
   .title-link::after {
@@ -112,6 +118,13 @@ const { title, description, pubDate, updatedDate, category, tags } = post.data;
 
   .post-item-link:hover .post-title {
     color: var(--color-accent-text);
+  }
+
+  /* 悬停横线:贴文字实际宽度,从左向右长出(先快后慢);离开反向收回(先慢后快)。多行标题每行各一条、同时长出 */
+  .post-item-link:hover .title-link,
+  .title-link:focus-visible {
+    background-size: 100% 2px;
+    transition: background-size 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
 
   .post-desc {
