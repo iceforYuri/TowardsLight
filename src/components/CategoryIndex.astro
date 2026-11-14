@@ -35,7 +35,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
           <h2 class="card-name font-display">{name}</h2>
           <p class="card-desc">{meta.description}</p>
           <p class="card-latest font-mono">最近更新 {formatDate(posts[0].data.pubDate)}</p>
-          <svg class="card-trace" aria-hidden="true"><rect /></svg>
+          <svg class="card-trace" aria-hidden="true"><path pathLength="100" /></svg>
         </a>
       );
     })
@@ -71,7 +71,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
   }
 
   /* 环绕描边:贴边框路径画一圈,hover 从左上角顺时针长出(先快后慢),离开反向收回(先慢后快)。 */
-  /* 描边色跟随分类色调(默认褐红;青绿/钢蓝同上)。周长由 card-trace.ts 实测写入 --trace-len */
+  /* 描边色跟随分类色调(默认褐红;青绿/钢蓝同上)。路径由 card-trace.ts 从顶部中心生成,使用 pathLength=100 归一化动画 */
   .card-trace {
     position: absolute;
     inset: -1px;
@@ -80,30 +80,25 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
     pointer-events: none;
   }
 
-  .card-trace rect {
-    x: 0.5px;
-    y: 0.5px;
-    width: calc(100% - 1px);
-    height: calc(100% - 1px);
-    rx: 15.5px;
+  .card-trace path {
     fill: none;
     stroke: var(--ct, var(--color-accent));
     stroke-width: 1.5px;
     stroke-linecap: round;
-    stroke-dasharray: var(--trace-len, none);
-    stroke-dashoffset: var(--trace-len, 0);
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
     opacity: 0;
     transition:
       stroke-dashoffset 0.5s cubic-bezier(0.55, 0.06, 0.68, 0.19),
       opacity 0s;
   }
 
-  .card-trace[data-trace-ready] rect {
+  .card-trace[data-trace-ready] path {
     opacity: 1;
   }
 
-  .category-card:hover .card-trace rect,
-  .category-card:focus-visible .card-trace rect {
+  .category-card:hover .card-trace path,
+  .category-card:focus-visible .card-trace path {
     stroke-dashoffset: 0;
     transition:
       stroke-dashoffset 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
