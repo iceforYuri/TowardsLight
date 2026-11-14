@@ -146,7 +146,10 @@ const popDelay = (name: string) => {
     align-items: baseline;
     gap: 7px;
     padding: 8px 15px;
-    background: var(--color-surface-raised);
+    /* 柔光玻璃:半透明底 + 背景模糊,热度色相只留在边框与图标上 */
+    background: color-mix(in oklab, var(--color-surface-raised) 62%, transparent);
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    backdrop-filter: blur(10px) saturate(1.2);
     /* 热度色相:靛蓝 → 青 → 绿 → 黄 → 橙 → 褐红(longer hue 绕色轮长路),
        明度彩度不变保持同一色系;图标实色,边框 48% 混合 */
     --heat-hue: color-mix(
@@ -168,8 +171,9 @@ const popDelay = (name: string) => {
   }
 
   .tag-chip:hover {
-    border-color: var(--color-accent);
-    background: var(--color-accent-soft);
+    /* 同色淡底:吃自己的热度色,冷标签泛淡蓝、热标签泛淡珊瑚,不再统一跳珊瑚 */
+    border-color: var(--heat-hue);
+    background: color-mix(in oklab, var(--heat-hue) 14%, transparent);
     transform: translateY(-1px);
   }
 
@@ -225,6 +229,8 @@ const popDelay = (name: string) => {
     border: none;
     border-bottom: 1px solid var(--color-border);
     background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     padding: 13px 6px;
   }
 
