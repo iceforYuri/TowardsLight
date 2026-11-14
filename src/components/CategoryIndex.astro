@@ -35,6 +35,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
           <h2 class="card-name font-display">{name}</h2>
           <p class="card-desc">{meta.description}</p>
           <p class="card-latest font-mono">最近更新 {formatDate(posts[0].data.pubDate)}</p>
+          <svg class="card-trace" aria-hidden="true"><rect /></svg>
         </a>
       );
     })
@@ -49,6 +50,7 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
   }
 
   .category-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: 22px;
@@ -63,11 +65,49 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
   }
 
   .category-card:hover {
-    /* hover 边框跟随分类色调(默认褐红;青绿/钢蓝见下) */
-    border-color: var(--ct, var(--color-accent));
     box-shadow: var(--shadow-raised);
     transform: translateY(-2px);
     color: var(--color-text);
+  }
+
+  /* 环绕描边:贴边框路径画一圈,hover 从左上角顺时针长出(先快后慢),离开反向收回(先慢后快)。 */
+  /* 描边色跟随分类色调(默认褐红;青绿/钢蓝同上)。周长由 card-trace.ts 实测写入 --trace-len */
+  .card-trace {
+    position: absolute;
+    inset: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    pointer-events: none;
+  }
+
+  .card-trace rect {
+    x: 0.5px;
+    y: 0.5px;
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
+    rx: 15.5px;
+    fill: none;
+    stroke: var(--ct, var(--color-accent));
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-dasharray: var(--trace-len, none);
+    stroke-dashoffset: var(--trace-len, 0);
+    opacity: 0;
+    transition:
+      stroke-dashoffset 0.5s cubic-bezier(0.55, 0.06, 0.68, 0.19),
+      opacity 0s;
+  }
+
+  .card-trace[data-trace-ready] rect {
+    opacity: 1;
+  }
+
+  .category-card:hover .card-trace rect,
+  .category-card:focus-visible .card-trace rect {
+    stroke-dashoffset: 0;
+    transition:
+      stroke-dashoffset 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+      opacity 0s;
   }
 
   .category-card[data-tone='contrast'] {
@@ -156,6 +196,8 @@ const metaOf = (name: string) => site.categoryMeta[name] ?? fallback;
 </style>
 
 <script>
+  import '../scripts/card-trace';
+
   /* 入场门控:astro:page-load 在转场动画开始时就触发(updateCallbackDone),
      转场快照会盖住新页面的入场动画;延迟 420ms(转场时长上限)再加 .ready */
   function initCategoryIndex() {

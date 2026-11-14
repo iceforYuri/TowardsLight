@@ -30,10 +30,12 @@ const { link, tone } = Astro.props;
   <h3 class="card-title">{link.title}</h3>
   <p class="card-desc">{link.description}</p>
   {link.status && <span class="card-status font-mono">{link.status}</span>}
+  <svg class="card-trace" aria-hidden="true"><rect /></svg>
 </a>
 
 <style>
   .tech-link-card {
+    position: relative;
     display: flex;
     flex-direction: column;
     padding: 20px;
@@ -49,11 +51,49 @@ const { link, tone } = Astro.props;
   }
 
   .tech-link-card:hover {
-    /* 中性卡的 hover 边框也是中性灰;组色卡由 [data-tone] 覆盖 */
-    border-color: color-mix(in oklab, var(--color-muted) 45%, var(--color-border));
     box-shadow: var(--shadow-raised);
     transform: translateY(-2px);
     color: var(--color-text);
+  }
+
+  /* 环绕描边:贴边框路径画一圈,hover 从左上角顺时针长出(先快后慢),离开反向收回(先慢后快)。 */
+  /* 颜色跟随卡片身份:组色卡用 --gt,中性卡用灰色兜底。周长由 card-trace.ts 实测写入 --trace-len */
+  .card-trace {
+    position: absolute;
+    inset: -1px;
+    width: calc(100% + 2px);
+    height: calc(100% + 2px);
+    pointer-events: none;
+  }
+
+  .card-trace rect {
+    x: 0.5px;
+    y: 0.5px;
+    width: calc(100% - 1px);
+    height: calc(100% - 1px);
+    rx: 15.5px;
+    fill: none;
+    stroke: var(--gt, color-mix(in oklab, var(--color-muted) 70%, var(--color-border)));
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    stroke-dasharray: var(--trace-len, none);
+    stroke-dashoffset: var(--trace-len, 0);
+    opacity: 0;
+    transition:
+      stroke-dashoffset 0.5s cubic-bezier(0.55, 0.06, 0.68, 0.19),
+      opacity 0s;
+  }
+
+  .card-trace[data-trace-ready] rect {
+    opacity: 1;
+  }
+
+  .tech-link-card:hover .card-trace rect,
+  .tech-link-card:focus-visible .card-trace rect {
+    stroke-dashoffset: 0;
+    transition:
+      stroke-dashoffset 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
+      opacity 0s;
   }
 
   .card-top {
@@ -132,9 +172,6 @@ const { link, tone } = Astro.props;
   .tech-link-card[data-tone] {
     background: var(--gt-soft);
   }
-  .tech-link-card[data-tone]:hover {
-    border-color: var(--gt);
-  }
   .tech-link-card[data-tone] .card-icon {
     color: var(--gt);
   }
@@ -142,3 +179,7 @@ const { link, tone } = Astro.props;
     color: var(--gt);
   }
 </style>
+
+<script>
+  import '../scripts/card-trace';
+</script>
